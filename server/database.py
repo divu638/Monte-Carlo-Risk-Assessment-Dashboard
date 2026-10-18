@@ -36,7 +36,7 @@ LOCAL_DB_FILE = os.path.join(BASE_DIR, 'riskguard.db')
 load_dotenv(ENV_FILE)
 
 SUPABASE_URL = os.getenv('SUPABASE_URL', '').strip()
-SUPABASE_KEY = os.getenv('SUPABASE_KEY', '').strip()
+SUPABASE_KEY = (os.getenv('SUPABASE_KEY') or os.getenv('SUPABASE_PUBLISHABLE_KEY') or os.getenv('SUPABASE_ANON_KEY') or os.getenv('SUPABASE_SECRET_KEY') or '').strip()
 
 _supabase_client = None
 _using_supabase = False
@@ -54,7 +54,7 @@ def get_supabase_client():
     # Reload env in case it was updated
     load_dotenv(ENV_FILE, override=True)
     SUPABASE_URL = os.getenv('SUPABASE_URL', '').strip()
-    SUPABASE_KEY = os.getenv('SUPABASE_KEY', '').strip()
+    SUPABASE_KEY = (os.getenv('SUPABASE_KEY') or os.getenv('SUPABASE_PUBLISHABLE_KEY') or os.getenv('SUPABASE_ANON_KEY') or os.getenv('SUPABASE_SECRET_KEY') or '').strip()
 
     if not SUPABASE_URL or not SUPABASE_KEY:
         return None
