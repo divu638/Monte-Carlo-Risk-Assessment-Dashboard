@@ -4393,6 +4393,225 @@ function purgeSimCache() {
     showToast('Simulation transient cache purged. Memory reclaimed.', 'info');
 }
 
+// ─── AI Risk Mitigation Resolution Engine (ISO 31000) ────────────────────────
+
+/**
+ * Client-side synthesis fallback for intelligent 3-tier enterprise resolution
+ */
+function generateAIMitigationPlanClient(riskData) {
+    const name = (riskData.name || 'Corporate Threat').trim();
+    const cat = (riskData.category || 'Operational').trim();
+    const l = parseInt(riskData.likelihood || 3);
+    const i = parseInt(riskData.impact || 3);
+    const score = l * i;
+    const fin = parseFloat(riskData.financial_impact || 0);
+    const vel = (riskData.velocity || 'Medium').trim();
+    const desc = (riskData.description || '').trim();
+
+    const finText = fin >= 1000000 ? `$${(fin / 1000000).toFixed(2)}M` : (fin > 0 ? `$${Math.round(fin / 1000)}k` : 'material');
+    const lower = (name + " " + desc).toLowerCase();
+
+    let t1 = "", t2 = "", t3 = "";
+
+    if (cat === 'Cybersecurity' || lower.includes('cyber') || lower.includes('ransom') || lower.includes('breach') || lower.includes('zero-day') || lower.includes('data')) {
+        t1 = "Immediately isolate impacted network perimeters, revoke compromised API credentials, and execute emergency EDR telemetry lockdown.";
+        t2 = "Enforce Zero-Trust architecture across all endpoints, mandate FIDO2 hardware MFA keys, and verify air-gapped immutable backups.";
+        t3 = "Conduct quarterly external red-team penetration tests and maintain an active $5.00M cyber-liability insurance indemnity pool.";
+    } else if (cat === 'Financial' || lower.includes('fx') || lower.includes('currency') || lower.includes('liquidity') || lower.includes('credit') || lower.includes('cash') || lower.includes('inflation')) {
+        t1 = `Activate rolling 90-day FX forward contracts and interest-rate collar corridors to cap ${finText} monetary exposure.`;
+        t2 = "Establish dual-signoff revolving credit facility with top-tier banking syndicate and institute dynamic counterparty credit limits.";
+        t3 = "Run automated bi-weekly stress simulations under +250 bps macroeconomic rate shock with real-time treasury telemetry alerts.";
+    } else if (cat === 'Operational' || lower.includes('supply') || lower.includes('vendor') || lower.includes('semiconductor') || lower.includes('logistics') || lower.includes('warehouse')) {
+        t1 = "Activate pre-vetted secondary Tier-1 suppliers in alternate geographical hubs to secure 60-day buffer safety stock.";
+        t2 = "Implement real-time IoT shipment route tracking and negotiate binding SLA breach penalty clauses across master service agreements.";
+        t3 = "Perform biannual supply-chain resilience audits and establish an agile alternate Bill of Materials (BOM) substitution protocol.";
+    } else if (cat === 'Compliance' || lower.includes('legal') || lower.includes('privacy') || lower.includes('gdpr') || lower.includes('regulat') || lower.includes('statutory')) {
+        t1 = "Execute emergency legal hold, map cross-border personal data flows, and pause non-compliant data replication pipelines.";
+        t2 = "Implement ISO 27701 privacy controls, update standard contractual clauses (SCCs), and roll out automated consent governance.";
+        t3 = "Mandate semi-annual third-party compliance reviews and institutionalize formal CRO signoff on regulatory disclosures.";
+    } else { // Strategic
+        t1 = "Convene executive risk committee chaired by CRO & Division VP to re-calibrate resource allocation within 14 days.";
+        t2 = "Diversify core revenue streams across non-correlated product categories and launch rapid agile customer-validation pilots.";
+        t3 = "Integrate competitive horizon threat scanning into quarterly Board of Directors governance review sessions.";
+    }
+
+    if (score >= 16 || vel === 'Fast') {
+        t1 = `[HIGH PRIORITY ESCALATION] ${t1} Submit immediate incident briefing to Board of Directors within 24 hours.`;
+    }
+
+    return `1. Immediate Containment (0–30 Days): ${t1}\n2. Preventive Engineering (30–90 Days): ${t2}\n3. Continuous Governance (Ongoing): ${t3}`;
+}
+
+/**
+ * Generate AI mitigation suggestion for Create/Edit Modal
+ */
+async function generateAIMitigationForForm() {
+    const btn = document.getElementById('btn-form-ai-suggest');
+    const nameInput = document.getElementById('form-name');
+    const textarea = document.getElementById('form-mitigation');
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    if (!name) {
+        showToast('Please enter a Risk Name first so AI can tailor the solution!', 'warning');
+        if (nameInput) nameInput.focus();
+        return;
+    }
+
+    const payload = {
+        name: name,
+        category: document.getElementById('form-category')?.value || 'Operational',
+        likelihood: parseInt(document.getElementById('form-likelihood')?.value || 3),
+        impact: parseInt(document.getElementById('form-impact')?.value || 3),
+        financial_impact: parseFloat(document.getElementById('form-financial')?.value || 500000),
+        velocity: document.getElementById('form-velocity')?.value || 'Medium',
+        description: document.getElementById('form-description')?.value || ''
+    };
+
+    if (btn) {
+        btn.classList.add('generating');
+        btn.innerHTML = `<span class="ai-sparkle">⏳</span><span>Generating...</span>`;
+    }
+
+    try {
+        let solution = '';
+        try {
+            const res = await fetch('/api/ai/suggest-mitigation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                solution = data.solution;
+            }
+        } catch (netErr) {
+            console.log('Using client fallback for AI mitigation:', netErr);
+        }
+
+        if (!solution) {
+            solution = generateAIMitigationPlanClient(payload);
+        }
+
+        if (textarea) {
+            textarea.value = solution;
+            textarea.style.borderColor = '#10b981';
+            setTimeout(() => { textarea.style.borderColor = ''; }, 1500);
+        }
+
+        showToast(`✨ AI Solution generated for "${name}"`, 'success');
+    } catch (err) {
+        showToast('Error generating AI suggestion', 'error');
+    } finally {
+        if (btn) {
+            btn.classList.remove('generating');
+            btn.innerHTML = `<span class="ai-sparkle">✨</span><span class="ai-btn-text">AI Suggest Solution</span>`;
+        }
+    }
+}
+
+/**
+ * Generate AI mitigation suggestion for Risk Detail Inspector Modal
+ */
+async function generateAIMitigationForCurrentDetail() {
+    const r = STATE.currentDetailRisk;
+    if (!r) {
+        showToast('No active risk selected', 'warning');
+        return;
+    }
+
+    const btn = document.getElementById('btn-detail-ai-suggest');
+    const container = document.getElementById('detail-mitigation-text');
+
+    if (btn) {
+        btn.classList.add('generating');
+        btn.innerHTML = `<span class="ai-sparkle">⏳</span><span>Synthesizing...</span>`;
+    }
+
+    const payload = {
+        name: r.name,
+        category: r.category,
+        likelihood: r.likelihood,
+        impact: r.impact,
+        financial_impact: r.financial_impact,
+        velocity: r.velocity,
+        description: r.description
+    };
+
+    try {
+        let solution = '';
+        try {
+            const res = await fetch('/api/ai/suggest-mitigation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                solution = data.solution;
+            }
+        } catch (netErr) {
+            console.log('Using client fallback for AI detail mitigation:', netErr);
+        }
+
+        if (!solution) {
+            solution = generateAIMitigationPlanClient(payload);
+        }
+
+        STATE._pendingAIMitigation = solution;
+
+        if (container) {
+            container.innerHTML = `
+                <div class="ai-enhanced-banner">
+                    <span>✨ AI Enhanced Strategy (ISO 31000)</span>
+                    <button type="button" class="btn-apply-ai-mitigation" onclick="applyAIMitigationToDetailRisk()">💾 Apply to Risk &amp; Save DB</button>
+                </div>
+                <div>${escapeHtml(solution)}</div>
+            `;
+        }
+
+        showToast(`✨ AI Strategy synthesized for "${r.name}"! Click 'Apply to Risk' to save.`, 'info');
+    } catch (err) {
+        showToast('Failed to generate AI solution', 'error');
+    } finally {
+        if (btn) {
+            btn.classList.remove('generating');
+            btn.innerHTML = `<span class="ai-sparkle">✨</span><span class="ai-btn-text">AI Enhance Solution</span>`;
+        }
+    }
+}
+
+/**
+ * Save newly generated AI mitigation directly into Database
+ */
+async function applyAIMitigationToDetailRisk() {
+    const r = STATE.currentDetailRisk;
+    const pendingText = STATE._pendingAIMitigation;
+    if (!r || !pendingText) return;
+
+    try {
+        const res = await fetch(`/api/risks/${r.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mitigation: pendingText })
+        });
+
+        if (!res.ok) throw new Error('Failed to update mitigation in database');
+
+        r.mitigation = pendingText;
+        STATE._pendingAIMitigation = null;
+
+        const container = document.getElementById('detail-mitigation-text');
+        if (container) {
+            container.innerHTML = escapeHtml(pendingText);
+        }
+
+        showToast(`Mitigation strategy for Risk #${r.id} saved to database!`, 'success');
+        await loadDashboardData(true);
+    } catch (err) {
+        showToast('Error saving mitigation strategy to database', 'error');
+    }
+}
+
 // Global window exposure for inline HTML events
 window.initAdminPortal = initAdminPortal;
 window.switchUserRole = switchUserRole;
@@ -4407,4 +4626,7 @@ window.seedBenchmarkRisks = seedBenchmarkRisks;
 window.purgeSimCache = purgeSimCache;
 window.setAppTheme = setAppTheme;
 window.switchLandscapeView = switchLandscapeView;
+window.generateAIMitigationForForm = generateAIMitigationForForm;
+window.generateAIMitigationForCurrentDetail = generateAIMitigationForCurrentDetail;
+window.applyAIMitigationToDetailRisk = applyAIMitigationToDetailRisk;
 

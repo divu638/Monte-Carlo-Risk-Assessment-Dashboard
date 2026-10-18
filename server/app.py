@@ -212,7 +212,67 @@ def reset_seed():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/api/ai/suggest-mitigation", methods=["POST"])
+def suggest_mitigation():
+    """AI Risk Mitigation Resolution Engine (ISO 31000 Compliant)."""
+    try:
+        data = request.get_json() or {}
+        name = (data.get("name") or "Corporate Threat").strip()
+        category = (data.get("category") or "Operational").strip()
+        likelihood = int(data.get("likelihood") or 3)
+        impact = int(data.get("impact") or 3)
+        score = likelihood * impact
+        financial = float(data.get("financial_impact") or 500000.0)
+        velocity = (data.get("velocity") or "Medium").strip()
+        description = (data.get("description") or "").strip()
+
+        plan = generate_ai_mitigation_plan_text(name, category, likelihood, impact, score, financial, velocity, description)
+        return jsonify({
+            "success": True,
+            "solution": plan,
+            "risk_name": name,
+            "category": category,
+            "score": score
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 # ─── Math & Analytical Engines ────────────────────────────────────────────────
+
+def generate_ai_mitigation_plan_text(name, category, likelihood, impact, score, financial, velocity, description=""):
+    """Synthesize structured 3-tier enterprise resolution based on ISO 31000 ERM protocol."""
+    fin_text = f"${financial/1_000_000:.2f}M" if financial >= 1_000_000 else (f"${int(financial/1_000)}k" if financial > 0 else "material")
+    lower_name = (name + " " + description).lower()
+
+    if category == "Cybersecurity" or any(k in lower_name for k in ["cyber", "ransom", "breach", "zero-day", "hack", "data"]):
+        t1 = "Immediately isolate impacted network perimeters, revoke compromised API credentials, and execute emergency EDR telemetry lockdown."
+        t2 = "Enforce Zero-Trust architecture across all endpoints, mandate FIDO2 hardware MFA keys, and verify air-gapped immutable backups."
+        t3 = "Conduct quarterly external red-team penetration tests and maintain an active $5.00M cyber-liability insurance indemnity pool."
+    elif category == "Financial" or any(k in lower_name for k in ["fx", "currency", "liquidity", "credit", "cash", "inflation", "interest"]):
+        t1 = f"Activate rolling 90-day FX forward contracts and interest-rate collar corridors to cap {fin_text} monetary exposure."
+        t2 = "Establish dual-signoff revolving credit facility with top-tier banking syndicate and institute dynamic counterparty credit limits."
+        t3 = "Run automated bi-weekly stress simulations under +250 bps macroeconomic rate shock with real-time treasury telemetry alerts."
+    elif category == "Operational" or any(k in lower_name for k in ["supply", "vendor", "semiconductor", "logistics", "factory", "warehouse"]):
+        t1 = "Activate pre-vetted secondary Tier-1 suppliers in alternate geographical hubs to secure 60-day buffer safety stock."
+        t2 = "Implement real-time IoT shipment route tracking and negotiate binding SLA breach penalty clauses across master service agreements."
+        t3 = "Perform biannual supply-chain resilience audits and establish an agile alternate Bill of Materials (BOM) substitution protocol."
+    elif category == "Compliance" or any(k in lower_name for k in ["legal", "privacy", "gdpr", "regulat", "audit", "license", "statutory"]):
+        t1 = "Execute emergency legal hold, map cross-border personal data flows, and pause non-compliant data replication pipelines."
+        t2 = "Implement ISO 27701 privacy controls, update standard contractual clauses (SCCs), and roll out automated consent governance."
+        t3 = "Mandate semi-annual third-party compliance reviews and institutionalize formal CRO signoff on regulatory disclosures."
+    else: # Strategic
+        t1 = "Convene executive risk committee chaired by CRO & Division VP to re-calibrate resource allocation within 14 days."
+        t2 = "Diversify core revenue streams across non-correlated product categories and launch rapid agile customer-validation pilots."
+        t3 = "Integrate competitive horizon threat scanning into quarterly Board of Directors governance review sessions."
+
+    if score >= 16 or velocity == "Fast":
+        t1 = f"[HIGH PRIORITY ESCALATION] {t1} Submit immediate incident briefing to Board of Directors within 24 hours."
+
+    return (
+        f"1. Immediate Containment (0–30 Days): {t1}\n"
+        f"2. Preventive Engineering (30–90 Days): {t2}\n"
+        f"3. Continuous Governance (Ongoing): {t3}"
+    )
 
 def run_monte_carlo(likelihood_val, impact_val, financial_base, iterations=3000):
     """Run probabilistic Monte Carlo trial simulation on exposure."""

@@ -1857,9 +1857,15 @@
                         <textarea id="form-description" class="form-control" rows="2" placeholder="Explain the root causes, trigger conditions, and scope of impact..."></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label for="form-mitigation">Mitigation Strategy & Controls</label>
-                        <textarea id="form-mitigation" class="form-control" rows="2" placeholder="Controls in place or planned actions to reduce probability or impact..."></textarea>
+                    <div class="form-group form-mitigation-group">
+                        <div class="form-label-row">
+                            <label for="form-mitigation">Mitigation Strategy & Controls</label>
+                            <button type="button" class="btn-ai-pill" id="btn-form-ai-suggest" onclick="generateAIMitigationForForm()" title="Auto-generate ISO 31000 compliant mitigation strategy">
+                                <span class="ai-sparkle">✨</span>
+                                <span class="ai-btn-text">AI Suggest Solution</span>
+                            </button>
+                        </div>
+                        <textarea id="form-mitigation" class="form-control" rows="3" placeholder="Controls in place or planned actions to reduce probability or impact..."></textarea>
                     </div>
                 </div>
 
@@ -1927,7 +1933,13 @@
                 </div>
 
                 <div class="detail-section">
-                    <h4>Mitigation Strategy & Action Plan</h4>
+                    <div class="detail-section-header">
+                        <h4>Mitigation Strategy & Action Plan</h4>
+                        <button type="button" class="btn-ai-pill" id="btn-detail-ai-suggest" onclick="generateAIMitigationForCurrentDetail()" title="Generate enhanced 3-tier enterprise mitigation plan">
+                            <span class="ai-sparkle">✨</span>
+                            <span class="ai-btn-text">AI Enhance Solution</span>
+                        </button>
+                    </div>
                     <div class="mitigation-box" id="detail-mitigation-text">--</div>
                 </div>
 
