@@ -113,10 +113,10 @@ function setAppTheme(themeName) {
     }
 
     const themeTitles = {
-        emerald: 'Emerald Velvet & Gold',
-        light: 'Classic White & Luxury Light'
+        emerald: '🌙 Emerald Velvet (Night Mode)',
+        light: '☀️ Classic White (Day Mode)'
     };
-    showToast(`Color Theme switched to ${themeTitles[themeName]}`, 'info');
+    showToast(`Theme switched to ${themeTitles[themeName]}`, 'info');
 }
 
 /**
