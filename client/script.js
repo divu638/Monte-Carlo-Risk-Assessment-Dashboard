@@ -105,14 +105,16 @@ function setAppTheme(themeName) {
         STATE.isDarkTheme = true;
     }
 
-    // Update single switch button UI
+    // Update theme emoji toggle button UI (Emoji-only: 🌙 in Night, ☀️ in Day)
     const toggleBtn = document.getElementById('theme-switch-btn');
-    const toggleLabel = document.getElementById('switch-theme-label');
+    const emojiSpan = document.getElementById('theme-toggle-emoji');
     if (toggleBtn) {
         toggleBtn.classList.toggle('light-mode-active', themeName === 'light');
+        toggleBtn.title = themeName === 'light' ? 'Switch to Night Mode (🌙)' : 'Switch to Day Mode (☀️)';
+        toggleBtn.setAttribute('aria-label', toggleBtn.title);
     }
-    if (toggleLabel) {
-        toggleLabel.textContent = themeName === 'light' ? 'Day' : 'Night';
+    if (emojiSpan) {
+        emojiSpan.textContent = themeName === 'light' ? '☀️' : '🌙';
     }
 
     localStorage.setItem('montecarlo-palette', themeName);

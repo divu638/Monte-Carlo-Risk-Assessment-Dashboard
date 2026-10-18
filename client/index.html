@@ -293,14 +293,9 @@
                         <span id="btn-supabase-label">Supabase Cloud</span>
                     </button>
 
-                    <!-- Single Unified Day/Night Theme Toggle Switch -->
-                    <button class="theme-switch-btn" id="theme-switch-btn" onclick="toggleDayNightTheme()" title="Switch Day (White) / Night (Emerald) Mode">
-                        <div class="switch-capsule">
-                            <span class="capsule-icon night">🌙</span>
-                            <span class="capsule-slider" id="capsule-slider"></span>
-                            <span class="capsule-icon day">☀️</span>
-                        </div>
-                        <span class="switch-label" id="switch-theme-label">Night</span>
+                    <!-- Single Sleek Day/Night Emoji Toggle Button -->
+                    <button class="btn-icon theme-emoji-btn theme-emoji-toggle" id="theme-switch-btn" onclick="toggleDayNightTheme()" title="Toggle Day (☀️) / Night (🌙) Mode" aria-label="Toggle Theme">
+                        <span class="theme-emoji-icon" id="theme-toggle-emoji">🌙</span>
                     </button>
 
                     <button class="btn btn-icon" id="btn-refresh" title="Refresh Live Data">
@@ -500,10 +495,10 @@
                                 <p class="card-subtitle">Total potential monetary exposure (USD)</p>
                             </div>
                             <div class="chart-view-toggle">
-                                <button class="btn btn-xs view-toggle-btn active" id="btn-fin-3d" onclick="setFinChartMode('3d')" title="Interactive 3D Holographic Columns">
+                                <button class="view-toggle-pill active" id="btn-fin-3d" onclick="setFinChartMode('3d')" title="Interactive 3D Holographic Columns">
                                     <span>🧊 3D Columns</span>
                                 </button>
-                                <button class="btn btn-xs view-toggle-btn" id="btn-fin-2d" onclick="setFinChartMode('2d')" title="Classic 2D Flat Chart">
+                                <button class="view-toggle-pill" id="btn-fin-2d" onclick="setFinChartMode('2d')" title="Classic 2D Flat Chart">
                                     <span>📊 2D Flat</span>
                                 </button>
                             </div>
@@ -539,10 +534,10 @@
                                 <p class="card-subtitle">Histogram of all active risk scores across the enterprise</p>
                             </div>
                             <div class="chart-view-toggle">
-                                <button class="btn btn-xs view-toggle-btn active" id="btn-score-3d" onclick="setScoreDistMode('3d')" title="Interactive 3D Stepped Towers">
+                                <button class="view-toggle-pill active" id="btn-score-3d" onclick="setScoreDistMode('3d')" title="Interactive 3D Stepped Towers">
                                     <span>🧊 3D Towers</span>
                                 </button>
-                                <button class="btn btn-xs view-toggle-btn" id="btn-score-2d" onclick="setScoreDistMode('2d')" title="Classic 2D Histogram">
+                                <button class="view-toggle-pill" id="btn-score-2d" onclick="setScoreDistMode('2d')" title="Classic 2D Histogram">
                                     <span>📊 2D Flat</span>
                                 </button>
                             </div>

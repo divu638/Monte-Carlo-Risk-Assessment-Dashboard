@@ -3214,92 +3214,90 @@ body.light-theme .admin-chip {
 }
 
 /* ==========================================================================
-   Header Theme Palette Switcher
+   Header Day / Night Emoji Theme Switcher
    ========================================================================== */
-.theme-palette-picker {
-/* ═══ Single Unified Day / Night Switch ═══ */
-.theme-switch-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(10, 26, 20, 0.75);
-    border: 1px solid var(--border-glass);
-    border-radius: 28px;
-    padding: 4px 14px 4px 6px;
-    cursor: pointer;
-    backdrop-filter: blur(16px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-}
-.theme-switch-btn:hover {
-    border-color: var(--accent-cyan);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 22px rgba(16, 185, 129, 0.3);
-}
-.switch-capsule {
-    position: relative;
-    width: 54px;
-    height: 28px;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 7px;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-.capsule-icon {
-    font-size: 0.8rem;
-    line-height: 1;
-    z-index: 2;
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-}
-.capsule-slider {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 24px;
-    height: 22px;
-    border-radius: 11px;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.85);
-    transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
-    z-index: 1;
-}
-.theme-switch-btn.light-mode-active .capsule-slider {
-    transform: translateX(26px);
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    box-shadow: 0 0 14px rgba(245, 158, 11, 0.9);
-}
-.switch-label {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: 0.4px;
-    user-select: none;
-}
-body.light-theme .theme-switch-btn {
-    background: rgba(255, 255, 255, 0.92);
-    border-color: rgba(0, 0, 0, 0.12);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-body.light-theme .switch-capsule {
-    background: #e2e8f0;
-    border-color: #cbd5e1;
-}
-body.light-theme .switch-label {
-    color: #0f172a;
+.theme-emoji-btn,
+.theme-emoji-toggle,
+#theme-switch-btn {
+    all: unset;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+    background: rgba(10, 26, 20, 0.78) !important;
+    border: 1px solid rgba(16, 185, 129, 0.28) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: #f1f5f9 !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
 }
 
-/* ═══ 3D Sub-Containers & Chart View Toggles ═══ */
+.theme-emoji-btn:hover,
+.theme-emoji-toggle:hover,
+#theme-switch-btn:hover {
+    background: rgba(16, 185, 129, 0.2) !important;
+    border-color: #10b981 !important;
+    transform: translateY(-2px) scale(1.04) !important;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.4), 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+.theme-emoji-btn:active,
+.theme-emoji-toggle:active,
+#theme-switch-btn:active {
+    transform: translateY(0) scale(0.96) !important;
+}
+
+.theme-emoji-icon {
+    font-size: 1.18rem !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    user-select: none !important;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-emoji-btn:hover .theme-emoji-icon,
+.theme-emoji-toggle:hover .theme-emoji-icon,
+#theme-switch-btn:hover .theme-emoji-icon {
+    transform: rotate(14deg) scale(1.15);
+}
+
+/* Light Theme Styling for Day/Night button */
+body.light-theme .theme-emoji-btn,
+body.light-theme .theme-emoji-toggle,
+body.light-theme #theme-switch-btn {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08), 0 0 12px rgba(245, 158, 11, 0.2) !important;
+    color: #1e293b !important;
+}
+
+body.light-theme .theme-emoji-btn:hover,
+body.light-theme .theme-emoji-toggle:hover,
+body.light-theme #theme-switch-btn:hover {
+    background: #ffffff !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35) !important;
+}
+
+/* ═══ 3D Sub-Containers & Chart View Toggles (3D Columns / 2D Flat) ═══ */
 .relative-chart-body {
     position: relative;
     overflow: hidden;
     min-height: 290px;
 }
+
 .three-sub-container {
     width: 100%;
     height: 290px;
@@ -3307,52 +3305,91 @@ body.light-theme .switch-label {
     border-radius: 0 0 12px 12px;
     overflow: hidden;
 }
+
 .three-sub-container canvas {
     display: block;
     width: 100% !important;
     height: 100% !important;
     outline: none;
 }
+
+/* Outer Toggle Capsule Container (No stark white!) */
 .chart-view-toggle {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 18px;
-    padding: 3px 5px;
+    background: rgba(4, 18, 12, 0.88) !important;
+    border: 1px solid rgba(16, 185, 129, 0.28) !important;
+    border-radius: 20px;
+    padding: 3px 4px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45);
 }
-body.light-theme .chart-view-toggle {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.1);
-}
+
+/* Toggle Pill Buttons (3D Columns / 2D Flat) — Overriding all browser defaults */
+.view-toggle-pill,
 .view-toggle-btn {
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 14px;
-    padding: 3px 10px;
-    font-size: 0.72rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-weight: 600;
+    all: unset;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: 14px !important;
+    padding: 5px 12px !important;
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    color: #94a3b8 !important;
+    cursor: pointer !important;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    user-select: none !important;
+    box-sizing: border-box !important;
+    line-height: 1.2 !important;
 }
+
+.view-toggle-pill:hover,
 .view-toggle-btn:hover {
-    color: #fff;
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.06) !important;
 }
-body.light-theme .view-toggle-btn:hover {
-    color: #0f172a;
-}
+
+/* Active State: Luxurious Emerald Glass & Glow */
+.view-toggle-pill.active,
 .view-toggle-btn.active {
-    background: rgba(16, 185, 129, 0.2);
-    color: #10b981;
-    border-color: rgba(16, 185, 129, 0.5);
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.26) 0%, rgba(5, 150, 105, 0.2) 100%) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(16, 185, 129, 0.55) !important;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    font-weight: 700 !important;
 }
+
+/* Light Theme Adaptations for Toggle */
+body.light-theme .chart-view-toggle {
+    background: rgba(241, 245, 249, 0.95) !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.light-theme .view-toggle-pill,
+body.light-theme .view-toggle-btn {
+    color: #64748b !important;
+}
+
+body.light-theme .view-toggle-pill:hover,
+body.light-theme .view-toggle-btn:hover {
+    color: #0f172a !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-theme .view-toggle-pill.active,
 body.light-theme .view-toggle-btn.active {
-    background: rgba(16, 185, 129, 0.15);
-    color: #047857;
-    border-color: rgba(16, 185, 129, 0.4);
+    background: #ffffff !important;
+    color: #047857 !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* ==========================================================================
