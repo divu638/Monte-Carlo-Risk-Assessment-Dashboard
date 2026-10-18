@@ -293,19 +293,15 @@
                         <span id="btn-supabase-label">Supabase Cloud</span>
                     </button>
 
-                    <!-- Live Theme Palette Picker (Day / Night with Emerald & White) -->
-                    <div class="theme-palette-picker" id="theme-palette-picker" title="Switch Theme: 🌙 Night (Emerald) / ☀️ Day (White)">
-                        <button class="palette-pill active" id="theme-btn-emerald" onclick="setAppTheme('emerald')" title="🌙 Night Mode — Emerald Velvet">
-                            <span class="theme-mode-emoji">🌙</span>
-                            <span class="swatch emerald"></span>
-                            <span class="palette-name">Emerald</span>
-                        </button>
-                        <button class="palette-pill" id="theme-btn-light" onclick="setAppTheme('light')" title="☀️ Day Mode — Classic White">
-                            <span class="theme-mode-emoji">☀️</span>
-                            <span class="swatch light"></span>
-                            <span class="palette-name">White</span>
-                        </button>
-                    </div>
+                    <!-- Single Unified Day/Night Theme Toggle Switch -->
+                    <button class="theme-switch-btn" id="theme-switch-btn" onclick="toggleDayNightTheme()" title="Switch Day (White) / Night (Emerald) Mode">
+                        <div class="switch-capsule">
+                            <span class="capsule-icon night">🌙</span>
+                            <span class="capsule-slider" id="capsule-slider"></span>
+                            <span class="capsule-icon day">☀️</span>
+                        </div>
+                        <span class="switch-label" id="switch-theme-label">Night</span>
+                    </button>
 
                     <button class="btn btn-icon" id="btn-refresh" title="Refresh Live Data">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -497,15 +493,24 @@
 
                 <!-- Financial Exposure Bar Chart & Top Priority Table -->
                 <div class="visualizer-row">
-                    <div class="card chart-card-wide">
+                    <div class="card chart-card-wide" id="card-financial-var">
                         <div class="card-header">
                             <div>
                                 <h3>Financial Value-at-Risk by Category</h3>
                                 <p class="card-subtitle">Total potential monetary exposure (USD)</p>
                             </div>
+                            <div class="chart-view-toggle">
+                                <button class="btn btn-xs view-toggle-btn active" id="btn-fin-3d" onclick="setFinChartMode('3d')" title="Interactive 3D Holographic Columns">
+                                    <span>🧊 3D Columns</span>
+                                </button>
+                                <button class="btn btn-xs view-toggle-btn" id="btn-fin-2d" onclick="setFinChartMode('2d')" title="Classic 2D Flat Chart">
+                                    <span>📊 2D Flat</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body chart-body">
-                            <canvas id="financial-bar-chart"></canvas>
+                        <div class="card-body chart-body relative-chart-body">
+                            <div id="financial-3d-container" class="three-sub-container"></div>
+                            <canvas id="financial-bar-chart" style="display: none;"></canvas>
                         </div>
                     </div>
 
@@ -527,15 +532,24 @@
 
                 <!-- Risk Trend Summary Row -->
                 <div class="visualizer-row">
-                    <div class="card chart-card-wide">
+                    <div class="card chart-card-wide" id="card-score-dist">
                         <div class="card-header">
                             <div>
                                 <h3>Risk Score Distribution</h3>
                                 <p class="card-subtitle">Histogram of all active risk scores across the enterprise</p>
                             </div>
+                            <div class="chart-view-toggle">
+                                <button class="btn btn-xs view-toggle-btn active" id="btn-score-3d" onclick="setScoreDistMode('3d')" title="Interactive 3D Stepped Towers">
+                                    <span>🧊 3D Towers</span>
+                                </button>
+                                <button class="btn btn-xs view-toggle-btn" id="btn-score-2d" onclick="setScoreDistMode('2d')" title="Classic 2D Histogram">
+                                    <span>📊 2D Flat</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body chart-body">
-                            <canvas id="score-distribution-chart"></canvas>
+                        <div class="card-body chart-body relative-chart-body">
+                            <div id="score-3d-container" class="three-sub-container"></div>
+                            <canvas id="score-distribution-chart" style="display: none;"></canvas>
                         </div>
                     </div>
 

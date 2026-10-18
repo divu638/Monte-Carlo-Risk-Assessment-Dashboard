@@ -24,6 +24,10 @@ const STATE = {
     },
     threeScene: null,
     domainRingScene: null,
+    financial3DScene: null,
+    score3DScene: null,
+    finChartMode: '3d',
+    scoreDistMode: '3d',
     confirmResolver: null,
     dbInfo: null
 };
@@ -78,6 +82,11 @@ function initThemeToggle() {
     setAppTheme(savedPalette === 'light' ? 'light' : 'emerald');
 }
 
+function toggleDayNightTheme() {
+    const nextTheme = STATE.isDarkTheme ? 'light' : 'emerald';
+    setAppTheme(nextTheme);
+}
+
 /**
  * Switch Application Color Theme Palette (Emerald or White)
  */
@@ -96,27 +105,34 @@ function setAppTheme(themeName) {
         STATE.isDarkTheme = true;
     }
 
-    // Update palette button active states
-    document.querySelectorAll('.palette-pill').forEach(btn => {
-        btn.classList.toggle('active', btn.id === `theme-btn-${themeName}`);
-    });
+    // Update single switch button UI
+    const toggleBtn = document.getElementById('theme-switch-btn');
+    const toggleLabel = document.getElementById('switch-theme-label');
+    if (toggleBtn) {
+        toggleBtn.classList.toggle('light-mode-active', themeName === 'light');
+    }
+    if (toggleLabel) {
+        toggleLabel.textContent = themeName === 'light' ? 'Day' : 'Night';
+    }
 
     localStorage.setItem('montecarlo-palette', themeName);
 
-    // Update Three.js background if initialized
-    if (STATE.threeScene && STATE.threeScene.scene) {
-        const bgColors = {
-            emerald: 0x040e0a,
-            light: 0xe8ecf1
-        };
-        STATE.threeScene.scene.background = new THREE.Color(bgColors[themeName] || 0x040e0a);
-    }
+    // Update all Three.js scenes background
+    const bgColors = {
+        emerald: 0x040e0a,
+        light: 0xe8ecf1
+    };
+    const newBg = new THREE.Color(bgColors[themeName] || 0x040e0a);
+    if (STATE.threeScene && STATE.threeScene.scene) STATE.threeScene.scene.background = newBg;
+    if (STATE.domainRingScene && STATE.domainRingScene.scene) STATE.domainRingScene.scene.background = newBg;
+    if (STATE.financial3DScene && STATE.financial3DScene.scene) STATE.financial3DScene.scene.background = newBg;
+    if (STATE.score3DScene && STATE.score3DScene.scene) STATE.score3DScene.scene.background = newBg;
 
     const themeTitles = {
-        emerald: '🌙 Emerald Velvet (Night Mode)',
-        light: '☀️ Classic White (Day Mode)'
+        emerald: '🌙 Night Mode (Emerald Velvet)',
+        light: '☀️ Day Mode (Classic White)'
     };
-    showToast(`Theme switched to ${themeTitles[themeName]}`, 'info');
+    showToast(`Switched to ${themeTitles[themeName]}`, 'info');
 }
 
 /**
@@ -754,6 +770,198 @@ function renderScoreDistribution(risks) {
             }
         }
     });
+
+    // Also initialize 3D Stepped Towers
+    init3DScoreDistribution(risks);
+}
+
+// ─── 3D Score Distribution Towers (Three.js) ──────────────────────────────────
+
+function setScoreDistMode(mode) {
+    STATE.scoreDistMode = mode;
+    const container3D = document.getElementById('score-3d-container');
+    const canvas2D = document.getElementById('score-distribution-chart');
+    const btn3D = document.getElementById('btn-score-3d');
+    const btn2D = document.getElementById('btn-score-2d');
+
+    if (mode === '3d') {
+        if (container3D) container3D.style.display = 'block';
+        if (canvas2D) canvas2D.style.display = 'none';
+        if (btn3D) btn3D.classList.add('active');
+        if (btn2D) btn2D.classList.remove('active');
+        if (STATE.score3DScene && STATE.score3DScene.onResize) {
+            STATE.score3DScene.onResize();
+        }
+    } else {
+        if (container3D) container3D.style.display = 'none';
+        if (canvas2D) canvas2D.style.display = 'block';
+        if (btn2D) btn2D.classList.add('active');
+        if (btn3D) btn3D.classList.remove('active');
+    }
+}
+
+function init3DScoreDistribution(risks) {
+    const container = document.getElementById('score-3d-container');
+    if (!container || !risks) return;
+
+    if (STATE.score3DScene) {
+        if (STATE.score3DScene.animationId) {
+            cancelAnimationFrame(STATE.score3DScene.animationId);
+        }
+        if (STATE.score3DScene.renderer) {
+            STATE.score3DScene.renderer.dispose();
+            if (STATE.score3DScene.renderer.domElement && STATE.score3DScene.renderer.domElement.parentNode) {
+                STATE.score3DScene.renderer.domElement.parentNode.removeChild(STATE.score3DScene.renderer.domElement);
+            }
+        }
+        STATE.score3DScene = null;
+    }
+
+    const activeRisks = Array.isArray(risks) ? risks.filter(r => r.status !== 'Closed') : [];
+    const bands = [
+        { label: 'Low', range: '1-4', color: 0x10b981, count: 0 },
+        { label: 'Medium', range: '5-9', color: 0xf59e0b, count: 0 },
+        { label: 'High', range: '10-15', color: 0xff8c21, count: 0 },
+        { label: 'Critical', range: '16-25', color: 0xff2e5b, count: 0 }
+    ];
+
+    activeRisks.forEach(r => {
+        if (r.score >= 16) bands[3].count++;
+        else if (r.score >= 10) bands[2].count++;
+        else if (r.score >= 5) bands[1].count++;
+        else bands[0].count++;
+    });
+
+    const width = container.clientWidth || 550;
+    const height = 290;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(STATE.isDarkTheme ? 0x040e0a : 0xe8ecf1);
+
+    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+    camera.position.set(0, 3.2, 7.0);
+    camera.lookAt(0, 0.8, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.95);
+    dirLight.position.set(4, 9, 5);
+    scene.add(dirLight);
+
+    const pointLight = new THREE.PointLight(0x34d399, 1.0, 12);
+    pointLight.position.set(0, 2.5, 3);
+    scene.add(pointLight);
+
+    // Circular base rings / grid
+    const grid = new THREE.GridHelper(8, 8, 0x10b981, STATE.isDarkTheme ? 0x143224 : 0xcbd5e1);
+    scene.add(grid);
+
+    const maxCount = Math.max(...bands.map(b => b.count), 1);
+    const spacing = 1.35;
+    const startX = -((bands.length - 1) * spacing) / 2;
+    const towers = [];
+
+    bands.forEach((b, i) => {
+        const normH = Math.max(0.4, (b.count / maxCount) * 2.7);
+        const group = new THREE.Group();
+
+        // 3D Tower
+        const geo = new THREE.CylinderGeometry(0.46, 0.52, normH, 20);
+        const mat = new THREE.MeshStandardMaterial({
+            color: b.color,
+            roughness: 0.2,
+            metalness: 0.7,
+            transparent: true,
+            opacity: 0.9,
+            emissive: b.color,
+            emissiveIntensity: 0.2
+        });
+        const towerMesh = new THREE.Mesh(geo, mat);
+        towerMesh.position.y = normH / 2;
+        group.add(towerMesh);
+
+        // Glowing Orb Hovering on Peak
+        const orbGeo = new THREE.SphereGeometry(0.16, 16, 16);
+        const orbMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            emissive: b.color,
+            emissiveIntensity: 1.0
+        });
+        const orb = new THREE.Mesh(orbGeo, orbMat);
+        orb.position.y = normH + 0.22;
+        group.add(orb);
+
+        // Value Sprite (e.g. "5 Risks")
+        const countSprite = createCanvasTextSprite(`${b.count} Risks`, {
+            bgColor: STATE.isDarkTheme ? 'rgba(10,26,20,0.85)' : 'rgba(255,255,255,0.92)',
+            textColor: '#' + b.color.toString(16).padStart(6, '0'),
+            borderColor: '#' + b.color.toString(16).padStart(6, '0'),
+            fontSize: 22
+        });
+        countSprite.position.set(0, normH + 0.58, 0);
+        countSprite.scale.set(1.15, 0.55, 1);
+        group.add(countSprite);
+
+        // Band Label Sprite (e.g. "Critical (16-25)")
+        const labelSprite = createCanvasTextSprite(`${b.label} (${b.range})`, {
+            bgColor: 'transparent',
+            textColor: STATE.isDarkTheme ? '#94a3b8' : '#475569',
+            fontSize: 18
+        });
+        labelSprite.position.set(0, -0.22, 0.45);
+        labelSprite.scale.set(1.3, 0.45, 1);
+        group.add(labelSprite);
+
+        group.position.x = startX + i * spacing;
+        scene.add(group);
+
+        towers.push({ group, orb, normH, orbBaseY: normH + 0.22 });
+    });
+
+    let clock = new THREE.Clock();
+    let animationId = null;
+
+    function animate() {
+        animationId = requestAnimationFrame(animate);
+        const elapsed = clock.getElapsedTime();
+
+        // Pulsing floating orbs
+        towers.forEach((t, idx) => {
+            t.orb.position.y = t.orbBaseY + Math.sin(elapsed * 3.0 + idx * 1.2) * 0.06;
+        });
+
+        // Gentle camera sway
+        camera.position.x = Math.sin(elapsed * 0.2) * 0.35;
+        camera.lookAt(0, 0.8, 0);
+
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    function onResize() {
+        if (!container) return;
+        const w = container.clientWidth || 550;
+        const h = 290;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+    }
+    window.addEventListener('resize', onResize);
+
+    STATE.score3DScene = { scene, camera, renderer, animationId, onResize };
+
+    if (STATE.scoreDistMode === '3d') {
+        container.style.display = 'block';
+        const canvas2D = document.getElementById('score-distribution-chart');
+        if (canvas2D) canvas2D.style.display = 'none';
+    }
 }
 
 function updateNavBadge(count) {
@@ -1010,6 +1218,192 @@ function buildDomainRingLegend(categories, palette) {
     });
 }
 
+// ─── 3D Financial VaR Pillars (Three.js) ─────────────────────────────────────
+
+function setFinChartMode(mode) {
+    STATE.finChartMode = mode;
+    const container3D = document.getElementById('financial-3d-container');
+    const canvas2D = document.getElementById('financial-bar-chart');
+    const btn3D = document.getElementById('btn-fin-3d');
+    const btn2D = document.getElementById('btn-fin-2d');
+
+    if (mode === '3d') {
+        if (container3D) container3D.style.display = 'block';
+        if (canvas2D) canvas2D.style.display = 'none';
+        if (btn3D) btn3D.classList.add('active');
+        if (btn2D) btn2D.classList.remove('active');
+        if (STATE.financial3DScene && STATE.financial3DScene.onResize) {
+            STATE.financial3DScene.onResize();
+        }
+    } else {
+        if (container3D) container3D.style.display = 'none';
+        if (canvas2D) canvas2D.style.display = 'block';
+        if (btn2D) btn2D.classList.add('active');
+        if (btn3D) btn3D.classList.remove('active');
+    }
+}
+
+function init3DFinancialPillars(categories) {
+    const container = document.getElementById('financial-3d-container');
+    if (!container || !categories || !categories.length) return;
+
+    if (STATE.financial3DScene) {
+        if (STATE.financial3DScene.animationId) {
+            cancelAnimationFrame(STATE.financial3DScene.animationId);
+        }
+        if (STATE.financial3DScene.renderer) {
+            STATE.financial3DScene.renderer.dispose();
+            if (STATE.financial3DScene.renderer.domElement && STATE.financial3DScene.renderer.domElement.parentNode) {
+                STATE.financial3DScene.renderer.domElement.parentNode.removeChild(STATE.financial3DScene.renderer.domElement);
+            }
+        }
+        STATE.financial3DScene = null;
+    }
+
+    const width = container.clientWidth || 550;
+    const height = 290;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(STATE.isDarkTheme ? 0x040e0a : 0xe8ecf1);
+
+    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+    camera.position.set(0, 3.4, 7.2);
+    camera.lookAt(0, 0.8, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.95);
+    dirLight.position.set(5, 10, 6);
+    scene.add(dirLight);
+
+    const pointLight = new THREE.PointLight(0x10b981, 1.2, 14);
+    pointLight.position.set(0, 2.5, 3);
+    scene.add(pointLight);
+
+    // Grid Floor
+    const grid = new THREE.GridHelper(10, 10, 0x10b981, STATE.isDarkTheme ? 0x143224 : 0xcbd5e1);
+    scene.add(grid);
+
+    // Color mapping
+    const palette = {
+        'Cybersecurity': 0x38bdf8,
+        'Financial': 0xe11d48,
+        'Operational': 0xf59e0b,
+        'Compliance': 0x10b981,
+        'Strategic': 0x8b5cf6
+    };
+
+    const maxFinancial = Math.max(...categories.map(c => c.total_financial || 100000), 1);
+    const n = categories.length;
+    const spacing = 1.25;
+    const startX = -((n - 1) * spacing) / 2;
+    const pillars = [];
+
+    categories.forEach((cat, i) => {
+        const val = cat.total_financial || 0;
+        const normH = Math.max(0.45, (val / maxFinancial) * 2.8);
+        const colHex = palette[cat.category] || 0x10b981;
+
+        const group = new THREE.Group();
+
+        // 3D Pillar Geometry
+        const geo = new THREE.BoxGeometry(0.78, normH, 0.78);
+        const mat = new THREE.MeshStandardMaterial({
+            color: colHex,
+            roughness: 0.25,
+            metalness: 0.65,
+            transparent: true,
+            opacity: 0.88,
+            emissive: colHex,
+            emissiveIntensity: 0.15
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.y = normH / 2;
+        group.add(mesh);
+
+        // Glowing Cap on Top
+        const capGeo = new THREE.BoxGeometry(0.82, 0.06, 0.82);
+        const capMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            emissive: colHex,
+            emissiveIntensity: 0.9
+        });
+        const cap = new THREE.Mesh(capGeo, capMat);
+        cap.position.y = normH + 0.03;
+        group.add(cap);
+
+        // Floating Sprite Value Label
+        const labelText = val >= 1000000 ? `$${(val / 1000000).toFixed(2)}M` : `$${Math.round(val / 1000)}k`;
+        const sprite = createCanvasTextSprite(labelText, {
+            bgColor: STATE.isDarkTheme ? 'rgba(10,26,20,0.85)' : 'rgba(255,255,255,0.92)',
+            textColor: colHex ? '#' + colHex.toString(16).padStart(6, '0') : '#10b981',
+            borderColor: '#' + colHex.toString(16).padStart(6, '0'),
+            fontSize: 22
+        });
+        sprite.position.set(0, normH + 0.38, 0);
+        sprite.scale.set(1.1, 0.55, 1);
+        group.add(sprite);
+
+        // Category Tag Sprite below
+        const catSprite = createCanvasTextSprite(cat.category, {
+            bgColor: 'transparent',
+            textColor: STATE.isDarkTheme ? '#94a3b8' : '#475569',
+            fontSize: 18
+        });
+        catSprite.position.set(0, -0.25, 0.5);
+        catSprite.scale.set(1.2, 0.45, 1);
+        group.add(catSprite);
+
+        group.position.x = startX + i * spacing;
+        scene.add(group);
+
+        pillars.push({ group, mesh, initialY: mesh.position.y, height: normH, category: cat.category, value: val });
+    });
+
+    let clock = new THREE.Clock();
+    let animationId = null;
+
+    function animate() {
+        animationId = requestAnimationFrame(animate);
+        const elapsed = clock.getElapsedTime();
+
+        pillars.forEach((p, idx) => {
+            p.group.position.y = Math.sin(elapsed * 1.5 + idx * 0.8) * 0.04;
+        });
+
+        camera.position.x = Math.sin(elapsed * 0.25) * 0.4;
+        camera.lookAt(0, 0.8, 0);
+
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    function onResize() {
+        if (!container) return;
+        const w = container.clientWidth || 550;
+        const h = 290;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+    }
+    window.addEventListener('resize', onResize);
+
+    STATE.financial3DScene = { scene, camera, renderer, animationId, onResize };
+
+    if (STATE.finChartMode === '3d') {
+        container.style.display = 'block';
+        const canvas2D = document.getElementById('financial-bar-chart');
+        if (canvas2D) canvas2D.style.display = 'none';
+    }
+}
+
 // ─── Chart.js Visualizations ────────────────────────────────────────────────
 
 function renderOverviewCharts(stats) {
@@ -1018,7 +1412,10 @@ function renderOverviewCharts(stats) {
     // 1. 3D Domain Ring Chart: Risks by Category (Three.js)
     initDomain3DRingChart(stats.categories);
 
-    // 2. Horizontal Bar Chart: Financial Exposure by Category
+    // 2. 3D Financial VaR Pillars (Three.js)
+    init3DFinancialPillars(stats.categories);
+
+    // 3. Horizontal Bar Chart: Financial Exposure by Category (2D Fallback)
     const barCanvas = document.getElementById('financial-bar-chart');
     if (barCanvas) {
         const labels = stats.categories.map(c => c.category);
