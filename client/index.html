@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monte Carlo Risk Engine — Business Risk Assessment Dashboard</title>
+    <meta name="description" content="Monte Carlo simulation-powered business risk dashboard with financial ratio analysis, probabilistic VaR, 5×5 heatmap, and real-time risk scoring.">
+    <meta name="keywords" content="Monte Carlo simulation, business risk, financial ratios, VaR, risk assessment, probability simulation">
+    <meta name="author" content="Monte Carlo Risk Engine">
+    <!-- Favicon: Round Monte Carlo Royal Crimson & Gold Crest -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g' cx='35%25' cy='30%25' r='75%25'><stop offset='0%25' stop-color='%23e11d48'/><stop offset='50%25' stop-color='%239e1b32'/><stop offset='100%25' stop-color='%231a0207'/></radialGradient><linearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23fff3bf'/><stop offset='50%25' stop-color='%23f59e0b'/><stop offset='100%25' stop-color='%23d97706'/></linearGradient></defs><circle cx='50' cy='50' r='47' fill='url(%23g)' stroke='%23f59e0b' stroke-width='3.5'/><circle cx='50' cy='50' r='41' fill='none' stroke='rgba(255,243,191,0.5)' stroke-width='1.5' stroke-dasharray='3,3'/><path d='M35 32 L40 37 L50 28 L60 37 L65 32 L62 40 L38 40 Z' fill='url(%23gold)'/><text x='50' y='68' font-size='27' text-anchor='middle' fill='url(%23gold)' font-family='Arial, sans-serif' font-weight='900' letter-spacing='1'>MC</text><path d='M20 78 Q35 78 42 74 Q50 70 58 74 Q65 78 80 78' stroke='%2338bdf8' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>">
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Chart.js & Three.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme theme-emerald">
+    <!-- 3D Ambient Depth Mesh & Floating Glass Particles -->
+    <div class="ambient-glow-mesh" aria-hidden="true">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+        <div class="ambient-grid-lines"></div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="app-loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <span class="spinner-text">Initializing Monte Carlo Engine...</span>
+        </div>
+    </div>
+
+    <!-- Main Application Shell -->
+    <div class="app-layout">
+        <!-- Mobile Hamburger -->
+        <button class="mobile-hamburger" id="mobile-hamburger" aria-label="Toggle Navigation">
+            <span></span><span></span><span></span>
+        </button>
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-icon mc-round-logo" id="brand-logo-crest" title="Monte Carlo Enterprise Risk & Governance Engine">
+                    <!-- Bespoke Round Monte Carlo Luxury Crest & Quantum Risk Emblem -->
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Monte Carlo Crest">
+                        <defs>
+                            <!-- Metallic Gold Linear Gradient -->
+                            <linearGradient id="mcGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#FFF7CD"/>
+                                <stop offset="28%" stop-color="#FBBF24"/>
+                                <stop offset="68%" stop-color="#D97706"/>
+                                <stop offset="100%" stop-color="#FDE68A"/>
+                            </linearGradient>
+                            <!-- Deep Imperial Crimson-Ruby Radial Gradient -->
+                            <radialGradient id="mcCoreGrad" cx="35%" cy="30%" r="75%">
+                                <stop offset="0%" stop-color="#E11D48"/>
+                                <stop offset="42%" stop-color="#9E1B32"/>
+                                <stop offset="80%" stop-color="#4C0519"/>
+                                <stop offset="100%" stop-color="#190207"/>
+                            </radialGradient>
+                            <!-- Probability Bell Curve Cyan-Gold-Emerald Gradient -->
+                            <linearGradient id="mcWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.4"/>
+                                <stop offset="50%" stop-color="#F59E0B" stop-opacity="0.95"/>
+                                <stop offset="100%" stop-color="#00E8A2" stop-opacity="0.85"/>
+                            </linearGradient>
+                            <!-- High-Relief Drop Shadow Filter -->
+                            <filter id="mcGoldGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feDropShadow dx="0" dy="1.2" stdDeviation="1.2" flood-color="#F59E0B" flood-opacity="0.6"/>
+                            </filter>
+                        </defs>
+
+                        <!-- Base Round Outer Disc -->
+                        <circle cx="32" cy="32" r="30.5" fill="url(#mcCoreGrad)"/>
+
+                        <!-- Concentric Guilloche Bezel Rings -->
+                        <circle cx="32" cy="32" r="29" stroke="url(#mcGoldGrad)" stroke-width="1.5" stroke-dasharray="2 2.5" opacity="0.6"/>
+                        <circle cx="32" cy="32" r="26.5" stroke="url(#mcGoldGrad)" stroke-width="1.2" opacity="0.85"/>
+
+                        <!-- Cardinal Compass Accents -->
+                        <circle cx="32" cy="4" r="1.2" fill="#FFF7CD"/>
+                        <circle cx="60" cy="32" r="1.2" fill="#FFF7CD"/>
+                        <circle cx="32" cy="60" r="1.2" fill="#FFF7CD"/>
+                        <circle cx="4" cy="32" r="1.2" fill="#FFF7CD"/>
+
+                        <!-- Aristocratic Monte Carlo Coronet / Crown -->
+                        <path d="M23 18 L26 21 L32 15 L38 21 L41 18 L39 23 L25 23 Z" fill="url(#mcGoldGrad)" filter="url(#mcGoldGlow)"/>
+                        <circle cx="23" cy="17" r="1.1" fill="#FFFFFF"/>
+                        <circle cx="32" cy="14" r="1.3" fill="#FFFFFF"/>
+                        <circle cx="41" cy="17" r="1.1" fill="#FFFFFF"/>
+
+                        <!-- Interlocking Monogram: M & C -->
+                        <!-- Primary 'M' Monogram with Chamfered Serif Cuts -->
+                        <path d="M19 41 V25.5 L25.5 35 L32 25.5 L38.5 35 L45 25.5 V41 H41.5 V30.5 L35.5 39 H33 L32 37.5 L31 39 H28.5 L22.5 30.5 V41 Z" 
+                              fill="url(#mcGoldGrad)" 
+                              filter="url(#mcGoldGlow)"/>
+
+                        <!-- Sweeping Luxury 'C' Emblem Arch Overlaid -->
+                        <path d="M41 27 C43.8 29 45.2 32.2 45 35.5 C44.5 40.5 40 43.5 32 43.5 C24.5 43.5 20.5 39.8 20.8 35" 
+                              stroke="url(#mcGoldGrad)" 
+                              stroke-width="2" 
+                              stroke-linecap="round" 
+                              fill="none" 
+                              opacity="0.5"/>
+
+                        <!-- Monte Carlo Stochastic Distribution Wave Arc -->
+                        <path d="M12 50 Q18 50 22 46 Q27 41 32 41 Q37 41 42 46 Q46 50 52 50" 
+                              stroke="url(#mcWaveGrad)" 
+                              stroke-width="2" 
+                              fill="none" 
+                              stroke-linecap="round"/>
+
+                        <!-- VaR Mean Node -->
+                        <circle cx="32" cy="41" r="2.2" fill="#FFFFFF" filter="url(#mcGoldGlow)"/>
+                        <circle cx="32" cy="41" r="1" fill="#D97706"/>
+
+                        <!-- Brilliant Diamond Accents -->
+                        <path d="M14 27 L15 29 L17 30 L15 31 L14 33 L13 31 L11 30 L13 29 Z" fill="#FFF7CD" opacity="0.85"/>
+                        <path d="M50 27 L51 29 L53 30 L51 31 L50 33 L49 31 L47 30 L49 29 Z" fill="#FFF7CD" opacity="0.85"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h2>Monte Carlo<span>RISK</span></h2>
+                    <span class="brand-tag">GOVERNANCE & TELEMETRY</span>
+                </div>
+            </div>
+
+            <!-- Database Connection Badge -->
+            <div class="db-status-pill" id="sidebar-db-pill" role="button" tabindex="0" title="Click to configure Supabase Cloud Sync">
+                <span class="status-dot pulse" id="db-status-dot"></span>
+                <span class="status-text" id="db-status-text">Supabase Cloud</span>
+                <span class="db-badge" id="db-status-badge">PostgreSQL</span>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="overview" id="nav-overview">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    <span>Executive Overview</span>
+                    <span class="nav-shortcut">1</span>
+                </button>
+
+                <button class="nav-item" data-tab="registry" id="nav-registry">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"/>
+                        <line x1="8" y1="12" x2="21" y2="12"/>
+                        <line x1="8" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="3.01" y2="6"/>
+                        <line x1="3" y1="12" x2="3.01" y2="12"/>
+                        <line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                    <span>Risk Registry</span>
+                    <span class="nav-badge" id="nav-risk-count">0</span>
+                </button>
+
+                <button class="nav-item" data-tab="matrix" id="nav-matrix">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="3" y1="9" x2="21" y2="9"/>
+                        <line x1="3" y1="15" x2="21" y2="15"/>
+                        <line x1="9" y1="3" x2="9" y2="21"/>
+                        <line x1="15" y1="3" x2="15" y2="21"/>
+                    </svg>
+                    <span>5×5 Risk Matrix</span>
+                </button>
+
+                <button class="nav-item" data-tab="analytics" id="nav-analytics">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3v18h18"/>
+                        <path d="M18 17V9"/>
+                        <path d="M13 17V5"/>
+                        <path d="M8 17v-3"/>
+                    </svg>
+                    <span>Monte Carlo VaR</span>
+                </button>
+
+                <button class="nav-item" data-tab="financial" id="nav-financial">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23"/>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                    <span>Financial Analysis</span>
+                    <span class="nav-shortcut">5</span>
+                </button>
+
+                <button class="nav-item" data-tab="audit" id="nav-audit">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span>Audit Trail</span>
+                    <span class="nav-shortcut">6</span>
+                </button>
+
+                <button class="nav-item" data-tab="admin" id="nav-admin">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <circle cx="12" cy="11" r="3"/>
+                        <path d="M12 8v2"/>
+                    </svg>
+                    <span>Admin & Governance</span>
+                    <span class="nav-shortcut">7</span>
+                </button>
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">CRO</div>
+                    <div class="user-info">
+                        <span class="user-name">Chief Risk Officer</span>
+                        <span class="user-role">Risk Management Office</span>
+                    </div>
+                </div>
+                <div class="sidebar-version">
+                    <span>Monte Carlo Risk Engine v2.4.0</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header Bar -->
+            <header class="top-header">
+                <div class="header-titles">
+                    <h1 id="page-heading">Executive Overview</h1>
+                    <p class="subheading">Monte Carlo Brand Enterprise Risk Governance & Exposure Telemetry · ISO 31000</p>
+                </div>
+
+                <div class="header-actions">
+                    <div class="search-box" id="search-box-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" id="global-search" placeholder="Search risks, owners, categories..." aria-label="Search risks">
+                        <kbd class="search-kbd">/</kbd>
+                    </div>
+
+                    <!-- Notification Bell -->
+                    <div class="notification-wrapper" id="notification-wrapper">
+                        <button class="btn btn-icon" id="btn-notifications" title="Notifications" aria-label="View Notifications">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <span class="notification-dot" id="notification-dot" style="display:none;"></span>
+                        </button>
+                        <!-- Notification Dropdown -->
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notif-header">
+                                <h4>Notifications</h4>
+                                <button class="btn btn-sm btn-link" id="btn-mark-all-read">Mark all read</button>
+                            </div>
+                            <div class="notif-list" id="notification-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="btn-open-create-modal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        <span>Add New Risk</span>
+                    </button>
+
+                    <button class="btn btn-outline" id="btn-export-csv" title="Export Registry to CSV">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span>Export CSV</span>
+                    </button>
+
+                    <!-- Supabase Cloud Connection Button -->
+                    <button class="btn btn-supabase" id="btn-open-supabase-modal" title="Supabase Database Settings & Sync">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                        </svg>
+                        <span id="btn-supabase-label">Supabase Cloud</span>
+                    </button>
+
+                    <!-- Live Theme Palette Picker (Emerald & White) -->
+                    <div class="theme-palette-picker" id="theme-palette-picker" title="Switch Theme: Emerald / White">
+                        <button class="palette-pill active" id="theme-btn-emerald" onclick="setAppTheme('emerald')" title="Emerald Velvet Dark">
+                            <span class="swatch emerald"></span>
+                            <span class="palette-name">Emerald</span>
+                        </button>
+                        <button class="palette-pill" id="theme-btn-light" onclick="setAppTheme('light')" title="Classic White / Light">
+                            <span class="swatch light"></span>
+                            <span class="palette-name">White</span>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-icon" id="btn-refresh" title="Refresh Live Data">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <polyline points="1 20 1 14 7 14"/>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Alerts Banner (Dynamic if critical alerts exist) -->
+            <div class="critical-alert-bar" id="critical-alert-bar" style="display: none;">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-content">
+                    <strong>Critical Exposure Alert:</strong> <span id="alert-message">Active critical threats detected.</span>
+                </div>
+                <button class="alert-action-btn" onclick="switchTab('registry', 'Critical')">View Critical Risks</button>
+            </div>
+
+            <!-- TAB 1: EXECUTIVE OVERVIEW -->
+            <section id="tab-overview" class="tab-pane active">
+                <!-- 4 Executive KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card" data-tilt>
+                        <div class="kpi-header">
+                            <span class="kpi-label">Active Enterprise Risks</span>
+                            <div class="kpi-icon icon-blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value-row">
+                            <span class="kpi-value counter-animate" id="kpi-total-risks" data-target="0">--</span>
+                            <span class="kpi-badge badge-neutral" id="kpi-mitigating-count">-- Mitigating</span>
+                        </div>
+                        <div class="kpi-subtext">Monitored across 5 operational pillars</div>
+                    </div>
+
+                    <div class="kpi-card" data-tilt>
+                        <div class="kpi-header">
+                            <span class="kpi-label">Critical & High Exposure</span>
+                            <div class="kpi-icon icon-red">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value-row">
+                            <span class="kpi-value text-critical counter-animate" id="kpi-critical-high" data-target="0">--</span>
+                            <span class="kpi-badge badge-critical" id="kpi-critical-badge">-- Critical</span>
+                        </div>
+                        <div class="kpi-subtext">Requires immediate CRO escalation</div>
+                    </div>
+
+                    <div class="kpi-card" data-tilt>
+                        <div class="kpi-header">
+                            <span class="kpi-label">Total Financial VaR</span>
+                            <div class="kpi-icon icon-amber">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value-row">
+                            <span class="kpi-value" id="kpi-financial-var">--</span>
+                            <span class="kpi-badge badge-amber">Aggregated</span>
+                        </div>
+                        <div class="kpi-subtext">Estimated aggregate portfolio loss potential</div>
+                    </div>
+
+                    <div class="kpi-card" data-tilt>
+                        <div class="kpi-header">
+                            <span class="kpi-label">Governance Health Score</span>
+                            <div class="kpi-icon icon-emerald">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value-row">
+                            <span class="kpi-value" id="kpi-health-score">--</span>
+                            <span class="kpi-badge badge-emerald" id="kpi-health-grade">Optimal</span>
+                        </div>
+                        <div class="health-progress-bar">
+                            <div class="health-fill" id="health-progress-fill" style="width: 75%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Risk Landscape Visualizer + Quick Matrix Snapshot -->
+                <div class="visualizer-row">
+                    <!-- 3D Spatial Topology Visualizer Card -->
+                    <div class="card visualizer-card" id="exec-risk-health-card">
+                        <div class="card-header">
+                            <div class="header-titles-exec">
+                                <div class="exec-badge-row">
+                                    <span class="exec-tag-pill">ISO 31000 ERM PROTOCOL</span>
+                                    <span class="exec-tag-pill highlight">MONTE CARLO FASHIONS LTD (NSE: MONTECARLO)</span>
+                                </div>
+                                <h3>3D Risk Spatial Topology — Enterprise Heat Matrix</h3>
+                                <p class="card-subtitle">Interactive 5×5 likelihood × impact risk landscape with real-time VaR elevation mapping</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 3D EXECUTIVE SPATIAL TOPOLOGY (ALWAYS VISIBLE) -->
+                        <div class="card-body canvas-container" id="threejs-container">
+                            <!-- Top HUD Controls Bar -->
+                            <div class="three-hud-top">
+                                <div class="three-hud-info">
+                                    <span class="hud-pulse-dot"></span>
+                                    <span class="hud-title">5×5 Spatial Topology</span>
+                                    <span class="hud-chip" id="hud-active-count">13 Active Risks Mapped</span>
+                                </div>
+                                <div class="three-camera-toolbar">
+                                    <button class="three-cam-btn active" id="btn-cam-iso" onclick="set3DCameraAngle('iso')" title="3D Isometric Perspective">
+                                        <span>📐 3D Iso</span>
+                                    </button>
+                                    <button class="three-cam-btn" id="btn-cam-top" onclick="set3DCameraAngle('top')" title="Overhead 5x5 Matrix Plan">
+                                        <span>🗺️ Top Plan</span>
+                                    </button>
+                                    <button class="three-cam-btn" id="btn-cam-horizon" onclick="set3DCameraAngle('horizon')" title="Severity Elevation Profile">
+                                        <span>📊 Horizon</span>
+                                    </button>
+                                    <button class="three-cam-btn" id="btn-cam-spin" onclick="toggle3DAutoSpin()" title="Toggle Auto-Rotation">
+                                        <span id="spin-label">🔄 Auto-Rotate: ON</span>
+                                    </button>
+                                    <button class="three-cam-btn" id="btn-reset-3d-cam" onclick="set3DCameraAngle('iso')" title="Reset View">
+                                        <span>⟲ Reset</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Floating 3D Hover Dossier Card (Glass HUD) -->
+                            <div class="three-hover-dossier" id="three-hover-dossier" style="display: none;">
+                                <div class="hover-dossier-header">
+                                    <span class="hover-level-badge" id="hover-level-badge">CRITICAL</span>
+                                    <span class="hover-coord-text" id="hover-coord-text">L5 × I4</span>
+                                </div>
+                                <h4 class="hover-risk-title" id="hover-risk-title">Ransomware &amp; Zero-Day Exploit</h4>
+                                <div class="hover-dossier-metrics">
+                                    <div class="hover-metric">
+                                        <span class="m-label">Score</span>
+                                        <span class="m-val" id="hover-metric-score">20/25</span>
+                                    </div>
+                                    <div class="hover-metric">
+                                        <span class="m-label">Category</span>
+                                        <span class="m-val" id="hover-metric-category">Cybersecurity</span>
+                                    </div>
+                                    <div class="hover-metric">
+                                        <span class="m-label">VaR Exposure</span>
+                                        <span class="m-val highlight" id="hover-metric-var">₹26.50 Cr ($3.20M)</span>
+                                    </div>
+                                </div>
+                                <div class="hover-dossier-action">
+                                    <span>🖱️ Click tower to inspect full risk dossier</span>
+                                </div>
+                            </div>
+
+                            <!-- Axis Orientation Compass/Guide -->
+                            <div class="three-axis-guide">
+                                <span class="guide-tag"><strong>X-Axis:</strong> Impact (1 Negligible → 5 Catastrophic)</span>
+                                <span class="guide-divider">•</span>
+                                <span class="guide-tag"><strong>Z-Axis:</strong> Likelihood (1 Rare → 5 Almost Certain)</span>
+                                <span class="guide-divider">•</span>
+                                <span class="guide-tag"><strong>Height:</strong> Aggregated VaR &amp; Density</span>
+                            </div>
+
+                            <!-- Interactive Tooltip (Legacy fallback) -->
+                            <div class="threejs-tooltip" id="threejs-tooltip"></div>
+
+                            <!-- Legend at Bottom Right -->
+                            <div class="canvas-overlay-legend">
+                                <span class="dot-legend dot-crit">■ Critical (16-25)</span>
+                                <span class="dot-legend dot-high">■ High (10-15)</span>
+                                <span class="dot-legend dot-med">■ Medium (5-9)</span>
+                                <span class="dot-legend dot-low">■ Low (1-4)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3D Domain Ring Chart Card -->
+                    <div class="card chart-card" id="domain-ring-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Risk Distribution by Domain</h3>
+                                <p class="card-subtitle">Active threats grouped by operational category — 3D ring topology</p>
+                            </div>
+                            <div class="domain-ring-legend" id="domain-ring-legend"></div>
+                        </div>
+                        <div class="card-body domain-ring-body">
+                            <canvas id="domain-3d-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Exposure Bar Chart & Top Priority Table -->
+                <div class="visualizer-row">
+                    <div class="card chart-card-wide">
+                        <div class="card-header">
+                            <div>
+                                <h3>Financial Value-at-Risk by Category</h3>
+                                <p class="card-subtitle">Total potential monetary exposure (USD)</p>
+                            </div>
+                        </div>
+                        <div class="card-body chart-body">
+                            <canvas id="financial-bar-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card priority-risks-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Top Priority Action Items</h3>
+                                <p class="card-subtitle">Highest severity risks requiring mitigation review</p>
+                            </div>
+                            <button class="btn btn-sm btn-link" onclick="switchTab('registry')">View All →</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="priority-list" id="priority-risks-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Trend Summary Row -->
+                <div class="visualizer-row">
+                    <div class="card chart-card-wide">
+                        <div class="card-header">
+                            <div>
+                                <h3>Risk Score Distribution</h3>
+                                <p class="card-subtitle">Histogram of all active risk scores across the enterprise</p>
+                            </div>
+                        </div>
+                        <div class="card-body chart-body">
+                            <canvas id="score-distribution-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Velocity & Trend Summary</h3>
+                                <p class="card-subtitle">Movement direction and speed of active risks</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="trend-summary-grid" id="trend-summary-grid">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: RISK REGISTRY -->
+            <section id="tab-registry" class="tab-pane">
+                <div class="card table-card">
+                    <!-- Table Filter Controls -->
+                    <div class="table-filter-bar">
+                        <div class="filter-group">
+                            <label>Category:</label>
+                            <select id="filter-category" class="filter-select" aria-label="Filter by category">
+                                <option value="All">All Categories</option>
+                                <option value="Financial">Financial</option>
+                                <option value="Cybersecurity">Cybersecurity</option>
+                                <option value="Operational">Operational</option>
+                                <option value="Compliance">Compliance</option>
+                                <option value="Strategic">Strategic</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Severity:</label>
+                            <select id="filter-level" class="filter-select" aria-label="Filter by severity">
+                                <option value="All">All Levels</option>
+                                <option value="Critical">Critical (16-25)</option>
+                                <option value="High">High (10-15)</option>
+                                <option value="Medium">Medium (5-9)</option>
+                                <option value="Low">Low (1-4)</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Status:</label>
+                            <select id="filter-status" class="filter-select" aria-label="Filter by status">
+                                <option value="All">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="Mitigating">Mitigating</option>
+                                <option value="Monitoring">Monitoring</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-right">
+                            <!-- Bulk Actions -->
+                            <div class="bulk-actions" id="bulk-actions" style="display: none;">
+                                <span class="bulk-count" id="bulk-count">0 selected</span>
+                                <select class="filter-select" id="bulk-status-select" aria-label="Bulk status change">
+                                    <option value="">Change Status...</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Mitigating">Mitigating</option>
+                                    <option value="Monitoring">Monitoring</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline" id="btn-bulk-delete" title="Delete Selected">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                </button>
+                            </div>
+                            <span class="table-counter" id="registry-count-label">Showing 0 risks</span>
+                        </div>
+                    </div>
+
+                    <!-- Risk Table -->
+                    <div class="table-responsive">
+                        <table class="data-table" id="risks-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">
+                                        <input type="checkbox" id="select-all-risks" class="custom-checkbox" aria-label="Select all risks">
+                                    </th>
+                                    <th style="width: 55px;">ID</th>
+                                    <th>Risk Details</th>
+                                    <th>Category</th>
+                                    <th style="width: 100px;">L × I</th>
+                                    <th style="width: 95px;">Score</th>
+                                    <th style="width: 80px;">Trend</th>
+                                    <th style="width: 120px;">Financial VaR</th>
+                                    <th style="width: 120px;">Status</th>
+                                    <th>Owner</th>
+                                    <th style="width: 100px; text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="risks-tbody">
+                                <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: 5×5 RISK MATRIX -->
+            <section id="tab-matrix" class="tab-pane">
+                <div class="matrix-layout">
+                    <!-- Matrix Grid Container -->
+                    <div class="card matrix-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Enterprise 5×5 Risk Assessment Heatmap</h3>
+                                <p class="card-subtitle">ISO 31000 Standard: Likelihood (Y) vs Impact Severity (X)</p>
+                            </div>
+                            <div class="matrix-legend-row">
+                                <span class="legend-box leg-low">1-4 Low</span>
+                                <span class="legend-box leg-med">5-9 Medium</span>
+                                <span class="legend-box leg-high">10-15 High</span>
+                                <span class="legend-box leg-crit">16-25 Critical</span>
+                            </div>
+                        </div>
+
+                        <div class="card-body matrix-body">
+                            <!-- 5x5 Grid with axis labels -->
+                            <div class="matrix-wrapper">
+                                <!-- Y Axis Label -->
+                                <div class="matrix-y-axis-label">
+                                    <span>LIKELIHOOD (PROBABILITY) →</span>
+                                </div>
+
+                                <div class="matrix-inner">
+                                    <!-- 5 rows (Likelihood 5 down to 1) -->
+                                    <div class="matrix-grid-5x5" id="matrix-grid-container">
+                                        <!-- Injected dynamically via JS -->
+                                    </div>
+
+                                    <!-- X Axis Label -->
+                                    <div class="matrix-x-axis-label">
+                                        <span>← IMPACT (SEVERITY) →</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side Drawer / Cell Inspector -->
+                    <div class="card matrix-inspector-card" id="matrix-inspector">
+                        <div class="card-header">
+                            <div>
+                                <h3 id="inspector-title">Matrix Cell Inspector</h3>
+                                <p class="card-subtitle" id="inspector-subtitle">Click any matrix cell to view specific risks</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="inspector-content" id="inspector-content">
+                                <div class="empty-state">
+                                    <div class="empty-icon">🎯</div>
+                                    <p>Select any square in the 5×5 grid on the left to inspect the enterprise risks residing in that likelihood-impact intersection.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: MONTE CARLO VaR ANALYTICS -->
+            <section id="tab-analytics" class="tab-pane">
+                <div class="visualizer-row">
+                    <!-- Monte Carlo Configuration Card -->
+                    <div class="card sim-config-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Probabilistic Monte Carlo Simulator</h3>
+                                <p class="card-subtitle">Calculate 95% Value-at-Risk (VaR) and distribution curve</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form id="sim-form" onsubmit="event.preventDefault(); runMonteCarloSim();">
+                                <div class="form-group">
+                                    <label>Preset Risk or Custom Parameters:</label>
+                                    <select id="sim-risk-select" class="form-control">
+                                        <option value="custom">-- Custom Scenario Parameters --</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Likelihood Level: <span class="param-val" id="sim-likelihood-val">3 (Possible)</span></label>
+                                    <input type="range" id="sim-likelihood" min="1" max="5" value="3" class="range-slider">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Impact Severity: <span class="param-val" id="sim-impact-val">4 (Major)</span></label>
+                                    <input type="range" id="sim-impact" min="1" max="5" value="4" class="range-slider">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Baseline Financial Exposure (USD):</label>
+                                    <input type="number" id="sim-exposure" class="form-control" value="1500000" step="50000">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Simulation Iterations (Trials):</label>
+                                    <select id="sim-trials" class="form-control">
+                                        <option value="1000">1,000 Iterations</option>
+                                        <option value="3000" selected>3,000 Iterations (Recommended)</option>
+                                        <option value="5000">5,000 Iterations</option>
+                                        <option value="10000">10,000 Iterations (High Fidelity)</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block" id="btn-run-sim">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                    <span>Execute Monte Carlo Simulation</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Simulation Result Metrics & Histogram -->
+                    <div class="card sim-results-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Simulation Exposure Telemetry</h3>
+                                <p class="card-subtitle">Log-Normal Loss Distribution & Confidence Interval</p>
+                            </div>
+                            <span class="badge-tag" id="sim-status-badge">Ready</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Metric Pill Row -->
+                            <div class="sim-metric-row">
+                                <div class="sim-pill">
+                                    <span class="pill-label">95% Value-at-Risk (VaR)</span>
+                                    <span class="pill-val text-critical" id="sim-var-val">$1,840,000</span>
+                                </div>
+                                <div class="sim-pill">
+                                    <span class="pill-label">Expected Mean Loss</span>
+                                    <span class="pill-val text-amber" id="sim-mean-val">$920,000</span>
+                                </div>
+                                <div class="sim-pill">
+                                    <span class="pill-label">Occurrence Probability</span>
+                                    <span class="pill-val text-blue" id="sim-occur-val">60.2%</span>
+                                </div>
+                                <div class="sim-pill">
+                                    <span class="pill-label">Worst-Case Tail Event</span>
+                                    <span class="pill-val text-critical" id="sim-worst-val">$3,450,000</span>
+                                </div>
+                            </div>
+
+                            <!-- Histogram Chart Canvas -->
+                            <div class="chart-body sim-chart-body">
+                                <canvas id="sim-histogram-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: FINANCIAL ANALYSIS (B.Com Component) -->
+            <section id="tab-financial" class="tab-pane">
+
+                <!-- Section: Monte Carlo Fashions Ltd Corporate Overview & Scale Switcher -->
+                <div class="mc-corporate-bar">
+                    <div class="mc-corp-brand">
+                        <div class="mc-crest">MC</div>
+                        <div>
+                            <div class="mc-corp-meta">
+                                <span class="mc-ticker">NSE: MONTECARLO</span>
+                                <span class="mc-bse">BSE: 538836</span>
+                                <span class="mc-sector">Textiles & Premium Knitwear · Ludhiana, PB</span>
+                            </div>
+                            <h2 class="mc-corp-title">Monte Carlo Fashions Limited — Enterprise Risk & Financial Telemetry</h2>
+                            <p class="mc-corp-sub">Institutional Risk Analytics · 365+ EBOs · 2,500+ MBOs · Seasonal Woollen Demand Analytics</p>
+                        </div>
+                    </div>
+                    <div class="mc-corp-actions">
+                        <div class="scale-switcher" role="group" aria-label="Financial Scale Switcher">
+                            <span class="scale-label">Scale:</span>
+                            <button type="button" class="scale-btn active" id="scale-btn-corporate" onclick="setFinancialScale('corporate')">🏢 Corporate (₹ Cr)</button>
+                            <button type="button" class="scale-btn" id="scale-btn-store" onclick="setFinancialScale('store')">🏪 Unit Store (₹ Lakhs)</button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="exportMonteCarloDossier()" title="Export Executive Risk Dossier">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                            <span>Executive Dossier (PDF)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Retail Footprint & Seasonal KPIs -->
+                <div class="mc-kpi-strip">
+                    <div class="mc-kpi-item">
+                        <span class="kpi-tag">Exclusive Brand Outlets</span>
+                        <span class="kpi-num">365+ EBOs</span>
+                        <span class="kpi-hint">Pan-India Retail Network</span>
+                    </div>
+                    <div class="mc-kpi-item">
+                        <span class="kpi-tag">Multi-Brand Outlets</span>
+                        <span class="kpi-num">2,500+ Doors</span>
+                        <span class="kpi-hint">Wholesale & NCS Retail</span>
+                    </div>
+                    <div class="mc-kpi-item">
+                        <span class="kpi-tag">Winter Revenue Share</span>
+                        <span class="kpi-num">56.5%</span>
+                        <span class="kpi-hint">Q3 Cold Weather Peak</span>
+                    </div>
+                    <div class="mc-kpi-item">
+                        <span class="kpi-tag">Raw Wool Sourcing</span>
+                        <span class="kpi-num">100% Merino</span>
+                        <span class="kpi-hint">Australian Woolmark Grade</span>
+                    </div>
+                    <div class="mc-kpi-item">
+                        <span class="kpi-tag">Working Capital Cycle</span>
+                        <span class="kpi-num">138 Days</span>
+                        <span class="kpi-hint">Seasonal Pre-Booking Window</span>
+                    </div>
+                </div>
+
+                <!-- Risk Type Cards -->
+                <div class="risk-types-grid">
+                    <div class="risk-type-card liquidity">
+                        <div class="rtype-icon">💧</div>
+                        <div class="rtype-body">
+                            <h4>Liquidity Risk</h4>
+                            <p>Difficulty paying short-term obligations</p>
+                            <span class="rtype-example">Insufficient cash to pay suppliers</span>
+                        </div>
+                    </div>
+                    <div class="risk-type-card debt">
+                        <div class="rtype-icon">📉</div>
+                        <div class="rtype-body">
+                            <h4>Debt Risk</h4>
+                            <p>Excessive dependence on borrowing</p>
+                            <span class="rtype-example">High loan repayments</span>
+                        </div>
+                    </div>
+                    <div class="risk-type-card profitability">
+                        <div class="rtype-icon">📈</div>
+                        <div class="rtype-body">
+                            <h4>Profitability Risk</h4>
+                            <p>Declining ability to earn profit</p>
+                            <span class="rtype-example">Increasing operating expenses</span>
+                        </div>
+                    </div>
+                    <div class="risk-type-card cashflow">
+                        <div class="rtype-icon">💸</div>
+                        <div class="rtype-body">
+                            <h4>Cash-Flow Risk</h4>
+                            <p>Mismatch between receipts and payments</p>
+                            <span class="rtype-example">Customers pay after supplier dues</span>
+                        </div>
+                    </div>
+                    <div class="risk-type-card efficiency">
+                        <div class="rtype-icon">⚙️</div>
+                        <div class="rtype-body">
+                            <h4>Efficiency Risk</h4>
+                            <p>Poor use of business resources</p>
+                            <span class="rtype-example">Slow-moving inventory</span>
+                        </div>
+                    </div>
+                    <div class="risk-type-card operational">
+                        <div class="rtype-icon">🏭</div>
+                        <div class="rtype-body">
+                            <h4>Operational Risk</h4>
+                            <p>Disruption to business activities</p>
+                            <span class="rtype-example">Supplier failure or system outage</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fin-two-col">
+                    <!-- Financial Data Inputs -->
+                    <div class="card fin-input-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 id="fin-input-card-title">Financial Data — Monte Carlo Fashions Ltd (₹ Crores)</h3>
+                                <p class="card-subtitle" id="fin-input-card-subtitle">Annual audited figures · Garment manufacturing, retail footprint & working capital</p>
+                            </div>
+                            <button class="btn btn-sm btn-outline" onclick="resetFinancialData()" id="btn-reset-fin">Reset to Baseline</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="fin-input-grid">
+                                <div class="form-group">
+                                    <label for="fin-current-assets">Current Assets (₹)</label>
+                                    <input type="number" id="fin-current-assets" class="form-control" value="1500000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-inventory">Inventory (₹)</label>
+                                    <input type="number" id="fin-inventory" class="form-control" value="550000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-current-liabilities">Current Liabilities (₹)</label>
+                                    <input type="number" id="fin-current-liabilities" class="form-control" value="1000000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-total-debt">Total Debt (₹)</label>
+                                    <input type="number" id="fin-total-debt" class="form-control" value="900000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-equity">Shareholders' Equity (₹)</label>
+                                    <input type="number" id="fin-equity" class="form-control" value="1200000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-revenue">Revenue (₹)</label>
+                                    <input type="number" id="fin-revenue" class="form-control" value="4000000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-cogs">Cost of Goods Sold (₹)</label>
+                                    <input type="number" id="fin-cogs" class="form-control" value="2400000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-operating-profit">Operating Profit (₹)</label>
+                                    <input type="number" id="fin-operating-profit" class="form-control" value="400000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-net-profit">Net Profit (₹)</label>
+                                    <input type="number" id="fin-net-profit" class="form-control" value="200000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-interest">Interest Expense (₹)</label>
+                                    <input type="number" id="fin-interest" class="form-control" value="100000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-avg-inventory">Average Inventory (₹)</label>
+                                    <input type="number" id="fin-avg-inventory" class="form-control" value="533333">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fin-avg-receivables">Average Trade Receivables (₹)</label>
+                                    <input type="number" id="fin-avg-receivables" class="form-control" value="533333">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-block" onclick="calculateFinancialRatios()" id="btn-calc-ratios" style="margin-top: 12px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                <span>Calculate All Financial Ratios</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Calculated Ratio Results -->
+                    <div class="card fin-results-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Computed Financial Ratios</h3>
+                                <p class="card-subtitle">Auto-calculated · Values update in real-time</p>
+                            </div>
+                            <span class="badge-tag" id="fin-calc-status">Sample Data Loaded</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="ratio-results-list" id="ratio-results-list">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Scoring Framework -->
+                <div class="fin-two-col" style="margin-top: 0;">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Risk Scoring Framework</h3>
+                                <p class="card-subtitle">Weighted composite score 0–100 · Higher = Greater Risk</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Overall Risk Score Display -->
+                            <div class="risk-score-display" id="risk-score-display">
+                                <div class="rsd-gauge-wrap">
+                                    <canvas id="risk-gauge-chart" width="220" height="220"></canvas>
+                                    <div class="rsd-score-center">
+                                        <div class="rsd-score-val" id="rsd-score-val">--</div>
+                                        <div class="rsd-score-label" id="rsd-score-label">Calculate Ratios</div>
+                                    </div>
+                                </div>
+                                <div class="rsd-categories">
+                                    <div class="rsd-cat-item">
+                                        <span class="rsd-cat-name">💧 Liquidity</span>
+                                        <div class="rsd-cat-bar-wrap">
+                                            <div class="rsd-cat-bar" id="rsd-bar-liquidity" style="width: 0%;"></div>
+                                        </div>
+                                        <span class="rsd-cat-score" id="rsd-score-liquidity">--</span>
+                                        <span class="rsd-cat-weight">25%</span>
+                                    </div>
+                                    <div class="rsd-cat-item">
+                                        <span class="rsd-cat-name">📉 Debt & Solvency</span>
+                                        <div class="rsd-cat-bar-wrap">
+                                            <div class="rsd-cat-bar" id="rsd-bar-debt" style="width: 0%;"></div>
+                                        </div>
+                                        <span class="rsd-cat-score" id="rsd-score-debt">--</span>
+                                        <span class="rsd-cat-weight">20%</span>
+                                    </div>
+                                    <div class="rsd-cat-item">
+                                        <span class="rsd-cat-name">📈 Profitability</span>
+                                        <div class="rsd-cat-bar-wrap">
+                                            <div class="rsd-cat-bar" id="rsd-bar-profitability" style="width: 0%;"></div>
+                                        </div>
+                                        <span class="rsd-cat-score" id="rsd-score-profitability">--</span>
+                                        <span class="rsd-cat-weight">20%</span>
+                                    </div>
+                                    <div class="rsd-cat-item">
+                                        <span class="rsd-cat-name">⚙️ Efficiency</span>
+                                        <div class="rsd-cat-bar-wrap">
+                                            <div class="rsd-cat-bar" id="rsd-bar-efficiency" style="width: 0%;"></div>
+                                        </div>
+                                        <span class="rsd-cat-score" id="rsd-score-efficiency">--</span>
+                                        <span class="rsd-cat-weight">15%</span>
+                                    </div>
+                                    <div class="rsd-cat-item">
+                                        <span class="rsd-cat-name">🏭 Operational</span>
+                                        <div class="rsd-cat-bar-wrap">
+                                            <div class="rsd-cat-bar" id="rsd-bar-operational" style="width: 0%;"></div>
+                                        </div>
+                                        <span class="rsd-cat-score" id="rsd-score-operational">--</span>
+                                        <span class="rsd-cat-weight">20%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Classification Table -->
+                            <table class="fin-class-table">
+                                <thead><tr><th>Overall Score</th><th>Classification</th></tr></thead>
+                                <tbody>
+                                    <tr><td>0 – 30</td><td><span class="score-chip badge-emerald">Low Risk</span></td></tr>
+                                    <tr><td>31 – 60</td><td><span class="score-chip badge-amber">Medium Risk</span></td></tr>
+                                    <tr><td>61 – 80</td><td><span class="score-chip badge-high">High Risk</span></td></tr>
+                                    <tr><td>81 – 100</td><td><span class="score-chip badge-critical">Critical Risk</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Financial Monte Carlo & Stress Presets -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Monte Carlo Stress Testing & Scenario Engine</h3>
+                                <p class="card-subtitle">Probabilistic simulation of apparel margin shocks, winter delays & working capital lags</p>
+                            </div>
+                            <span class="badge-tag" id="sim-scenario-badge">Base Case Active</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Scenario Presets -->
+                            <div class="mc-scenario-presets">
+                                <span class="scenario-label">Monte Carlo Stress Scenarios:</span>
+                                <div class="scenario-chips">
+                                    <button type="button" class="scenario-chip" id="chip-mild-winter" onclick="applyScenarioPreset('mild-winter')">❄️ Mild Winter Shock</button>
+                                    <button type="button" class="scenario-chip" id="chip-wool-spike" onclick="applyScenarioPreset('wool-spike')">🧶 Wool Cost Inflation</button>
+                                    <button type="button" class="scenario-chip" id="chip-mbo-credit" onclick="applyScenarioPreset('mbo-credit')">🏪 Franchisee Credit Freeze</button>
+                                    <button type="button" class="scenario-chip active" id="chip-base-case" onclick="applyScenarioPreset('base-case')">🎯 Balanced Base</button>
+                                </div>
+                            </div>
+
+                            <form id="fin-sim-form" onsubmit="event.preventDefault(); runFinancialMonteCarlo();">
+                                <div class="form-group">
+                                    <label>Revenue Variation (±%): <span class="param-val" id="fin-rev-var-val">±15%</span></label>
+                                    <input type="range" id="fin-rev-variation" min="1" max="40" value="15" class="range-slider"
+                                        oninput="document.getElementById('fin-rev-var-val').textContent = '±' + this.value + '%'">
+                                </div>
+                                <div class="form-group">
+                                    <label>Expense / COGS Variation (±%): <span class="param-val" id="fin-exp-var-val">±10%</span></label>
+                                    <input type="range" id="fin-exp-variation" min="1" max="40" value="10" class="range-slider"
+                                        oninput="document.getElementById('fin-exp-var-val').textContent = '±' + this.value + '%'">
+                                </div>
+                                <div class="form-group">
+                                    <label>Debtor Collection Lag (±days): <span class="param-val" id="fin-col-var-val">±15 days</span></label>
+                                    <input type="range" id="fin-col-variation" min="1" max="60" value="15" class="range-slider"
+                                        oninput="document.getElementById('fin-col-var-val').textContent = '±' + this.value + ' days'">
+                                </div>
+                                <div class="form-group">
+                                    <label>Simulation Trials:</label>
+                                    <select id="fin-sim-trials" class="form-control">
+                                        <option value="1000">1,000 Iterations</option>
+                                        <option value="3000" selected>3,000 Iterations (Recommended)</option>
+                                        <option value="5000">5,000 Iterations (High Fidelity)</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block" id="btn-run-fin-sim">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                    <span>Execute Monte Carlo Simulation</span>
+                                </button>
+                            </form>
+                            <div class="fin-sim-results" id="fin-sim-results" style="display:none;">
+                                <div class="sim-metric-row" style="margin-top: 16px;">
+                                    <div class="sim-pill">
+                                        <span class="pill-label">Expected Net Profit</span>
+                                        <span class="pill-val text-amber" id="fin-sim-mean">--</span>
+                                    </div>
+                                    <div class="sim-pill">
+                                        <span class="pill-label">95% Value-at-Risk (VaR)</span>
+                                        <span class="pill-val text-critical" id="fin-sim-var95">--</span>
+                                    </div>
+                                    <div class="sim-pill">
+                                        <span class="pill-label">99% Tail Risk (VaR 99)</span>
+                                        <span class="pill-val text-critical" id="fin-sim-var99">--</span>
+                                    </div>
+                                    <div class="sim-pill">
+                                        <span class="pill-label">Conditional VaR (CVaR)</span>
+                                        <span class="pill-val text-critical" id="fin-sim-cvar">--</span>
+                                    </div>
+                                    <div class="sim-pill">
+                                        <span class="pill-label">Loss Probability</span>
+                                        <span class="pill-val text-critical" id="fin-sim-loss-pct">--</span>
+                                    </div>
+                                </div>
+                                <div class="chart-body" style="height: 180px; margin-top: 12px;">
+                                    <canvas id="fin-sim-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tornado Sensitivity Analysis: Key Risk Drivers -->
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-header">
+                        <div>
+                            <h3>Tornado Sensitivity Analysis — Monte Carlo Key Risk Drivers</h3>
+                            <p class="card-subtitle">Deterministic sensitivity of Net Profit (PAT) to operational, supply chain, and weather shocks</p>
+                        </div>
+                        <span class="badge-tag">Sensitivity Variance (₹)</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="tornado-chart-wrapper" style="height: 250px;">
+                            <canvas id="tornado-chart"></canvas>
+                        </div>
+                        <div class="tornado-insights">
+                            <div class="tornado-insight-item">
+                                <div class="t-badge" style="background: rgba(59, 130, 246, 0.15); color: var(--accent-cyan);">1</div>
+                                <div>
+                                    <strong>Revenue & Off-Take Shock (±15%)</strong>
+                                    <p>Largest sensitivity driver — directly tied to winter onset dates and footfalls across 365+ EBOs.</p>
+                                </div>
+                            </div>
+                            <div class="tornado-insight-item">
+                                <div class="t-badge" style="background: rgba(255, 59, 92, 0.15); color: var(--risk-critical);">2</div>
+                                <div>
+                                    <strong>Australian Merino Wool & Yarn Cost (±10%)</strong>
+                                    <p>Raw material inflation shifts COGS directly, impacting gross margins by up to 260 basis points.</p>
+                                </div>
+                            </div>
+                            <div class="tornado-insight-item">
+                                <div class="t-badge" style="background: rgba(255, 192, 33, 0.15); color: var(--risk-medium);">3</div>
+                                <div>
+                                    <strong>MBO Dealer Collection Lag (±25 Days)</strong>
+                                    <p>Slow distributor collections expand working capital financing requirements and short-term debt costs.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operational Risks & Recommendations -->
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-header">
+                        <div>
+                            <h3>Operational Risks &amp; Management Recommendations</h3>
+                            <p class="card-subtitle">Linked to financial indicators · Action items triggered by ratio alerts</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="recommendations-grid" id="recommendations-grid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Validation Plan -->
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-header">
+                        <div>
+                            <h3>Validation &amp; Testing Plan</h3>
+                            <p class="card-subtitle">Proposed test cases — actual pass/fail recorded after application testing</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="validation-table-wrap">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Test Case</th>
+                                        <th>Expected Result</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="validation-tbody">
+                                    <tr>
+                                        <td>Enter valid sample data</td>
+                                        <td>Ratios match manual calculations</td>
+                                        <td><span class="score-chip badge-emerald">✓ Pass</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Leave a required field blank</td>
+                                        <td>Missing information is identified</td>
+                                        <td><span class="score-chip badge-amber">Proposed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Enter zero as a denominator</td>
+                                        <td>Ratio marked as not calculable</td>
+                                        <td><span class="score-chip badge-emerald">✓ Pass</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Overall score = 30</td>
+                                        <td>Classification: Low Risk</td>
+                                        <td><span class="score-chip badge-emerald">✓ Pass</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Overall score = 31</td>
+                                        <td>Classification: Medium Risk</td>
+                                        <td><span class="score-chip badge-emerald">✓ Pass</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Overall score = 61</td>
+                                        <td>Classification: High Risk</td>
+                                        <td><span class="score-chip badge-emerald">✓ Pass</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Overall score = 81</td>
+                                        <td>Classification: Critical Risk</td>
+                                        <td><span class="score-chip badge-emerald">✓ Pass</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Change a financial input</td>
+                                        <td>Dependent results update correctly</td>
+                                        <td><span class="score-chip badge-emerald">✓ Pass</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="fin-disclaimer">
+                            <strong>⚠️ Note:</strong> The sample business figures relate to Monte Carlo Brand retail operations case study. Proposed weights and classification ranges are structured under the B.Com Risk Assessment curriculum.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 6: AUDIT TRAIL -->
+            <section id="tab-audit" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3>Enterprise Audit Trail & Mutation Log</h3>
+                            <p class="card-subtitle">Immutable timeline of database changes, status updates, and risk registrations</p>
+                        </div>
+                        <div class="audit-header-actions">
+                            <button class="btn btn-sm btn-outline" onclick="loadAuditLogs()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/></svg>
+                                <span>Refresh Logs</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline" id="btn-reset-db" title="Reset & Re-Seed Database">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 2v6h6"/><path d="M2.66 15.57a10 10 0 1 0 .57-8.38"/></svg>
+                                <span>Reset DB</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="audit-timeline" id="audit-timeline-container">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 7: ENTERPRISE ADMIN & GOVERNANCE PORTAL -->
+            <section id="tab-admin" class="tab-pane">
+                <!-- Admin Header Hero Banner -->
+                <div class="admin-hero-banner">
+                    <div class="admin-hero-left">
+                        <div class="admin-tag-row">
+                            <span class="admin-hero-tag">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                ISO 31000 · ERM PROTOCOL v3.2
+                            </span>
+                            <span class="admin-hero-tag highlight">MONTE CARLO FASHIONS LTD (NSE: MONTECARLO)</span>
+                        </div>
+                        <h2>Enterprise Governance & Admin Console</h2>
+                        <p>Configure quantitative risk appetite thresholds, test incident webhook integrations, switch role personas, and download verified disaster recovery database snapshots.</p>
+                    </div>
+                    <div class="admin-hero-chips">
+                        <div class="admin-chip">
+                            <span class="chip-lbl">Current Persona</span>
+                            <strong id="admin-badge-active-role">CRO Super Admin</strong>
+                        </div>
+                        <div class="admin-chip">
+                            <span class="chip-lbl">Board Policy Status</span>
+                            <strong class="text-success">Ratified (Q3 FY26)</strong>
+                        </div>
+                        <div class="admin-chip">
+                            <span class="chip-lbl">Cloud DB Engine</span>
+                            <strong class="text-cyan">Supabase PostgreSQL</strong>
+                        </div>
+                        <div class="admin-chip">
+                            <span class="chip-lbl">Incident Webhooks</span>
+                            <strong class="text-gold" id="admin-webhooks-active">3 Channels Online</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Grid Layout -->
+                <div class="admin-layout-grid">
+                    <!-- SECTION 1: ROLE-BASED ACCESS CONTROL (RBAC) PERSONAS -->
+                    <div class="card admin-full-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Role-Based Access Control (RBAC) Persona Switcher</h3>
+                                <p class="card-subtitle">Select an executive persona to inspect security boundaries, privilege scopes, and simulation overrides</p>
+                            </div>
+                            <span class="badge badge-primary" id="rbac-active-indicator">Active: CRO Super Admin</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="rbac-role-grid">
+                                <!-- CRO Super Admin -->
+                                <div class="rbac-role-card active" id="role-card-cro" onclick="switchUserRole('cro')">
+                                    <div class="role-card-top">
+                                        <div class="role-avatar-circle cro-avatar">CRO</div>
+                                        <div>
+                                            <h4>Chief Risk Officer</h4>
+                                            <span class="role-rank-badge">Super Admin · Full Access</span>
+                                        </div>
+                                    </div>
+                                    <p class="role-desc">Executive committee authority. Calibrates risk appetite, signs Board dossiers, purges/seeds database, dispatches alerts.</p>
+                                    <ul class="role-caps-list">
+                                        <li><span class="cap-check">✔</span> Risk Appetite Overrides</li>
+                                        <li><span class="cap-check">✔</span> Supabase DB Wipe & Re-seed</li>
+                                        <li><span class="cap-check">✔</span> Board Dossier PDF Sign-off</li>
+                                    </ul>
+                                    <button class="btn btn-sm btn-primary rbac-switch-btn">Active Role</button>
+                                </div>
+
+                                <!-- Lead Risk Analyst -->
+                                <div class="rbac-role-card" id="role-card-manager" onclick="switchUserRole('manager')">
+                                    <div class="role-card-top">
+                                        <div class="role-avatar-circle mgr-avatar">MGR</div>
+                                        <div>
+                                            <h4>Lead Risk Analyst</h4>
+                                            <span class="role-rank-badge">Corporate Risk Office</span>
+                                        </div>
+                                    </div>
+                                    <p class="role-desc">Manages risk registry, runs 50k Monte Carlo iterations, modifies scenario stresses, exports financial sensitivity charts.</p>
+                                    <ul class="role-caps-list">
+                                        <li><span class="cap-check">✔</span> Add & Edit Registry Vectors</li>
+                                        <li><span class="cap-check">✔</span> 50,000 Iteration Simulations</li>
+                                        <li><span class="cap-cross">✕</span> Policy Cutoff Modification</li>
+                                    </ul>
+                                    <button class="btn btn-sm btn-outline rbac-switch-btn">Switch Role</button>
+                                </div>
+
+                                <!-- Compliance & Statutory Auditor -->
+                                <div class="rbac-role-card" id="role-card-auditor" onclick="switchUserRole('auditor')">
+                                    <div class="role-card-top">
+                                        <div class="role-avatar-circle aud-avatar">AUD</div>
+                                        <div>
+                                            <h4>Compliance & Auditor</h4>
+                                            <span class="role-rank-badge">Read-Only Attestation</span>
+                                        </div>
+                                    </div>
+                                    <p class="role-desc">SEBI LODR & ISO 31000 statutory auditor. Inspects immutable database audit logs, exports cryptographic JSON/SQL dumps.</p>
+                                    <ul class="role-caps-list">
+                                        <li><span class="cap-check">✔</span> Immutable Audit Ledger Read</li>
+                                        <li><span class="cap-check">✔</span> Export SQL & JSON Schemas</li>
+                                        <li><span class="cap-cross">✕</span> Mutation / Deletion Rights</li>
+                                    </ul>
+                                    <button class="btn btn-sm btn-outline rbac-switch-btn">Switch Role</button>
+                                </div>
+
+                                <!-- Store Operations Risk Lead -->
+                                <div class="rbac-role-card" id="role-card-ops" onclick="switchUserRole('ops')">
+                                    <div class="role-card-top">
+                                        <div class="role-avatar-circle ops-avatar">OPS</div>
+                                        <div>
+                                            <h4>Store Operations Lead</h4>
+                                            <span class="role-rank-badge">EBO Retail Telemetry</span>
+                                        </div>
+                                    </div>
+                                    <p class="role-desc">Monitors 365+ EBO store inventory stockouts, wool shipment logistics delays, and Ludhiana manufacturing uptime.</p>
+                                    <ul class="role-caps-list">
+                                        <li><span class="cap-check">✔</span> Log Store-Level Risks (₹ Lakhs)</li>
+                                        <li><span class="cap-check">✔</span> Sourcing Delay Flagging</li>
+                                        <li><span class="cap-cross">✕</span> Corporate VaR Calibration</li>
+                                    </ul>
+                                    <button class="btn btn-sm btn-outline rbac-switch-btn">Switch Role</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2 COLUMNS: RISK APPETITE SLIDERS & INCIDENT WEBHOOKS -->
+                    <div class="admin-cols-2">
+                        <!-- SECTION 2: RISK APPETITE & ISO 31000 CALIBRATION -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Risk Appetite & Escalation Cutoffs</h3>
+                                    <p class="card-subtitle">ISO 31000 quantitative tolerance limits mandated by Monte Carlo Board</p>
+                                </div>
+                                <span class="badge badge-warning">Board Mandate</span>
+                            </div>
+                            <div class="card-body">
+                                <form id="form-risk-appetite" onsubmit="event.preventDefault(); saveRiskAppetite();">
+                                    <!-- Critical Risk Cutoff Slider -->
+                                    <div class="admin-slider-group">
+                                        <div class="slider-header">
+                                            <label for="slider-critical-cutoff">Critical Risk Escalation Score (16 - 25)</label>
+                                            <span class="slider-val-badge text-danger" id="val-critical-cutoff">20 / 25</span>
+                                        </div>
+                                        <input type="range" id="slider-critical-cutoff" min="16" max="25" value="20" step="1" oninput="updateAppetiteSliders()">
+                                        <span class="slider-caption">Risks at or above this threshold trigger mandatory auto-escalation to Board Audit Committee within 1 hr.</span>
+                                    </div>
+
+                                    <!-- High Risk Cutoff Slider -->
+                                    <div class="admin-slider-group">
+                                        <div class="slider-header">
+                                            <label for="slider-high-cutoff">High Risk Review Cutoff (10 - 18)</label>
+                                            <span class="slider-val-badge text-warning" id="val-high-cutoff">15 / 25</span>
+                                        </div>
+                                        <input type="range" id="slider-high-cutoff" min="10" max="18" value="15" step="1" oninput="updateAppetiteSliders()">
+                                        <span class="slider-caption">Quarterly mitigation roadmap required with senior departmental sign-off.</span>
+                                    </div>
+
+                                    <!-- Materiality Inputs -->
+                                    <div class="form-row mt-3">
+                                        <div class="form-group col-6">
+                                            <label for="admin-corporate-materiality">Corporate Materiality (₹ Cr)</label>
+                                            <input type="number" id="admin-corporate-materiality" class="form-control" value="25.0" step="0.5">
+                                            <span class="field-help">SEBI LODR external disclosure cutoff</span>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <label for="admin-store-materiality">Store Unit Cutoff (₹ Lakhs)</label>
+                                            <input type="number" id="admin-store-materiality" class="form-control" value="15.0" step="1.0">
+                                            <span class="field-help">Per-EBO inventory stockout threshold</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Simulation Target Selection -->
+                                    <div class="form-row mt-2">
+                                        <div class="form-group col-6">
+                                            <label>VaR Target Benchmark</label>
+                                            <select id="admin-var-target" class="form-control">
+                                                <option value="95" selected>95% Value-at-Risk (Standard)</option>
+                                                <option value="99">99% Tail Risk (Extreme Stress)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <label>Default Simulation Engine Runs</label>
+                                            <select id="admin-sim-iterations" class="form-control">
+                                                <option value="10000">10,000 Iterations (Fast)</option>
+                                                <option value="25000">25,000 Iterations (Recommended)</option>
+                                                <option value="50000" selected>50,000 Iterations (Board-Grade)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="admin-actions-bar mt-4">
+                                        <button type="submit" class="btn btn-primary" id="btn-save-appetite">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                            <span>Enforce & Broadcast Policy</span>
+                                        </button>
+                                        <button type="button" class="btn btn-outline" onclick="resetRiskAppetite()">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 2v6h6"/><path d="M2.66 15.57a10 10 0 1 0 .57-8.38"/></svg>
+                                            <span>Reset to Default</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 3: AUTOMATED INCIDENT DISPATCH & WEBHOOKS -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Automated Incident Push Webhooks</h3>
+                                    <p class="card-subtitle">Real-time alerts broadcast to executive messaging channels upon VaR breach</p>
+                                </div>
+                                <span class="badge badge-success">Live Dispatch</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="webhooks-list">
+                                    <!-- Slack Webhook -->
+                                    <div class="webhook-channel-card">
+                                        <div class="webhook-left">
+                                            <div class="channel-icon-circle slack-bg">#</div>
+                                            <div>
+                                                <h4>Slack Executive Channel</h4>
+                                                <span class="channel-target">#board-risk-alerts · Webhook API</span>
+                                                <p class="channel-condition">Trigger: Critical Risks (Score ≥ 20) or VaR Loss > ₹35 Cr</p>
+                                            </div>
+                                        </div>
+                                        <div class="webhook-right">
+                                            <span class="status-indicator-badge live" id="status-slack">Online · 200 OK</span>
+                                            <button class="btn btn-sm btn-outline" onclick="sendTestWebhookAlert('slack')">
+                                                <span>Send Test Ping</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Microsoft Teams Webhook -->
+                                    <div class="webhook-channel-card">
+                                        <div class="webhook-left">
+                                            <div class="channel-icon-circle teams-bg">T</div>
+                                            <div>
+                                                <h4>Microsoft Teams</h4>
+                                                <span class="channel-target">ERM Executive Committee · Incoming Webhook</span>
+                                                <p class="channel-condition">Trigger: Wool Inflation / Mild Winter Shock preset activation</p>
+                                            </div>
+                                        </div>
+                                        <div class="webhook-right">
+                                            <span class="status-indicator-badge live" id="status-teams">Online · 200 OK</span>
+                                            <button class="btn btn-sm btn-outline" onclick="sendTestWebhookAlert('teams')">
+                                                <span>Send Test Ping</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Executive Email Digest -->
+                                    <div class="webhook-channel-card">
+                                        <div class="webhook-left">
+                                            <div class="channel-icon-circle mail-bg">✉</div>
+                                            <div>
+                                                <h4>Board Email Distribution Relay</h4>
+                                                <span class="channel-target">cro.office@montecarlo.co.in, board.audit@montecarlo.co.in</span>
+                                                <p class="channel-condition">Trigger: Board Executive Dossier PDF generation & Quarterly closing</p>
+                                            </div>
+                                        </div>
+                                        <div class="webhook-right">
+                                            <span class="status-indicator-badge live" id="status-email">Online · SMTP TLS</span>
+                                            <button class="btn btn-sm btn-outline" onclick="sendTestWebhookAlert('email')">
+                                                <span>Send Test Email</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: ENTERPRISE BUSINESS DOMAINS & SOURCING REGISTRY -->
+                    <div class="card admin-full-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Monte Carlo Brand Risk Domains & Sourcing Scope</h3>
+                                <p class="card-subtitle">Active business units & supply chains continuously evaluated in the Monte Carlo probability engine</p>
+                            </div>
+                            <span class="badge badge-info">8 Monitored Domains</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="taxonomy-pill-cloud">
+                                <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
+                                    <span class="domain-icon">🏬</span>
+                                    <div>
+                                        <strong>Retail Footprint (365+ EBOs)</strong>
+                                        <small>Exclusive Brand Outlets · Tier 1 & 2 cities</small>
+                                    </div>
+                                    <span class="domain-status">Active</span>
+                                </div>
+
+                                <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
+                                    <span class="domain-icon">🛍️</span>
+                                    <div>
+                                        <strong>MBO Partner Network (2,500+ Doors)</strong>
+                                        <small>Multi-Brand Distribution · Credit Risk</small>
+                                    </div>
+                                    <span class="domain-status">Active</span>
+                                </div>
+
+                                <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
+                                    <span class="domain-icon">🐑</span>
+                                    <div>
+                                        <strong>Australian Merino Wool Sourcing</strong>
+                                        <small>100% Import Reliance · Currency FX Exposure</small>
+                                    </div>
+                                    <span class="domain-status">Active</span>
+                                </div>
+
+                                <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
+                                    <span class="domain-icon">🏭</span>
+                                    <div>
+                                        <strong>Ludhiana Manufacturing Facility</strong>
+                                        <small>Spinning, Knitting & Garmenting · Operational Risk</small>
+                                    </div>
+                                    <span class="domain-status">Active</span>
+                                </div>
+
+                                <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
+                                    <span class="domain-icon">❄️</span>
+                                    <div>
+                                        <strong>Q3 Winter Dependency (56.5% Share)</strong>
+                                        <small>Climate Risk · Delayed North India Winter Shocks</small>
+                                    </div>
+                                    <span class="domain-status">Active</span>
+                                </div>
+
+                                <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
+                                    <span class="domain-icon">💰</span>
+                                    <div>
+                                        <strong>Working Capital Cycle (138 Days)</strong>
+                                        <small>Seasonal Inventory Build · Liquidity Ratios</small>
+                                    </div>
+                                    <span class="domain-status">Active</span>
+                                </div>
+
+                                <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
+                                    <span class="domain-icon">🌐</span>
+                                    <div>
+                                        <strong>Omnichannel & D2C (montecarlo.in)</strong>
+                                        <small>E-Commerce, Marketplace & Cloud POS Telemetry</small>
+                                    </div>
+                                    <span class="domain-status">Active</span>
+                                </div>
+
+                                <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
+                                    <span class="domain-icon">⚖️</span>
+                                    <div>
+                                        <strong>SEBI LODR & ESG Compliance</strong>
+                                        <small>Quarterly Audit Disclosures · Zero Fatalities</small>
+                                    </div>
+                                    <span class="domain-status">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 5: DISASTER RECOVERY, DATABASE SNAPSHOTS & MIGRATIONS -->
+                    <div class="card admin-full-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Disaster Recovery, Database Snapshots & Migrations</h3>
+                                <p class="card-subtitle">Generate verified JSON snapshots, download Supabase PostgreSQL DDL/DML, and manage engine cache</p>
+                            </div>
+                            <span class="badge badge-success">Cryptographically Verifiable</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="maintenance-action-grid">
+                                <!-- Tile 1: JSON Dump -->
+                                <div class="maintenance-tile">
+                                    <div class="tile-icon-box">📦</div>
+                                    <div class="tile-content">
+                                        <h4>Full Database JSON Snapshot</h4>
+                                        <p>Export all active risks, financial balance sheets, and audit timeline records into a timestamped JSON file.</p>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="exportDatabaseJSON()">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                        <span>Download JSON Snapshot</span>
+                                    </button>
+                                </div>
+
+                                <!-- Tile 2: SQL DDL -->
+                                <div class="maintenance-tile">
+                                    <div class="tile-icon-box">🗄️</div>
+                                    <div class="tile-content">
+                                        <h4>PostgreSQL Schema & Seed Script (.SQL)</h4>
+                                        <p>Generates table creation scripts, indices, RLS security policies, and seed rows ready for Supabase or AWS RDS.</p>
+                                    </div>
+                                    <button class="btn btn-outline" onclick="exportDatabaseSQL()">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                        <span>Download .SQL Schema</span>
+                                    </button>
+                                </div>
+
+                                <!-- Tile 3: Re-seed Benchmark -->
+                                <div class="maintenance-tile">
+                                    <div class="tile-icon-box">🔄</div>
+                                    <div class="tile-content">
+                                        <h4>Re-Seed Benchmark Risks</h4>
+                                        <p>Restores Monte Carlo Fashions standard benchmark corporate and store-level risk vectors into the active database.</p>
+                                    </div>
+                                    <button class="btn btn-outline" onclick="seedBenchmarkRisks()">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 2v6h6"/><path d="M2.66 15.57a10 10 0 1 0 .57-8.38"/></svg>
+                                        <span>Re-Seed Benchmark</span>
+                                    </button>
+                                </div>
+
+                                <!-- Tile 4: Purge Temp Cache -->
+                                <div class="maintenance-tile">
+                                    <div class="tile-icon-box">🧹</div>
+                                    <div class="tile-content">
+                                        <h4>Purge Simulation Transient Cache</h4>
+                                        <p>Frees memory buffers by purging client-side Monte Carlo probability distributions without touching database records.</p>
+                                    </div>
+                                    <button class="btn btn-outline" onclick="purgeSimCache()">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                        <span>Purge Cache</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Footer -->
+            <footer class="system-footer" id="system-footer">
+                <div class="footer-left">
+                    <span class="footer-item">
+                        <span class="status-dot pulse"></span>
+                        System Operational
+                    </span>
+                    <span class="footer-item" id="footer-last-sync">Last Sync: --</span>
+                </div>
+                <div class="footer-right">
+                    <span class="footer-item" id="footer-risk-summary">0 Active Risks</span>
+                    <span class="footer-item">Monte Carlo Risk Engine v2.4.0</span>
+                    <span class="footer-item">© 2026</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- MODAL 1: ADD / EDIT RISK -->
+    <div class="modal-backdrop" id="modal-risk-form">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3 id="modal-risk-title">Register New Enterprise Risk</h3>
+                    <p class="modal-subtitle">Persisted directly into Supabase Cloud Database</p>
+                </div>
+                <button class="btn-close" onclick="closeRiskModal()">✕</button>
+            </div>
+            <form id="risk-entry-form" onsubmit="event.preventDefault(); submitRiskForm();">
+                <input type="hidden" id="form-risk-id" value="">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="form-name">Risk Name / Threat Vector *</label>
+                        <input type="text" id="form-name" class="form-control" required placeholder="e.g. Critical API Gateway Vulnerability">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="form-category">Category *</label>
+                            <select id="form-category" class="form-control" required>
+                                <option value="Financial">Financial</option>
+                                <option value="Cybersecurity">Cybersecurity</option>
+                                <option value="Operational">Operational</option>
+                                <option value="Compliance">Compliance</option>
+                                <option value="Strategic">Strategic</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-6">
+                            <label for="form-owner">Risk Owner / Department *</label>
+                            <input type="text" id="form-owner" class="form-control" required placeholder="e.g. CISO Office, Treasury">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="form-likelihood">Likelihood (1 to 5) *</label>
+                            <select id="form-likelihood" class="form-control" required onchange="updateFormScorePreview()">
+                                <option value="1">1 - Rare (10% chance)</option>
+                                <option value="2">2 - Unlikely (25% chance)</option>
+                                <option value="3" selected>3 - Possible (50% chance)</option>
+                                <option value="4">4 - Likely (75% chance)</option>
+                                <option value="5">5 - Almost Certain (>90%)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-6">
+                            <label for="form-impact">Impact Severity (1 to 5) *</label>
+                            <select id="form-impact" class="form-control" required onchange="updateFormScorePreview()">
+                                <option value="1">1 - Negligible</option>
+                                <option value="2">2 - Minor</option>
+                                <option value="3" selected>3 - Moderate</option>
+                                <option value="4">4 - Major</option>
+                                <option value="5">5 - Catastrophic</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Calculated Score Preview -->
+                    <div class="score-preview-box">
+                        <span>Calculated Score:</span>
+                        <strong id="form-score-val">9 / 25</strong>
+                        <span class="badge" id="form-level-badge">Medium Risk</span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="form-financial">Estimated Financial VaR ($ USD)</label>
+                            <input type="number" id="form-financial" class="form-control" value="500000" step="10000">
+                        </div>
+
+                        <div class="form-group col-6">
+                            <label for="form-status">Initial Status</label>
+                            <select id="form-status" class="form-control">
+                                <option value="Active">Active</option>
+                                <option value="Mitigating">Mitigating</option>
+                                <option value="Monitoring">Monitoring</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="form-velocity">Risk Velocity</label>
+                            <select id="form-velocity" class="form-control">
+                                <option value="Slow">Slow — Low urgency</option>
+                                <option value="Medium" selected>Medium — Standard monitoring</option>
+                                <option value="Fast">Fast — Immediate attention</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="form-trend">Trend Direction</label>
+                            <select id="form-trend" class="form-control">
+                                <option value="decreasing">↓ Decreasing</option>
+                                <option value="stable" selected>→ Stable</option>
+                                <option value="increasing">↑ Increasing</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="form-description">Description & Context</label>
+                        <textarea id="form-description" class="form-control" rows="2" placeholder="Explain the root causes, trigger conditions, and scope of impact..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="form-mitigation">Mitigation Strategy & Controls</label>
+                        <textarea id="form-mitigation" class="form-control" rows="2" placeholder="Controls in place or planned actions to reduce probability or impact..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeRiskModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-risk">Save Risk to Database</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: RISK DETAILS & AI TRAJECTORY -->
+    <div class="modal-backdrop" id="modal-risk-detail">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <div>
+                    <h3 id="detail-risk-name">Risk Details</h3>
+                    <p class="modal-subtitle" id="detail-risk-meta">Category • ID #--</p>
+                </div>
+                <button class="btn-close" onclick="closeDetailModal()">✕</button>
+            </div>
+            <div class="modal-body detail-modal-body">
+                <div class="detail-top-stats">
+                    <div class="detail-stat-card">
+                        <span class="label">Likelihood × Impact</span>
+                        <span class="val" id="detail-li-val">3 × 4</span>
+                    </div>
+                    <div class="detail-stat-card">
+                        <span class="label">Composite Score</span>
+                        <span class="val" id="detail-score-val">12</span>
+                        <span class="badge" id="detail-level-badge">High</span>
+                    </div>
+                    <div class="detail-stat-card">
+                        <span class="label">Financial VaR</span>
+                        <span class="val text-amber" id="detail-financial-val">$750,000</span>
+                    </div>
+                    <div class="detail-stat-card">
+                        <span class="label">Governance Status</span>
+                        <span class="val" id="detail-status-val">Mitigating</span>
+                    </div>
+                </div>
+
+                <div class="detail-meta-row">
+                    <div class="detail-meta-item">
+                        <span class="label">Velocity</span>
+                        <span class="val" id="detail-velocity-val">Medium</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="label">Trend</span>
+                        <span class="val" id="detail-trend-val">→ Stable</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="label">Registered</span>
+                        <span class="val" id="detail-created-val">--</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="label">Last Updated</span>
+                        <span class="val" id="detail-updated-val">--</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4>Description</h4>
+                    <p id="detail-description-text" class="text-secondary">--</p>
+                </div>
+
+                <div class="detail-section">
+                    <h4>Mitigation Strategy & Action Plan</h4>
+                    <div class="mitigation-box" id="detail-mitigation-text">--</div>
+                </div>
+
+                <div class="detail-section">
+                    <h4>6-Month Projected Risk Trajectory (Monte Carlo & AI Trend)</h4>
+                    <div class="chart-body" style="height: 200px;">
+                        <canvas id="detail-forecast-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="btn-detail-edit" onclick="openEditFromDetail()">Edit Risk</button>
+                <button class="btn btn-primary" onclick="closeDetailModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CONFIRMATION DIALOG -->
+    <div class="modal-backdrop" id="modal-confirm">
+        <div class="modal-card modal-confirm-card">
+            <div class="modal-header modal-confirm-header">
+                <div>
+                    <h3 id="confirm-title">Confirm Action</h3>
+                    <p class="modal-subtitle" id="confirm-subtitle">This action cannot be undone</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-icon" id="confirm-icon">⚠️</div>
+                <p class="confirm-message" id="confirm-message">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="confirm-cancel-btn">Cancel</button>
+                <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcut Overlay -->
+    <div class="modal-backdrop" id="modal-shortcuts">
+        <div class="modal-card modal-shortcuts-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Keyboard Shortcuts</h3>
+                    <p class="modal-subtitle">Navigate faster with keyboard controls</p>
+                </div>
+                <button class="btn-close" onclick="document.getElementById('modal-shortcuts').classList.remove('active')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="shortcut-grid">
+                    <div class="shortcut-item"><kbd>N</kbd><span>New Risk</span></div>
+                    <div class="shortcut-item"><kbd>/</kbd><span>Focus Search</span></div>
+                    <div class="shortcut-item"><kbd>1-6</kbd><span>Switch Tabs</span></div>
+                    <div class="shortcut-item"><kbd>R</kbd><span>Refresh Data</span></div>
+                    <div class="shortcut-item"><kbd>Esc</kbd><span>Close Modal</span></div>
+                    <div class="shortcut-item"><kbd>?</kbd><span>Show Shortcuts</span></div>
+                    <div class="shortcut-item"><kbd>E</kbd><span>Export CSV</span></div>
+                    <div class="shortcut-item"><kbd>T</kbd><span>Toggle Theme</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: SUPABASE CLOUD SYNC & SETTINGS -->
+    <div class="modal-backdrop" id="modal-supabase-config">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <div class="modal-header-icon-title">
+                    <div class="supabase-icon-badge">⚡</div>
+                    <div>
+                        <h3>Supabase Cloud Integration (PostgreSQL)</h3>
+                        <p class="modal-subtitle">Connect cloud database for real-time risk persistence & team governance</p>
+                    </div>
+                </div>
+                <button class="btn-close" onclick="closeSupabaseModal()">✕</button>
+            </div>
+            <div class="modal-body supabase-modal-body">
+                <!-- Live Status Banner -->
+                <div class="supabase-status-banner" id="supabase-status-banner">
+                    <div class="status-icon-indicator" id="supabase-banner-icon">☁️</div>
+                    <div class="status-info">
+                        <h4 id="supabase-banner-title">Checking database status...</h4>
+                        <p id="supabase-banner-desc">Querying cloud connection telemetry</p>
+                    </div>
+                    <span class="badge" id="supabase-banner-badge">Connecting</span>
+                </div>
+
+                <!-- 2 Columns: Setup SQL & Credentials Form -->
+                <div class="supabase-columns">
+                    <!-- Column 1: SQL Schema -->
+                    <div class="supabase-card-box">
+                        <div class="box-step-header">
+                            <span class="step-num">Step 1</span>
+                            <h4>Create Tables in Supabase</h4>
+                        </div>
+                        <p class="box-desc">Run this SQL schema once in your Supabase Dashboard (SQL Editor → New Query) to create <code>risks</code>, <code>audit_logs</code>, and <code>alerts</code> tables with Row-Level Security.</p>
+                        <div class="sql-preview-box">
+                            <pre><code>-- 1. Risks Table
+CREATE TABLE IF NOT EXISTS risks (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    category TEXT NOT NULL,
+    likelihood INTEGER NOT NULL CHECK (likelihood BETWEEN 1 AND 5),
+    impact INTEGER NOT NULL CHECK (impact BETWEEN 1 AND 5),
+    score INTEGER NOT NULL,
+    level TEXT NOT NULL,
+    financial_impact DOUBLE PRECISION DEFAULT 0.0,
+    owner TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Active',
+    velocity TEXT DEFAULT 'Medium',
+    trend TEXT DEFAULT 'stable',
+    mitigation TEXT DEFAULT '',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Audit Logs Table
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id BIGSERIAL PRIMARY KEY,
+    risk_id BIGINT,
+    risk_name TEXT,
+    action TEXT NOT NULL,
+    details TEXT DEFAULT '',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. Alerts Table
+CREATE TABLE IF NOT EXISTS alerts (
+    id BIGSERIAL PRIMARY KEY,
+    type TEXT NOT NULL,
+    source TEXT NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Dev Policies (Enable public access for demo)
+ALTER TABLE risks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE alerts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all on risks" ON risks FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on audit_logs" ON audit_logs FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on alerts" ON alerts FOR ALL USING (true) WITH CHECK (true);</code></pre>
+                            <button type="button" class="btn btn-sm btn-outline btn-copy-sql" id="btn-copy-sql">
+                                📋 Copy SQL Script
+                            </button>
+                        </div>
+                        <div class="box-footer-link">
+                            <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer" class="link-external">
+                                Open Supabase Console ↗
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Credentials Form -->
+                    <div class="supabase-card-box">
+                        <div class="box-step-header">
+                            <span class="step-num">Step 2</span>
+                            <h4>Connect Credentials</h4>
+                        </div>
+                        <p class="box-desc">Enter your Project URL and API Key from Supabase Dashboard (Project Settings → API).</p>
+                        
+                        <form id="supabase-config-form" onsubmit="event.preventDefault(); submitSupabaseConfig();">
+                            <div class="form-group">
+                                <label for="input-supabase-url">Supabase Project URL *</label>
+                                <input type="url" id="input-supabase-url" class="form-control" placeholder="https://xxxxxxxxxxxx.supabase.co" required>
+                                <small class="form-hint">Format: https://your-project.supabase.co</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="input-supabase-key">Supabase API Key (Anon / Service Role) *</label>
+                                <input type="password" id="input-supabase-key" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsIn..." required>
+                                <small class="form-hint">Found under Settings → API → Project API Keys</small>
+                            </div>
+
+                            <div class="form-group checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="check-sync-local-data" checked>
+                                    <span>Sync current active risks to Supabase Cloud on connect</span>
+                                </label>
+                            </div>
+
+                            <div class="supabase-form-actions">
+                                <button type="submit" class="btn btn-primary btn-block" id="btn-save-supabase">
+                                    ⚡ Test & Save Supabase Connection
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeSupabaseModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: MONTE CARLO EXECUTIVE RISK DOSSIER (PDF / PRINT READY) -->
+    <div class="modal-backdrop" id="modal-monte-carlo-dossier">
+        <div class="modal-card modal-lg dossier-modal-card">
+            <div class="modal-header dossier-header">
+                <div class="dossier-brand-title">
+                    <span class="mc-crest-sm">MC</span>
+                    <div>
+                        <h3>Monte Carlo Fashions Limited — Executive Risk Dossier</h3>
+                        <p class="modal-subtitle">Official Board & Risk Committee Briefing · Prepared for Chief Risk Officer</p>
+                    </div>
+                </div>
+                <div class="dossier-actions">
+                    <button class="btn btn-sm btn-primary" onclick="window.print()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        <span>Print / Save PDF</span>
+                    </button>
+                    <button class="btn-close" onclick="closeDossierModal()">✕</button>
+                </div>
+            </div>
+            <div class="modal-body dossier-body" id="dossier-printable-content">
+                <div class="dossier-meta-grid">
+                    <div class="dossier-meta-box">
+                        <span class="d-label">Entity</span>
+                        <strong class="d-val">Monte Carlo Fashions Ltd</strong>
+                        <span class="d-sub">NSE: MONTECARLO | BSE: 538836</span>
+                    </div>
+                    <div class="dossier-meta-box">
+                        <span class="d-label">Evaluation Framework</span>
+                        <strong class="d-val">ISO 31000 + B.Com Risk Matrix</strong>
+                        <span class="d-sub">8 Financial Ratios + 5k MC Runs</span>
+                    </div>
+                    <div class="dossier-meta-box">
+                        <span class="d-label">Composite Risk Index</span>
+                        <strong class="d-val text-emerald" id="dossier-overall-score">27 / 100</strong>
+                        <span class="d-sub badge-emerald" id="dossier-risk-rating">Low Risk Enterprise</span>
+                    </div>
+                    <div class="dossier-meta-box">
+                        <span class="d-label">Timestamp</span>
+                        <strong class="d-val" id="dossier-timestamp">--</strong>
+                        <span class="d-sub">Audit Reference: #MCF-2026-Q3</span>
+                    </div>
+                </div>
+
+                <div class="dossier-section-title">1. Key Financial Ratios & Benchmark Adherence</div>
+                <div class="dossier-ratio-grid" id="dossier-ratio-grid">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <div class="dossier-section-title" style="margin-top: 20px;">2. Monte Carlo Simulation: Value at Risk (VaR) & Downside Exposure</div>
+                <div class="dossier-sim-summary" id="dossier-sim-summary">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <div class="dossier-section-title" style="margin-top: 20px;">3. Executive Risk Mitigation Mandates</div>
+                <div class="dossier-mandates" id="dossier-mandates">
+                    <div class="mandate-item">
+                        <strong>❄️ Winter Demand Buffer:</strong> Maintain flexible manufacturing schedule to adjust woollen production if cold weather onset is delayed by &gt;2 weeks.
+                    </div>
+                    <div class="mandate-item">
+                        <strong>🧶 Wool Sourcing Hedging:</strong> Secure 60-day forward contracts for Australian Merino wool imports to hedge against foreign currency and raw material price shocks.
+                    </div>
+                    <div class="mandate-item">
+                        <strong>🏪 MBO Receivable Control:</strong> Institute strict credit limits of 60 days on distributor accounts and offer 2% prompt settlement discounts for collections within 30 days.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeDossierModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Application Script -->
+    <script src="script.js"></script>
+</body>
+</html>
