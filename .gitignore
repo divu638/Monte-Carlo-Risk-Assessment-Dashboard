@@ -11,11 +11,20 @@ ENV/
 
 # Database files
 *.db-journal
+*.db-wal
+*.db-shm
 *.sqlite3-journal
 
-# Environment secrets
+# Environment secrets & credentials
 .env
+.env.*
 !.env.example
+*.pem
+*.key
+credentials*.json
+*.bak
+*.tmp
+*.local
 
 # IDE & OS
 .vscode/

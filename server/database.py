@@ -130,7 +130,9 @@ def init_db():
             return True
         except Exception as e:
             _using_supabase = False
-            _db_status_message = f"Supabase connection warning: {str(e)}. Operating in Local Safe Mode."
+            # Sanitize error to prevent leaking connection tokens or sensitive network details
+            safe_err = str(e).split('?')[0].split('//')[-1][:120]
+            _db_status_message = f"Supabase notice: {safe_err}. Operating in Local Safe Mode."
             print(f"  ⚠️  {_db_status_message}")
             print("  ℹ️  Ensure you ran setup_supabase.sql in your Supabase SQL Editor.")
     else:
