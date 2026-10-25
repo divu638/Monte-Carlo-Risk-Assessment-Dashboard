@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monte Carlo Risk Engine — Business Risk Assessment Dashboard</title>
-    <meta name="description" content="Monte Carlo simulation-powered business risk dashboard with financial ratio analysis, probabilistic VaR, 5×5 heatmap, and real-time risk scoring.">
-    <meta name="keywords" content="Monte Carlo simulation, business risk, financial ratios, VaR, risk assessment, probability simulation">
-    <meta name="author" content="Monte Carlo Risk Engine">
-    <!-- Favicon: Round Monte Carlo Royal Crimson & Gold Crest -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g' cx='35%25' cy='30%25' r='75%25'><stop offset='0%25' stop-color='%23e11d48'/><stop offset='50%25' stop-color='%239e1b32'/><stop offset='100%25' stop-color='%231a0207'/></radialGradient><linearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23fff3bf'/><stop offset='50%25' stop-color='%23f59e0b'/><stop offset='100%25' stop-color='%23d97706'/></linearGradient></defs><circle cx='50' cy='50' r='47' fill='url(%23g)' stroke='%23f59e0b' stroke-width='3.5'/><circle cx='50' cy='50' r='41' fill='none' stroke='rgba(255,243,191,0.5)' stroke-width='1.5' stroke-dasharray='3,3'/><path d='M35 32 L40 37 L50 28 L60 37 L65 32 L62 40 L38 40 Z' fill='url(%23gold)'/><text x='50' y='68' font-size='27' text-anchor='middle' fill='url(%23gold)' font-family='Arial, sans-serif' font-weight='900' letter-spacing='1'>MC</text><path d='M20 78 Q35 78 42 74 Q50 70 58 74 Q65 78 80 78' stroke='%2338bdf8' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>">
+    <title>Business Risk Assessment Dashboard — Enterprise Risk Analytics & Monte Carlo Engine</title>
+    <meta name="description" content="Business Risk Assessment Dashboard with financial ratio analysis, operational resilience scoring, and Monte Carlo Value-at-Risk simulation.">
+    <meta name="keywords" content="Business risk assessment, financial ratios, Monte Carlo simulation, VaR, risk matrix, probability simulation">
+    <meta name="author" content="Business Risk Assessment Platform">
+    <!-- Favicon: Modern Risk Shield & Probability Crest -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g' cx='35%25' cy='30%25' r='75%25'><stop offset='0%25' stop-color='%2310b981'/><stop offset='60%25' stop-color='%23059669'/><stop offset='100%25' stop-color='%23022c22'/></radialGradient></defs><circle cx='50' cy='50' r='47' fill='url(%23g)' stroke='%2338bdf8' stroke-width='3'/><path d='M50 20 L72 28 V48 C72 65 60 76 50 80 C40 76 28 65 28 48 V28 L50 20 Z' stroke='%23fff' stroke-width='3' fill='none'/><path d='M34 58 Q44 58 48 38 Q50 30 52 38 Q56 58 66 58' stroke='%2338bdf8' stroke-width='3' fill='none'/></svg>">
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +31,7 @@
     <div class="loading-overlay" id="app-loading-overlay">
         <div class="loading-spinner">
             <div class="spinner-ring"></div>
-            <span class="spinner-text">Initializing Monte Carlo Engine...</span>
+            <span class="spinner-text">Initializing Business Risk Engine...</span>
         </div>
     </div>
 
@@ -45,88 +45,49 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
             <div class="brand">
-                <div class="brand-icon mc-round-logo" id="brand-logo-crest" title="Monte Carlo Enterprise Risk & Governance Engine">
-                    <!-- Bespoke Round Monte Carlo Luxury Crest & Quantum Risk Emblem -->
-                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Monte Carlo Crest">
+                <div class="brand-icon mc-round-logo" id="brand-logo-crest" title="Business Risk Assessment Dashboard · Powered by Monte Carlo Simulation Engine">
+                    <!-- Clean Modern Shield & Stochastic Probability Risk Crest -->
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Risk Assessment Emblem">
                         <defs>
-                            <!-- Metallic Gold Linear Gradient -->
-                            <linearGradient id="mcGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#FFF7CD"/>
-                                <stop offset="28%" stop-color="#FBBF24"/>
-                                <stop offset="68%" stop-color="#D97706"/>
-                                <stop offset="100%" stop-color="#FDE68A"/>
+                            <linearGradient id="raGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#34D399"/>
+                                <stop offset="50%" stop-color="#10B981"/>
+                                <stop offset="100%" stop-color="#059669"/>
                             </linearGradient>
-                            <!-- Deep Imperial Crimson-Ruby Radial Gradient -->
-                            <radialGradient id="mcCoreGrad" cx="35%" cy="30%" r="75%">
-                                <stop offset="0%" stop-color="#E11D48"/>
-                                <stop offset="42%" stop-color="#9E1B32"/>
-                                <stop offset="80%" stop-color="#4C0519"/>
-                                <stop offset="100%" stop-color="#190207"/>
+                            <linearGradient id="raCyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#38BDF8"/>
+                                <stop offset="100%" stop-color="#0284C7"/>
+                            </linearGradient>
+                            <radialGradient id="raCoreGrad" cx="35%" cy="30%" r="75%">
+                                <stop offset="0%" stop-color="#0f2923"/>
+                                <stop offset="60%" stop-color="#061a15"/>
+                                <stop offset="100%" stop-color="#020d0b"/>
                             </radialGradient>
-                            <!-- Probability Bell Curve Cyan-Gold-Emerald Gradient -->
-                            <linearGradient id="mcWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.4"/>
-                                <stop offset="50%" stop-color="#F59E0B" stop-opacity="0.95"/>
-                                <stop offset="100%" stop-color="#00E8A2" stop-opacity="0.85"/>
-                            </linearGradient>
-                            <!-- High-Relief Drop Shadow Filter -->
-                            <filter id="mcGoldGlow" x="-20%" y="-20%" width="140%" height="140%">
-                                <feDropShadow dx="0" dy="1.2" stdDeviation="1.2" flood-color="#F59E0B" flood-opacity="0.6"/>
+                            <filter id="raGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#10B981" flood-opacity="0.5"/>
                             </filter>
                         </defs>
-
-                        <!-- Base Round Outer Disc -->
-                        <circle cx="32" cy="32" r="30.5" fill="url(#mcCoreGrad)"/>
-
-                        <!-- Concentric Guilloche Bezel Rings -->
-                        <circle cx="32" cy="32" r="29" stroke="url(#mcGoldGrad)" stroke-width="1.5" stroke-dasharray="2 2.5" opacity="0.6"/>
-                        <circle cx="32" cy="32" r="26.5" stroke="url(#mcGoldGrad)" stroke-width="1.2" opacity="0.85"/>
-
-                        <!-- Cardinal Compass Accents -->
-                        <circle cx="32" cy="4" r="1.2" fill="#FFF7CD"/>
-                        <circle cx="60" cy="32" r="1.2" fill="#FFF7CD"/>
-                        <circle cx="32" cy="60" r="1.2" fill="#FFF7CD"/>
-                        <circle cx="4" cy="32" r="1.2" fill="#FFF7CD"/>
-
-                        <!-- Aristocratic Monte Carlo Coronet / Crown -->
-                        <path d="M23 18 L26 21 L32 15 L38 21 L41 18 L39 23 L25 23 Z" fill="url(#mcGoldGrad)" filter="url(#mcGoldGlow)"/>
-                        <circle cx="23" cy="17" r="1.1" fill="#FFFFFF"/>
-                        <circle cx="32" cy="14" r="1.3" fill="#FFFFFF"/>
-                        <circle cx="41" cy="17" r="1.1" fill="#FFFFFF"/>
-
-                        <!-- Interlocking Monogram: M & C -->
-                        <!-- Primary 'M' Monogram with Chamfered Serif Cuts -->
-                        <path d="M19 41 V25.5 L25.5 35 L32 25.5 L38.5 35 L45 25.5 V41 H41.5 V30.5 L35.5 39 H33 L32 37.5 L31 39 H28.5 L22.5 30.5 V41 Z" 
-                              fill="url(#mcGoldGrad)" 
-                              filter="url(#mcGoldGlow)"/>
-
-                        <!-- Sweeping Luxury 'C' Emblem Arch Overlaid -->
-                        <path d="M41 27 C43.8 29 45.2 32.2 45 35.5 C44.5 40.5 40 43.5 32 43.5 C24.5 43.5 20.5 39.8 20.8 35" 
-                              stroke="url(#mcGoldGrad)" 
-                              stroke-width="2" 
-                              stroke-linecap="round" 
-                              fill="none" 
-                              opacity="0.5"/>
-
-                        <!-- Monte Carlo Stochastic Distribution Wave Arc -->
-                        <path d="M12 50 Q18 50 22 46 Q27 41 32 41 Q37 41 42 46 Q46 50 52 50" 
-                              stroke="url(#mcWaveGrad)" 
-                              stroke-width="2" 
-                              fill="none" 
-                              stroke-linecap="round"/>
-
-                        <!-- VaR Mean Node -->
-                        <circle cx="32" cy="41" r="2.2" fill="#FFFFFF" filter="url(#mcGoldGlow)"/>
-                        <circle cx="32" cy="41" r="1" fill="#D97706"/>
-
-                        <!-- Brilliant Diamond Accents -->
-                        <path d="M14 27 L15 29 L17 30 L15 31 L14 33 L13 31 L11 30 L13 29 Z" fill="#FFF7CD" opacity="0.85"/>
-                        <path d="M50 27 L51 29 L53 30 L51 31 L50 33 L49 31 L47 30 L49 29 Z" fill="#FFF7CD" opacity="0.85"/>
+                        <!-- Outer Base Disc -->
+                        <circle cx="32" cy="32" r="30.5" fill="url(#raCoreGrad)"/>
+                        <circle cx="32" cy="32" r="29" stroke="url(#raGrad)" stroke-width="1.5" stroke-dasharray="2 2.5" opacity="0.6"/>
+                        <circle cx="32" cy="32" r="26.5" stroke="url(#raCyanGrad)" stroke-width="1.2" opacity="0.85"/>
+                        <!-- Cardinal Compass Nodes -->
+                        <circle cx="32" cy="5.5" r="1.5" fill="#34D399"/>
+                        <circle cx="58.5" cy="32" r="1.5" fill="#38BDF8"/>
+                        <circle cx="32" cy="58.5" r="1.5" fill="#34D399"/>
+                        <circle cx="5.5" cy="32" r="1.5" fill="#38BDF8"/>
+                        <!-- Modern Risk Shield Outline -->
+                        <path d="M32 14 L46 19 V31 C46 41 39 48 32 51 C25 48 18 41 18 31 V19 L32 14 Z" stroke="url(#raGrad)" stroke-width="2" fill="rgba(16, 185, 129, 0.12)" filter="url(#raGlow)"/>
+                        <!-- Monte Carlo Bell Curve Arc across Shield -->
+                        <path d="M22 38 Q28 38 30 26 Q32 20 34 26 Q36 38 42 38" stroke="url(#raCyanGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <!-- VaR Mean Probability Node -->
+                        <circle cx="32" cy="22" r="2.8" fill="#FFFFFF" filter="url(#raGlow)"/>
+                        <circle cx="32" cy="22" r="1.4" fill="#059669"/>
                     </svg>
                 </div>
                 <div class="brand-text">
-                    <h2>Monte Carlo<span>RISK</span></h2>
-                    <span class="brand-tag">GOVERNANCE & TELEMETRY</span>
+                    <h2>RiskAssess<span>PRO</span></h2>
+                    <span class="brand-tag">BUSINESS RISK DASHBOARD</span>
                 </div>
             </div>
 
@@ -137,7 +98,20 @@
                 <span class="db-badge" id="db-status-badge">PostgreSQL</span>
             </div>
 
+            <!-- Prominent Linear-Style Primary Action CTA -->
+            <div class="sidebar-hero-cta">
+                <button type="button" class="btn-sidebar-wizard" onclick="switchTab('assessment'); if(window.assessmentWizard) window.assessmentWizard.startNew();" id="btn-sidebar-start-wizard" title="Start New 8-Step Business Risk Assessment">
+                    <div class="cta-sparkle">✦</div>
+                    <div class="cta-label-group">
+                        <span class="cta-main-text">Start Assessment</span>
+                        <span class="cta-sub-text">8-Step Guided Flow</span>
+                    </div>
+                    <span class="cta-step-pill">Wizard</span>
+                </button>
+            </div>
+
             <!-- Navigation Links -->
+            <div class="nav-section-label">CORE PLATFORM</div>
             <nav class="nav-menu">
                 <button class="nav-item active" data-tab="overview" id="nav-overview">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -147,8 +121,21 @@
                         <rect x="3" y="14" width="7" height="7"/>
                     </svg>
                     <span>Executive Overview</span>
-                    <span class="nav-shortcut">1</span>
                 </button>
+
+                <button class="nav-item" data-tab="assessment" id="nav-assessment">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    <span>Assessment Wizard</span>
+                    <span class="nav-badge nav-badge-accent">8 Steps</span>
+                </button>
+
+                <div class="nav-section-label" style="margin-top: 10px;">RISK &amp; QUANT ANALYTICS</div>
 
                 <button class="nav-item" data-tab="registry" id="nav-registry">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -171,7 +158,7 @@
                         <line x1="9" y1="3" x2="9" y2="21"/>
                         <line x1="15" y1="3" x2="15" y2="21"/>
                     </svg>
-                    <span>5×5 Risk Matrix</span>
+                    <span>3D Risk Heatmap</span>
                 </button>
 
                 <button class="nav-item" data-tab="analytics" id="nav-analytics">
@@ -189,9 +176,10 @@
                         <line x1="12" y1="1" x2="12" y2="23"/>
                         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                     </svg>
-                    <span>Financial Analysis</span>
-                    <span class="nav-shortcut">5</span>
+                    <span>Stress Testing</span>
                 </button>
+
+                <div class="nav-section-label" style="margin-top: 10px;">GOVERNANCE &amp; REPORTS</div>
 
                 <button class="nav-item" data-tab="audit" id="nav-audit">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -199,7 +187,6 @@
                         <polyline points="12 6 12 12 16 14"/>
                     </svg>
                     <span>Audit Trail</span>
-                    <span class="nav-shortcut">6</span>
                 </button>
 
                 <button class="nav-item" data-tab="admin" id="nav-admin">
@@ -208,8 +195,7 @@
                         <circle cx="12" cy="11" r="3"/>
                         <path d="M12 8v2"/>
                     </svg>
-                    <span>Admin & Governance</span>
-                    <span class="nav-shortcut">7</span>
+                    <span>Admin &amp; Settings</span>
                 </button>
             </nav>
 
@@ -223,7 +209,7 @@
                     </div>
                 </div>
                 <div class="sidebar-version">
-                    <span>Monte Carlo Risk Engine v2.4.0</span>
+                    <span>Business Risk Engine v2.4.0 · ISO 31000</span>
                 </div>
             </div>
         </aside>
@@ -233,8 +219,20 @@
             <!-- Top Header Bar -->
             <header class="top-header">
                 <div class="header-titles">
+                    <!-- Global Navigation Breadcrumb & Back Action -->
+                    <div class="breadcrumb-nav-row" id="breadcrumb-nav-row">
+                        <button type="button" class="header-back-btn" id="btn-header-back" onclick="navigateBack()" title="Go back to previous page" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                            <span>Back</span>
+                        </button>
+                        <nav class="breadcrumb-trail" aria-label="Breadcrumb">
+                            <span class="crumb-link" onclick="switchTab('overview')">Home</span>
+                            <span class="crumb-sep" id="crumb-sep" style="display: none;">/</span>
+                            <span class="crumb-active" id="crumb-active">Overview</span>
+                        </nav>
+                    </div>
                     <h1 id="page-heading">Executive Overview</h1>
-                    <p class="subheading">Monte Carlo Brand Enterprise Risk Governance & Exposure Telemetry · ISO 31000</p>
+                    <p class="subheading" id="top-subheading">Enterprise Business Risk Assessment &amp; Analytics Dashboard · ISO 31000</p>
                 </div>
 
                 <div class="header-actions">
@@ -267,6 +265,13 @@
                             </div>
                         </div>
                     </div>
+
+                    <button class="btn btn-primary btn-emerald-action" onclick="switchTab('assessment')" id="btn-quick-assessment" title="Launch Step-by-Step Risk Assessment" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-color: #10b981; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                        </svg>
+                        <span>Start Assessment</span>
+                    </button>
 
                     <button class="btn btn-primary" id="btn-open-create-modal">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -380,6 +385,82 @@
                     </div>
                 </div>
 
+                <!-- PLATFORM COMMAND HUB — Linear / Stripe Style Modern Action Deck -->
+                <div class="platform-hub-card">
+                    <div class="hub-header-row">
+                        <div class="hub-headline">
+                            <span class="hub-tag-pill">⚡ ENTERPRISE RISK ANALYTICS · ISO 31000 PROTOCOL</span>
+                            <h2>Business Risk Intelligence &amp; Quantitative Simulation Engine</h2>
+                            <p>End-to-end framework combining institutional 8-step business risk diagnosis, Three.js 3D spatial heatmap analysis, and Monte Carlo Value-at-Risk modeling.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="switchTab('assessment'); if(window.assessmentWizard) window.assessmentWizard.startNew();" id="btn-banner-start-wiz" style="background: linear-gradient(135deg, #6366F1 0%, #3B82F6 100%); box-shadow: 0 4px 18px rgba(99, 102, 241, 0.4);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            <span>Start 8-Step Assessment</span>
+                        </button>
+                    </div>
+
+                    <div class="hub-actions-grid">
+                        <!-- Action Card 1: 8-Step Wizard -->
+                        <div class="hub-card primary-hub" onclick="switchTab('assessment'); if(window.assessmentWizard) window.assessmentWizard.startNew();">
+                            <div class="hub-card-top">
+                                <div class="hub-card-icon">📝</div>
+                                <span class="hub-card-badge">Guided Flow</span>
+                            </div>
+                            <div class="hub-card-body">
+                                <h4>Business Risk Assessment</h4>
+                                <p>Evaluate entity details, liquidity ratios, debt-to-equity, and operational supplier risks across 8 structured steps.</p>
+                            </div>
+                            <div class="hub-card-footer">
+                                <span class="hub-card-action">Launch Assessment <span>→</span></span>
+                                <span style="font-size: 0.68rem; color: #34D399; font-weight: 600;">8 Steps</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Card 2: Monte Carlo Simulation -->
+                        <div class="hub-card" onclick="switchTab('analytics');">
+                            <div class="hub-card-top">
+                                <div class="hub-card-icon">🎲</div>
+                                <span class="hub-card-badge">Quant Model</span>
+                            </div>
+                            <div class="hub-card-body">
+                                <h4>Monte Carlo VaR Engine</h4>
+                                <p>Execute 3,000+ stochastic trials to generate normal distributions, 95% Confidence Value-at-Risk, and portfolio downside.</p>
+                            </div>
+                            <div class="hub-card-footer">
+                                <span class="hub-card-action">Open VaR Engine <span>→</span></span>
+                                <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 600;">10,000 Runs</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Card 3: 3D Spatial Heatmap -->
+                        <div class="hub-card" onclick="switchTab('matrix');">
+                            <div class="hub-card-top">
+                                <div class="hub-card-icon">🗺️</div>
+                                <span class="hub-card-badge">3D Terrain</span>
+                            </div>
+                            <div class="hub-card-body">
+                                <h4>3D Risk Matrix &amp; Heatmap</h4>
+                                <p>Interactive 5×5 likelihood vs impact landscape with real-time Three.js spatial mesh, orbit camera, and risk clusters.</p>
+                            </div>
+                            <div class="hub-card-footer">
+                                <span class="hub-card-action">Explore 3D Matrix <span>→</span></span>
+                                <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 600;">5×5 Grid</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hub-footer-bar">
+                        <div class="hub-sample-info">
+                            <span class="hub-sample-pill">Demo Case Study</span>
+                            <span>Want to explore a completed evaluation? Load <strong>ABC Retail Store</strong> (Retail Supermarket, ₹2.8M Capital)</span>
+                        </div>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="switchTab('assessment'); if(window.assessmentWizard) window.assessmentWizard.loadSample();" id="btn-banner-sample-wiz">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span>Load ABC Retail Store Sample</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- 3D Risk Landscape Visualizer + Quick Matrix Snapshot -->
                 <div class="visualizer-row">
                     <!-- 3D Spatial Topology Visualizer Card -->
@@ -388,7 +469,7 @@
                             <div class="header-titles-exec">
                                 <div class="exec-badge-row">
                                     <span class="exec-tag-pill">ISO 31000 ERM PROTOCOL</span>
-                                    <span class="exec-tag-pill highlight">MONTE CARLO FASHIONS LTD (NSE: MONTECARLO)</span>
+                                    <span class="exec-tag-pill highlight" id="exec-active-entity-badge">ACTIVE BUSINESS: ABC RETAIL STORE</span>
                                 </div>
                                 <h3>3D Risk Spatial Topology — Enterprise Heat Matrix</h3>
                                 <p class="card-subtitle">Interactive 5×5 likelihood × impact risk landscape with real-time VaR elevation mapping</p>
@@ -566,6 +647,20 @@
 
             <!-- TAB 2: RISK REGISTRY -->
             <section id="tab-registry" class="tab-pane">
+                <div class="tab-context-banner">
+                    <div class="tcb-left">
+                        <span class="badge-tag">Registry Module</span>
+                        <h3>Enterprise Risk Registry</h3>
+                        <p class="text-muted">Master database of identified corporate, operational, and financial risks</p>
+                    </div>
+                    <div class="tcb-right">
+                        <button type="button" class="tab-back-btn" onclick="switchTab('overview')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                            <span>← Back to Overview</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="card table-card">
                     <!-- Table Filter Controls -->
                     <div class="table-filter-bar">
@@ -652,6 +747,20 @@
 
             <!-- TAB 3: 5×5 RISK MATRIX -->
             <section id="tab-matrix" class="tab-pane">
+                <div class="tab-context-banner">
+                    <div class="tcb-left">
+                        <span class="badge-tag">Risk Heatmap</span>
+                        <h3>5×5 Probability × Impact Heatmap</h3>
+                        <p class="text-muted">Visual severity clustering based on ISO 31000 ERM protocol</p>
+                    </div>
+                    <div class="tcb-right">
+                        <button type="button" class="tab-back-btn" onclick="switchTab('overview')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                            <span>← Back to Overview</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="matrix-layout">
                     <!-- Matrix Grid Container -->
                     <div class="card matrix-card">
@@ -713,6 +822,20 @@
 
             <!-- TAB 4: MONTE CARLO VaR ANALYTICS -->
             <section id="tab-analytics" class="tab-pane">
+                <div class="tab-context-banner">
+                    <div class="tcb-left">
+                        <span class="badge-tag">Quant Engine</span>
+                        <h3>Monte Carlo Value-at-Risk (VaR) Simulator</h3>
+                        <p class="text-muted">10,000 statistical iterations estimating aggregate financial loss probability distribution</p>
+                    </div>
+                    <div class="tcb-right">
+                        <button type="button" class="tab-back-btn" onclick="switchTab('overview')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                            <span>← Back to Overview</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="visualizer-row">
                     <!-- Monte Carlo Configuration Card -->
                     <div class="card sim-config-card">
@@ -806,24 +929,28 @@
             <!-- TAB 5: FINANCIAL ANALYSIS (B.Com Component) -->
             <section id="tab-financial" class="tab-pane">
 
-                <!-- Section: Monte Carlo Fashions Ltd Corporate Overview & Scale Switcher -->
+                <!-- Section: Enterprise Overview & Scale Switcher -->
                 <div class="mc-corporate-bar">
                     <div class="mc-corp-brand">
-                        <div class="mc-crest">MC</div>
+                        <div class="mc-crest">📊</div>
                         <div>
                             <div class="mc-corp-meta">
-                                <span class="mc-ticker">NSE: MONTECARLO</span>
-                                <span class="mc-bse">BSE: 538836</span>
-                                <span class="mc-sector">Textiles & Premium Knitwear · Ludhiana, PB</span>
+                                <span class="mc-ticker" id="fin-active-biz-badge">ACTIVE ENTERPRISE</span>
+                                <span class="mc-bse">FINANCIAL TELEMETRY</span>
+                                <span class="mc-sector" id="fin-active-biz-sector">Retail & Commercial Enterprise</span>
                             </div>
-                            <h2 class="mc-corp-title">Monte Carlo Fashions Limited — Enterprise Risk & Financial Telemetry</h2>
-                            <p class="mc-corp-sub">Institutional Risk Analytics · 365+ EBOs · 2,500+ MBOs · Seasonal Woollen Demand Analytics</p>
+                            <h2 class="mc-corp-title" id="fin-active-biz-title">Enterprise Risk & Financial Telemetry</h2>
+                            <p class="mc-corp-sub" id="fin-active-biz-sub">Dynamic Stress Testing, Sensitivity Tornado, and Ratio Analytics for Active Assessment</p>
                         </div>
                     </div>
                     <div class="mc-corp-actions">
+                        <button type="button" class="tab-back-btn" onclick="switchTab('overview')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                            <span>Back to Overview</span>
+                        </button>
                         <div class="scale-switcher" role="group" aria-label="Financial Scale Switcher">
                             <span class="scale-label">Scale:</span>
-                            <button type="button" class="scale-btn active" id="scale-btn-corporate" onclick="setFinancialScale('corporate')">🏢 Corporate (₹ Cr)</button>
+                            <button type="button" class="scale-btn active" id="scale-btn-corporate" onclick="setFinancialScale('corporate')">🏢 Benchmark (₹ Cr)</button>
                             <button type="button" class="scale-btn" id="scale-btn-store" onclick="setFinancialScale('store')">🏪 Unit Store (₹ Lakhs)</button>
                         </div>
                         <button type="button" class="btn btn-sm btn-primary" onclick="exportMonteCarloDossier()" title="Export Executive Risk Dossier">
@@ -846,19 +973,19 @@
                         <span class="kpi-hint">Wholesale & NCS Retail</span>
                     </div>
                     <div class="mc-kpi-item">
-                        <span class="kpi-tag">Winter Revenue Share</span>
-                        <span class="kpi-num">56.5%</span>
-                        <span class="kpi-hint">Q3 Cold Weather Peak</span>
+                        <span class="kpi-tag">Peak Revenue Share</span>
+                        <span class="kpi-num">48.5%</span>
+                        <span class="kpi-hint">High Season Concentration</span>
                     </div>
                     <div class="mc-kpi-item">
-                        <span class="kpi-tag">Raw Wool Sourcing</span>
-                        <span class="kpi-num">100% Merino</span>
-                        <span class="kpi-hint">Australian Woolmark Grade</span>
+                        <span class="kpi-tag">Key Supplier Sourcing</span>
+                        <span class="kpi-num">Tier-1</span>
+                        <span class="kpi-hint">Audited Vendor Network</span>
                     </div>
                     <div class="mc-kpi-item">
                         <span class="kpi-tag">Working Capital Cycle</span>
-                        <span class="kpi-num">138 Days</span>
-                        <span class="kpi-hint">Seasonal Pre-Booking Window</span>
+                        <span class="kpi-num">88 Days</span>
+                        <span class="kpi-hint">Cash Conversion Window</span>
                     </div>
                 </div>
 
@@ -914,172 +1041,85 @@
                     </div>
                 </div>
 
-                <div class="fin-two-col">
-                    <!-- Financial Data Inputs -->
-                    <div class="card fin-input-card">
-                        <div class="card-header">
-                            <div>
-                                <h3 id="fin-input-card-title">Financial Data — Monte Carlo Fashions Ltd (₹ Crores)</h3>
-                                <p class="card-subtitle" id="fin-input-card-subtitle">Annual audited figures · Garment manufacturing, retail footprint & working capital</p>
-                            </div>
-                            <button class="btn btn-sm btn-outline" onclick="resetFinancialData()" id="btn-reset-fin">Reset to Baseline</button>
+                <!-- Unified Active Enterprise Assessment Context Card (Eliminates Redundant Input Forms) -->
+                <div class="card active-assessment-sync-card">
+                    <div class="card-header">
+                        <div class="sync-card-titles">
+                            <span class="badge-tag highlight">Live Assessment Telemetry</span>
+                            <h3 id="sync-active-entity-title">Active Enterprise: ABC Retail Store</h3>
+                            <p class="card-subtitle">Real-time parameters and financial ratios dynamically bound to the 8-Step Risk Assessment Workflow</p>
                         </div>
-                        <div class="card-body">
-                            <div class="fin-input-grid">
-                                <div class="form-group">
-                                    <label for="fin-current-assets">Current Assets (₹)</label>
-                                    <input type="number" id="fin-current-assets" class="form-control" value="1500000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-inventory">Inventory (₹)</label>
-                                    <input type="number" id="fin-inventory" class="form-control" value="550000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-current-liabilities">Current Liabilities (₹)</label>
-                                    <input type="number" id="fin-current-liabilities" class="form-control" value="1000000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-total-debt">Total Debt (₹)</label>
-                                    <input type="number" id="fin-total-debt" class="form-control" value="900000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-equity">Shareholders' Equity (₹)</label>
-                                    <input type="number" id="fin-equity" class="form-control" value="1200000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-revenue">Revenue (₹)</label>
-                                    <input type="number" id="fin-revenue" class="form-control" value="4000000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-cogs">Cost of Goods Sold (₹)</label>
-                                    <input type="number" id="fin-cogs" class="form-control" value="2400000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-operating-profit">Operating Profit (₹)</label>
-                                    <input type="number" id="fin-operating-profit" class="form-control" value="400000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-net-profit">Net Profit (₹)</label>
-                                    <input type="number" id="fin-net-profit" class="form-control" value="200000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-interest">Interest Expense (₹)</label>
-                                    <input type="number" id="fin-interest" class="form-control" value="100000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-avg-inventory">Average Inventory (₹)</label>
-                                    <input type="number" id="fin-avg-inventory" class="form-control" value="533333">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fin-avg-receivables">Average Trade Receivables (₹)</label>
-                                    <input type="number" id="fin-avg-receivables" class="form-control" value="533333">
-                                </div>
-                            </div>
-                            <button class="btn btn-primary btn-block" onclick="calculateFinancialRatios()" id="btn-calc-ratios" style="margin-top: 12px;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                <span>Calculate All Financial Ratios</span>
+                        <div class="sync-card-actions">
+                            <button class="btn btn-sm btn-primary" onclick="switchTab('assessment')" id="btn-goto-wizard">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                <span>Edit in Assessment Flow</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline" onclick="assessmentWizard.loadSample()" id="btn-resync-sample">
+                                <span>Load ABC Sample</span>
                             </button>
                         </div>
                     </div>
-
-                    <!-- Calculated Ratio Results -->
-                    <div class="card fin-results-card">
-                        <div class="card-header">
-                            <div>
-                                <h3>Computed Financial Ratios</h3>
-                                <p class="card-subtitle">Auto-calculated · Values update in real-time</p>
+                    <div class="card-body">
+                        <!-- Summary Telemetry Row -->
+                        <div class="sync-telemetry-row">
+                            <div class="sync-score-badge-box">
+                                <span class="sync-score-num" id="sync-score-val">42</span>
+                                <div class="sync-score-meta">
+                                    <span class="sync-score-tag badge-amber" id="sync-score-tag">Medium Risk</span>
+                                    <span class="sync-score-sub">Composite Score (0–100)</span>
+                                </div>
                             </div>
-                            <span class="badge-tag" id="fin-calc-status">Sample Data Loaded</span>
+                            <div class="sync-ratios-pills-grid">
+                                <div class="sync-pill"><span class="lbl">Current Ratio</span><strong id="sync-cr-val">1.50</strong></div>
+                                <div class="sync-pill"><span class="lbl">Quick Ratio</span><strong id="sync-qr-val">0.95</strong></div>
+                                <div class="sync-pill"><span class="lbl">Debt-to-Equity</span><strong id="sync-de-val">0.75</strong></div>
+                                <div class="sync-pill"><span class="lbl">Net Margin</span><strong id="sync-nm-val">5.0%</strong></div>
+                                <div class="sync-pill"><span class="lbl">Op Margin</span><strong id="sync-om-val">10.0%</strong></div>
+                                <div class="sync-pill"><span class="lbl">Interest Coverage</span><strong id="sync-icr-val">4.00x</strong></div>
+                                <div class="sync-pill"><span class="lbl">Inv Turnover</span><strong id="sync-it-val">4.50x</strong></div>
+                                <div class="sync-pill"><span class="lbl">Debtor Days</span><strong id="sync-dd-val">49 days</strong></div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="ratio-results-list" id="ratio-results-list">
-                                <!-- Populated by JS -->
-                            </div>
+
+                        <!-- Hidden Inputs for Backwards Compatibility & Monte Carlo Stress Engine -->
+                        <div style="display:none;" aria-hidden="true">
+                            <input type="number" id="fin-current-assets" value="1500000">
+                            <input type="number" id="fin-inventory" value="550000">
+                            <input type="number" id="fin-current-liabilities" value="1000000">
+                            <input type="number" id="fin-total-debt" value="900000">
+                            <input type="number" id="fin-equity" value="1200000">
+                            <input type="number" id="fin-revenue" value="4000000">
+                            <input type="number" id="fin-cogs" value="2400000">
+                            <input type="number" id="fin-operating-profit" value="400000">
+                            <input type="number" id="fin-net-profit" value="200000">
+                            <input type="number" id="fin-interest" value="100000">
+                            <input type="number" id="fin-avg-inventory" value="533333">
+                            <input type="number" id="fin-avg-receivables" value="400000">
+                            <span id="fin-calc-status">Synced</span>
+                            <div id="ratio-results-list"></div>
+                            <div id="rsd-score-val">42</div>
+                            <div id="rsd-score-label">Medium Risk</div>
+                            <div id="rsd-bar-liquidity"></div>
+                            <div id="rsd-bar-debt"></div>
+                            <div id="rsd-bar-profitability"></div>
+                            <div id="rsd-bar-efficiency"></div>
+                            <div id="rsd-bar-operational"></div>
+                            <span id="rsd-score-liquidity">35</span>
+                            <span id="rsd-score-debt">40</span>
+                            <span id="rsd-score-profitability">30</span>
+                            <span id="rsd-score-efficiency">45</span>
+                            <span id="rsd-score-operational">65</span>
+                            <canvas id="risk-gauge-chart" style="display:none;"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- Risk Scoring Framework -->
-                <div class="fin-two-col" style="margin-top: 0;">
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <h3>Risk Scoring Framework</h3>
-                                <p class="card-subtitle">Weighted composite score 0–100 · Higher = Greater Risk</p>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <!-- Overall Risk Score Display -->
-                            <div class="risk-score-display" id="risk-score-display">
-                                <div class="rsd-gauge-wrap">
-                                    <canvas id="risk-gauge-chart" width="220" height="220"></canvas>
-                                    <div class="rsd-score-center">
-                                        <div class="rsd-score-val" id="rsd-score-val">--</div>
-                                        <div class="rsd-score-label" id="rsd-score-label">Calculate Ratios</div>
-                                    </div>
-                                </div>
-                                <div class="rsd-categories">
-                                    <div class="rsd-cat-item">
-                                        <span class="rsd-cat-name">💧 Liquidity</span>
-                                        <div class="rsd-cat-bar-wrap">
-                                            <div class="rsd-cat-bar" id="rsd-bar-liquidity" style="width: 0%;"></div>
-                                        </div>
-                                        <span class="rsd-cat-score" id="rsd-score-liquidity">--</span>
-                                        <span class="rsd-cat-weight">25%</span>
-                                    </div>
-                                    <div class="rsd-cat-item">
-                                        <span class="rsd-cat-name">📉 Debt & Solvency</span>
-                                        <div class="rsd-cat-bar-wrap">
-                                            <div class="rsd-cat-bar" id="rsd-bar-debt" style="width: 0%;"></div>
-                                        </div>
-                                        <span class="rsd-cat-score" id="rsd-score-debt">--</span>
-                                        <span class="rsd-cat-weight">20%</span>
-                                    </div>
-                                    <div class="rsd-cat-item">
-                                        <span class="rsd-cat-name">📈 Profitability</span>
-                                        <div class="rsd-cat-bar-wrap">
-                                            <div class="rsd-cat-bar" id="rsd-bar-profitability" style="width: 0%;"></div>
-                                        </div>
-                                        <span class="rsd-cat-score" id="rsd-score-profitability">--</span>
-                                        <span class="rsd-cat-weight">20%</span>
-                                    </div>
-                                    <div class="rsd-cat-item">
-                                        <span class="rsd-cat-name">⚙️ Efficiency</span>
-                                        <div class="rsd-cat-bar-wrap">
-                                            <div class="rsd-cat-bar" id="rsd-bar-efficiency" style="width: 0%;"></div>
-                                        </div>
-                                        <span class="rsd-cat-score" id="rsd-score-efficiency">--</span>
-                                        <span class="rsd-cat-weight">15%</span>
-                                    </div>
-                                    <div class="rsd-cat-item">
-                                        <span class="rsd-cat-name">🏭 Operational</span>
-                                        <div class="rsd-cat-bar-wrap">
-                                            <div class="rsd-cat-bar" id="rsd-bar-operational" style="width: 0%;"></div>
-                                        </div>
-                                        <span class="rsd-cat-score" id="rsd-score-operational">--</span>
-                                        <span class="rsd-cat-weight">20%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Classification Table -->
-                            <table class="fin-class-table">
-                                <thead><tr><th>Overall Score</th><th>Classification</th></tr></thead>
-                                <tbody>
-                                    <tr><td>0 – 30</td><td><span class="score-chip badge-emerald">Low Risk</span></td></tr>
-                                    <tr><td>31 – 60</td><td><span class="score-chip badge-amber">Medium Risk</span></td></tr>
-                                    <tr><td>61 – 80</td><td><span class="score-chip badge-high">High Risk</span></td></tr>
-                                    <tr><td>81 – 100</td><td><span class="score-chip badge-critical">Critical Risk</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Financial Monte Carlo & Stress Presets -->
+                <!-- Financial Monte Carlo & Stress Presets -->
                     <div class="card">
                         <div class="card-header">
                             <div>
                                 <h3>Monte Carlo Stress Testing & Scenario Engine</h3>
-                                <p class="card-subtitle">Probabilistic simulation of apparel margin shocks, winter delays & working capital lags</p>
+                                <p class="card-subtitle">Probabilistic simulation of enterprise margin shocks, demand contraction & working capital lags</p>
                             </div>
                             <span class="badge-tag" id="sim-scenario-badge">Base Case Active</span>
                         </div>
@@ -1088,9 +1128,9 @@
                             <div class="mc-scenario-presets">
                                 <span class="scenario-label">Monte Carlo Stress Scenarios:</span>
                                 <div class="scenario-chips">
-                                    <button type="button" class="scenario-chip" id="chip-mild-winter" onclick="applyScenarioPreset('mild-winter')">❄️ Mild Winter Shock</button>
-                                    <button type="button" class="scenario-chip" id="chip-wool-spike" onclick="applyScenarioPreset('wool-spike')">🧶 Wool Cost Inflation</button>
-                                    <button type="button" class="scenario-chip" id="chip-mbo-credit" onclick="applyScenarioPreset('mbo-credit')">🏪 Franchisee Credit Freeze</button>
+                                    <button type="button" class="scenario-chip" id="chip-mild-winter" onclick="applyScenarioPreset('mild-winter')">📉 Demand Drop Shock</button>
+                                    <button type="button" class="scenario-chip" id="chip-wool-spike" onclick="applyScenarioPreset('wool-spike')">📦 Supply Cost Inflation</button>
+                                    <button type="button" class="scenario-chip" id="chip-mbo-credit" onclick="applyScenarioPreset('mbo-credit')">💳 Client Credit Freeze</button>
                                     <button type="button" class="scenario-chip active" id="chip-base-case" onclick="applyScenarioPreset('base-case')">🎯 Balanced Base</button>
                                 </div>
                             </div>
@@ -1153,7 +1193,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
                 <!-- Tornado Sensitivity Analysis: Key Risk Drivers -->
                 <div class="card" style="margin-top: 24px;">
@@ -1173,21 +1212,21 @@
                                 <div class="t-badge" style="background: rgba(59, 130, 246, 0.15); color: var(--accent-cyan);">1</div>
                                 <div>
                                     <strong>Revenue & Off-Take Shock (±15%)</strong>
-                                    <p>Largest sensitivity driver — directly tied to winter onset dates and footfalls across 365+ EBOs.</p>
+                                    <p>Largest sensitivity driver — directly tied to customer demand cycles and store footfalls across distribution network.</p>
                                 </div>
                             </div>
                             <div class="tornado-insight-item">
                                 <div class="t-badge" style="background: rgba(255, 59, 92, 0.15); color: var(--risk-critical);">2</div>
                                 <div>
-                                    <strong>Australian Merino Wool & Yarn Cost (±10%)</strong>
+                                    <strong>Core Raw Material & Sourcing Cost (±10%)</strong>
                                     <p>Raw material inflation shifts COGS directly, impacting gross margins by up to 260 basis points.</p>
                                 </div>
                             </div>
                             <div class="tornado-insight-item">
                                 <div class="t-badge" style="background: rgba(255, 192, 33, 0.15); color: var(--risk-medium);">3</div>
                                 <div>
-                                    <strong>MBO Dealer Collection Lag (±25 Days)</strong>
-                                    <p>Slow distributor collections expand working capital financing requirements and short-term debt costs.</p>
+                                    <strong>Customer / Channel Collection Lag (±25 Days)</strong>
+                                    <p>Slow debtor collections expand working capital financing requirements and short-term borrowing costs.</p>
                                 </div>
                             </div>
                         </div>
@@ -1287,6 +1326,10 @@
                             <p class="card-subtitle">Immutable timeline of database changes, status updates, and risk registrations</p>
                         </div>
                         <div class="audit-header-actions">
+                            <button class="btn btn-sm btn-outline tab-back-btn" onclick="switchTab('overview')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                                <span>Back to Overview</span>
+                            </button>
                             <button class="btn btn-sm btn-outline" onclick="loadAuditLogs()">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/></svg>
                                 <span>Refresh Logs</span>
@@ -1315,7 +1358,11 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                 ISO 31000 · ERM PROTOCOL v3.2
                             </span>
-                            <span class="admin-hero-tag highlight">MONTE CARLO FASHIONS LTD (NSE: MONTECARLO)</span>
+                            <span class="admin-hero-tag highlight">ENTERPRISE RISK GOVERNANCE</span>
+                            <button class="tab-back-btn" onclick="switchTab('overview')" style="margin-left: 10px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                                <span>Back to Overview</span>
+                            </button>
                         </div>
                         <h2>Enterprise Governance & Admin Console</h2>
                         <p>Configure quantitative risk appetite thresholds, test incident webhook integrations, switch role personas, and download verified disaster recovery database snapshots.</p>
@@ -1412,13 +1459,13 @@
                                     <div class="role-card-top">
                                         <div class="role-avatar-circle ops-avatar">OPS</div>
                                         <div>
-                                            <h4>Store Operations Lead</h4>
-                                            <span class="role-rank-badge">EBO Retail Telemetry</span>
+                                            <h4>Operations & Sourcing Lead</h4>
+                                            <span class="role-rank-badge">Operational Risk Telemetry</span>
                                         </div>
                                     </div>
-                                    <p class="role-desc">Monitors 365+ EBO store inventory stockouts, wool shipment logistics delays, and Ludhiana manufacturing uptime.</p>
+                                    <p class="role-desc">Monitors distribution network inventory stockouts, supplier shipment delays, and core facility uptime.</p>
                                     <ul class="role-caps-list">
-                                        <li><span class="cap-check">✔</span> Log Store-Level Risks (₹ Lakhs)</li>
+                                        <li><span class="cap-check">✔</span> Log Unit-Level Risks (₹ Lakhs)</li>
                                         <li><span class="cap-check">✔</span> Sourcing Delay Flagging</li>
                                         <li><span class="cap-cross">✕</span> Corporate VaR Calibration</li>
                                     </ul>
@@ -1544,7 +1591,7 @@
                                             <div>
                                                 <h4>Microsoft Teams</h4>
                                                 <span class="channel-target">ERM Executive Committee · Incoming Webhook</span>
-                                                <p class="channel-condition">Trigger: Wool Inflation / Mild Winter Shock preset activation</p>
+                                                <p class="channel-condition">Trigger: Supply Cost Spike / Demand Contraction preset activation</p>
                                             </div>
                                         </div>
                                         <div class="webhook-right">
@@ -1561,7 +1608,7 @@
                                             <div class="channel-icon-circle mail-bg">✉</div>
                                             <div>
                                                 <h4>Board Email Distribution Relay</h4>
-                                                <span class="channel-target">cro.office@montecarlo.co.in, board.audit@montecarlo.co.in</span>
+                                                <span class="channel-target">cro.office@riskassess.io, board.audit@riskassess.io</span>
                                                 <p class="channel-condition">Trigger: Board Executive Dossier PDF generation & Quarterly closing</p>
                                             </div>
                                         </div>
@@ -1581,7 +1628,7 @@
                     <div class="card admin-full-card">
                         <div class="card-header">
                             <div>
-                                <h3>Monte Carlo Brand Risk Domains & Sourcing Scope</h3>
+                                <h3>Enterprise Risk Domains & Operating Scope</h3>
                                 <p class="card-subtitle">Active business units & supply chains continuously evaluated in the Monte Carlo probability engine</p>
                             </div>
                             <span class="badge badge-info">8 Monitored Domains</span>
@@ -1591,8 +1638,8 @@
                                 <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
                                     <span class="domain-icon">🏬</span>
                                     <div>
-                                        <strong>Retail Footprint (365+ EBOs)</strong>
-                                        <small>Exclusive Brand Outlets · Tier 1 & 2 cities</small>
+                                        <strong>Direct Commercial Outlets</strong>
+                                        <small>Retail & Store Footprint · Tier 1 & 2 cities</small>
                                     </div>
                                     <span class="domain-status">Active</span>
                                 </div>
@@ -1600,17 +1647,17 @@
                                 <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
                                     <span class="domain-icon">🛍️</span>
                                     <div>
-                                        <strong>MBO Partner Network (2,500+ Doors)</strong>
-                                        <small>Multi-Brand Distribution · Credit Risk</small>
+                                        <strong>B2B Distribution Network</strong>
+                                        <small>Channel Partners & Wholesale · Credit Risk</small>
                                     </div>
                                     <span class="domain-status">Active</span>
                                 </div>
 
                                 <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
-                                    <span class="domain-icon">🐑</span>
+                                    <span class="domain-icon">📦</span>
                                     <div>
-                                        <strong>Australian Merino Wool Sourcing</strong>
-                                        <small>100% Import Reliance · Currency FX Exposure</small>
+                                        <strong>Critical Raw Material Sourcing</strong>
+                                        <small>Import Sourcing · Currency FX & Price Volatility</small>
                                     </div>
                                     <span class="domain-status">Active</span>
                                 </div>
@@ -1618,17 +1665,17 @@
                                 <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
                                     <span class="domain-icon">🏭</span>
                                     <div>
-                                        <strong>Ludhiana Manufacturing Facility</strong>
-                                        <small>Spinning, Knitting & Garmenting · Operational Risk</small>
+                                        <strong>Primary Manufacturing Facility</strong>
+                                        <small>Core Assembly & Plant Uptime · Operational Risk</small>
                                     </div>
                                     <span class="domain-status">Active</span>
                                 </div>
 
                                 <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
-                                    <span class="domain-icon">❄️</span>
+                                    <span class="domain-icon">📈</span>
                                     <div>
-                                        <strong>Q3 Winter Dependency (56.5% Share)</strong>
-                                        <small>Climate Risk · Delayed North India Winter Shocks</small>
+                                        <strong>High Season Revenue Concentration</strong>
+                                        <small>Cyclical Demand Volatility · Off-Peak Hedging</small>
                                     </div>
                                     <span class="domain-status">Active</span>
                                 </div>
@@ -1636,8 +1683,8 @@
                                 <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
                                     <span class="domain-icon">💰</span>
                                     <div>
-                                        <strong>Working Capital Cycle (138 Days)</strong>
-                                        <small>Seasonal Inventory Build · Liquidity Ratios</small>
+                                        <strong>Working Capital & Cash Flow</strong>
+                                        <small>Receivables Velocity · Liquidity Buffer</small>
                                     </div>
                                     <span class="domain-status">Active</span>
                                 </div>
@@ -1645,7 +1692,7 @@
                                 <div class="domain-pill active" onclick="toggleDomainTaxonomy(this)">
                                     <span class="domain-icon">🌐</span>
                                     <div>
-                                        <strong>Omnichannel & D2C (montecarlo.in)</strong>
+                                        <strong>Omnichannel & Digital Commerce</strong>
                                         <small>E-Commerce, Marketplace & Cloud POS Telemetry</small>
                                     </div>
                                     <span class="domain-status">Active</span>
@@ -1705,7 +1752,7 @@
                                     <div class="tile-icon-box">🔄</div>
                                     <div class="tile-content">
                                         <h4>Re-Seed Benchmark Risks</h4>
-                                        <p>Restores Monte Carlo Fashions standard benchmark corporate and store-level risk vectors into the active database.</p>
+                                        <p>Restores standard benchmark corporate and enterprise risk vectors into the active database.</p>
                                     </div>
                                     <button class="btn btn-outline" onclick="seedBenchmarkRisks()">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 2v6h6"/><path d="M2.66 15.57a10 10 0 1 0 .57-8.38"/></svg>
@@ -1726,6 +1773,866 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 8: STEP-BY-STEP BUSINESS RISK ASSESSMENT WIZARD (STEPS 1-8) -->
+            <section id="tab-assessment" class="tab-pane">
+                <div class="assessment-container">
+                    <!-- Wizard Header & Progress Bar -->
+                    <div class="card wizard-header-card">
+                        <div class="wiz-top-bar">
+                            <div class="wiz-title-group">
+                                <span class="badge-tag highlight">Interactive 8-Step Assessment Flow</span>
+                                <h2 id="wiz-main-title">Business Risk Assessment Dashboard</h2>
+                                <p class="card-subtitle">Systematic enterprise risk profiling: Financial ratios, operational resilience, and automated mitigation suggestions</p>
+                            </div>
+                            <div class="wiz-quick-actions">
+                                <button class="btn btn-sm btn-outline tab-back-btn" onclick="switchTab('overview')" title="Exit back to Executive Overview">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                                    <span>Exit to Overview</span>
+                                </button>
+                                <button class="btn btn-sm btn-outline" onclick="assessmentWizard.startNew()" id="wiz-btn-quick-new" title="Clear inputs and start a new assessment">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span>New Assessment</span>
+                                </button>
+                                <button class="btn btn-sm btn-emerald" onclick="assessmentWizard.loadSample()" id="wiz-btn-quick-sample" title="Load ABC Retail Store Sample Report">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                    <span>Load ABC Retail Store</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 8 Step Progress Indicators -->
+                        <div class="wiz-stepper-wrap">
+                            <div class="wiz-stepper" id="wiz-stepper">
+                                <div class="step-node active" data-step="1" onclick="assessmentWizard.goToStep(1)">
+                                    <div class="step-circle">1</div>
+                                    <span class="step-label">Home</span>
+                                </div>
+                                <div class="step-connector"></div>
+                                <div class="step-node" data-step="2" onclick="assessmentWizard.goToStep(2)">
+                                    <div class="step-circle">2</div>
+                                    <span class="step-label">Business</span>
+                                </div>
+                                <div class="step-connector"></div>
+                                <div class="step-node" data-step="3" onclick="assessmentWizard.goToStep(3)">
+                                    <div class="step-circle">3</div>
+                                    <span class="step-label">Financials</span>
+                                </div>
+                                <div class="step-connector"></div>
+                                <div class="step-node" data-step="4" onclick="assessmentWizard.goToStep(4)">
+                                    <div class="step-circle">4</div>
+                                    <span class="step-label">Risk Questions</span>
+                                </div>
+                                <div class="step-connector"></div>
+                                <div class="step-node" data-step="5" onclick="assessmentWizard.goToStep(5)">
+                                    <div class="step-circle">5</div>
+                                    <span class="step-label">Review</span>
+                                </div>
+                                <div class="step-connector"></div>
+                                <div class="step-node" data-step="6" onclick="assessmentWizard.goToStep(6)">
+                                    <div class="step-circle">6</div>
+                                    <span class="step-label">Results</span>
+                                </div>
+                                <div class="step-connector"></div>
+                                <div class="step-node" data-step="7" onclick="assessmentWizard.goToStep(7)">
+                                    <div class="step-circle">7</div>
+                                    <span class="step-label">Suggestions</span>
+                                </div>
+                                <div class="step-connector"></div>
+                                <div class="step-node" data-step="8" onclick="assessmentWizard.goToStep(8)">
+                                    <div class="step-circle">8</div>
+                                    <span class="step-label">Final Report</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 1: HOME PAGE -->
+                    <div class="wiz-step-pane active" id="wiz-step-1">
+                        <div class="card wiz-hero-card">
+                            <div class="wiz-hero-badge">Step 1 of 8 · Application Overview</div>
+                            <h1 class="wiz-hero-title">Business Risk Assessment Dashboard</h1>
+                            <p class="wiz-hero-desc">
+                                A comprehensive, automated risk analysis platform. Enter your enterprise details and financial information, 
+                                answer key operational risk questions, and receive an instant multi-dimensional risk diagnosis with actionable guidance.
+                            </p>
+
+                            <div class="wiz-hero-cta-group">
+                                <button class="btn btn-primary btn-lg" onclick="assessmentWizard.goToStep(2)" id="btn-wiz-start-new">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                    <span>Start New Assessment</span>
+                                </button>
+                                <button class="btn btn-outline btn-lg" onclick="assessmentWizard.loadSample()" id="btn-wiz-load-sample">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                    <span>View Sample Report (ABC Retail Store)</span>
+                                </button>
+                                <button class="btn btn-outline btn-lg tab-back-btn" onclick="switchTab('overview')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                                    <span>← Back to Overview</span>
+                                </button>
+                            </div>
+
+                            <div class="wiz-flow-features">
+                                <div class="wf-feat-card">
+                                    <div class="wf-feat-icon">📊</div>
+                                    <h4>8 Core Financial Ratios</h4>
+                                    <p>Current, Quick, Debt-to-Equity, Net Margin, Operating Margin, ICR, Inventory Turnover & Receivable Days.</p>
+                                </div>
+                                <div class="wf-feat-card">
+                                    <div class="wf-feat-icon">🛡️</div>
+                                    <h4>Dynamic Operational Risk</h4>
+                                    <p>Qualitative assessment of single supplier/customer concentration, disruption impact, and statutory compliance.</p>
+                                </div>
+                                <div class="wf-feat-card">
+                                    <div class="wf-feat-icon">🎯</div>
+                                    <h4>Composite Risk Score (0–100)</h4>
+                                    <p>Weighted classification into Low (0–30), Medium (31–60), High (61–80), and Critical (81–100) risk bands.</p>
+                                </div>
+                                <div class="wf-feat-card">
+                                    <div class="wf-feat-icon">📑</div>
+                                    <h4>Print-Ready Executive Report</h4>
+                                    <p>One-click clean PDF export with categorized suggestions, alerts, and comparative industry benchmarks.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: ENTER BUSINESS DETAILS -->
+                    <div class="wiz-step-pane" id="wiz-step-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <span class="badge-tag">Step 2 of 8</span>
+                                    <h3>Enter Business Details</h3>
+                                    <p class="card-subtitle">Basic enterprise identification used for report generation and benchmark classification</p>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <form id="form-biz-details" onsubmit="event.preventDefault(); assessmentWizard.goToStep(3);">
+                                    <div class="wiz-form-grid">
+                                        <div class="form-group">
+                                            <label for="wiz-biz-name">Business Name <span class="text-critical">*</span></label>
+                                            <input type="text" id="wiz-biz-name" class="form-control" placeholder="e.g. ABC Retail Store" required value="ABC Retail Store">
+                                            <span class="form-hint">Official registered entity or operating store name</span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="wiz-biz-type">Type of Business <span class="text-critical">*</span></label>
+                                            <select id="wiz-biz-type" class="form-control" required>
+                                                <option value="Retail Store" selected>Retail Store / Multi-Brand Outlet</option>
+                                                <option value="Garment Manufacturing">Garment & Textile Manufacturing</option>
+                                                <option value="Wholesale Distributor">Wholesale & B2B Distribution</option>
+                                                <option value="IT & Software Services">IT, Tech & Software Services</option>
+                                                <option value="Healthcare & Pharma">Healthcare, Clinic & Pharmacy</option>
+                                                <option value="Food & Hospitality">Food, Beverage & Hospitality</option>
+                                                <option value="General Services">General Commercial Services</option>
+                                            </select>
+                                            <span class="form-hint">Sector industry profile</span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="wiz-biz-size">Business Size <span class="text-critical">*</span></label>
+                                            <select id="wiz-biz-size" class="form-control" required>
+                                                <option value="Micro Business (< ₹1 Cr)">Micro Business (Revenue &lt; ₹1 Crore)</option>
+                                                <option value="Small Enterprise (₹1 - ₹10 Cr)" selected>Small Enterprise (Revenue ₹1 – ₹10 Crores)</option>
+                                                <option value="Medium Enterprise (₹10 - ₹50 Cr)">Medium Enterprise (Revenue ₹10 – ₹50 Crores)</option>
+                                                <option value="Large Corporate (> ₹50 Cr)">Large Corporate (Revenue &gt; ₹50 Crores)</option>
+                                            </select>
+                                            <span class="form-hint">Turnover and operational scale</span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="wiz-biz-fy">Financial Year <span class="text-critical">*</span></label>
+                                            <select id="wiz-biz-fy" class="form-control" required>
+                                                <option value="FY 2024-25" selected>FY 2024-25 (Current Period)</option>
+                                                <option value="FY 2023-24">FY 2023-24 (Previous Audited)</option>
+                                                <option value="FY 2025-26 (Projected)">FY 2025-26 (Budgeted / Projected)</option>
+                                            </select>
+                                            <span class="form-hint">Accounting reporting cycle</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="wiz-nav-bar">
+                                        <button type="button" class="btn btn-outline" onclick="assessmentWizard.goToStep(1)">
+                                            <span>← Back to Step 1</span>
+                                        </button>
+                                        <button type="button" class="btn btn-ghost" onclick="switchTab('overview')">
+                                            <span>Exit to Overview</span>
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <span>Continue to Financial Information →</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: ENTER FINANCIAL INFORMATION -->
+                    <div class="wiz-step-pane" id="wiz-step-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <span class="badge-tag">Step 3 of 8</span>
+                                    <h3>Enter Financial Information</h3>
+                                    <p class="card-subtitle">Key balance sheet, profit & loss, and working capital figures (enter in ₹ Rupees)</p>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline" onclick="assessmentWizard.fillSampleFinancials()">Fill Sample Data</button>
+                            </div>
+                            <div class="card-body">
+                                <div id="wiz-step3-error-banner" class="wiz-error-alert" style="display:none;"></div>
+                                <form id="form-financial-info" onsubmit="event.preventDefault(); assessmentWizard.goToStep(4);">
+                                    <h4 class="wiz-section-title">1. Balance Sheet & Liquidity Assets</h4>
+                                    <div class="wiz-form-grid">
+                                        <div class="form-group">
+                                            <label for="wiz-current-assets">Current Assets (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-current-assets" class="form-control" value="1500000" min="0" step="any" required>
+                                            <span class="form-hint">Cash, bank balance, debtors & inventory</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wiz-inventory">Inventory / Stock (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-inventory" class="form-control" value="550000" min="0" step="any" required>
+                                            <span class="form-hint">Finished goods and raw materials</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wiz-current-liabilities">Current Liabilities (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-current-liabilities" class="form-control" value="1000000" min="0" step="any" required>
+                                            <span class="form-hint">Creditors, short-term dues payable within 1 year</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wiz-total-debt">Total Debt / Borrowings (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-total-debt" class="form-control" value="900000" min="0" step="any" required>
+                                            <span class="form-hint">Bank loans, overdrafts and external debt</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wiz-equity">Owner's / Shareholders' Equity (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-equity" class="form-control" value="1200000" min="0" step="any" required>
+                                            <span class="form-hint">Capital invested plus retained earnings</span>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="wiz-section-title" style="margin-top: 24px;">2. Income Statement & Profitability</h4>
+                                    <div class="wiz-form-grid">
+                                        <div class="form-group">
+                                            <label for="wiz-revenue">Total Revenue / Sales (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-revenue" class="form-control" value="4000000" min="0" step="any" required>
+                                            <span class="form-hint">Gross annual turnover</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wiz-cogs">Cost of Goods Sold (COGS) (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-cogs" class="form-control" value="2400000" min="0" step="any" required>
+                                            <span class="form-hint">Direct purchase and production cost</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wiz-operating-profit">Operating Profit (EBIT) (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-operating-profit" class="form-control" value="400000" min="0" step="any" required>
+                                            <span class="form-hint">Profit before interest and tax</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wiz-net-profit">Net Profit (PAT) (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-net-profit" class="form-control" value="200000" min="0" step="any" required>
+                                            <span class="form-hint">Bottom-line final profit after all costs</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wiz-interest">Interest Expense (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-interest" class="form-control" value="100000" min="0" step="any" required>
+                                            <span class="form-hint">Annual interest paid on loans and debt</span>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="wiz-section-title" style="margin-top: 24px;">3. Working Capital & Trade Turnover</h4>
+                                    <div class="wiz-form-grid">
+                                        <div class="form-group">
+                                            <label for="wiz-avg-inventory">Average Inventory (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-avg-inventory" class="form-control" value="533333" min="0" step="any" required>
+                                            <span class="form-hint">(Opening Inventory + Closing Inventory) ÷ 2</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wiz-avg-receivables">Average Trade Receivables (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-avg-receivables" class="form-control" value="400000" min="0" step="any" required>
+                                            <span class="form-hint">Average outstanding customer receivables</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wiz-credit-sales">Annual Credit Sales (₹) <span class="text-critical">*</span></label>
+                                            <input type="number" id="wiz-credit-sales" class="form-control" value="3000000" min="0" step="any" required>
+                                            <span class="form-hint">Total sales made on credit terms (usually 60–80% of revenue)</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="wiz-nav-bar">
+                                        <button type="button" class="btn btn-outline" onclick="assessmentWizard.goToStep(2)">
+                                            <span>← Back to Business Details</span>
+                                        </button>
+                                        <button type="button" class="btn btn-ghost" onclick="switchTab('overview')">
+                                            <span>Exit to Overview</span>
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <span>Continue to Risk Questions →</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: ANSWER BUSINESS RISK QUESTIONS -->
+                    <div class="wiz-step-pane" id="wiz-step-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <span class="badge-tag">Step 4 of 8</span>
+                                    <h3>Answer Business Risk Questions</h3>
+                                    <p class="card-subtitle">Qualitative assessment of supply chain, client concentration, disruption vulnerability, and statutory compliance</p>
+                                </div>
+                                <div class="op-score-badge-box">
+                                    <span class="op-lbl">Operational Risk Preview:</span>
+                                    <strong class="op-val" id="wiz-op-preview-score">45 / 100</strong>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <form id="form-risk-questions" onsubmit="event.preventDefault(); assessmentWizard.goToStep(5);">
+                                    <div class="wiz-questions-list">
+                                        <!-- Question 1 -->
+                                        <div class="question-card">
+                                            <div class="q-header">
+                                                <span class="q-num">1</span>
+                                                <div class="q-title-wrap">
+                                                    <h4>Does the business depend heavily on one major supplier?</h4>
+                                                    <p class="text-muted">High supplier reliance can halt inventory replenishment if vendor defaults or raises prices.</p>
+                                                </div>
+                                            </div>
+                                            <div class="q-options-grid">
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-supplier" value="yes" checked onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>Yes — High Dependency</strong>
+                                                        <span>Over 50% of purchases come from a single supplier</span>
+                                                        <span class="opt-tag tag-high">+25 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-supplier" value="moderate" onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>Moderate Dependency</strong>
+                                                        <span>2 to 3 key suppliers satisfy majority of orders</span>
+                                                        <span class="opt-tag tag-med">+15 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-supplier" value="no" onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>No — Well Diversified</strong>
+                                                        <span>Multiple active vendors; easy alternate sourcing</span>
+                                                        <span class="opt-tag tag-low">+5 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Question 2 -->
+                                        <div class="question-card">
+                                            <div class="q-header">
+                                                <span class="q-num">2</span>
+                                                <div class="q-title-wrap">
+                                                    <h4>Does the business depend heavily on one major customer?</h4>
+                                                    <p class="text-muted">Losing a single key account or facing payment default can trigger sudden cash flow crises.</p>
+                                                </div>
+                                            </div>
+                                            <div class="q-options-grid">
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-customer" value="yes" onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>Yes — High Dependency</strong>
+                                                        <span>Single client contributes &gt;40% of total revenue</span>
+                                                        <span class="opt-tag tag-high">+25 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-customer" value="moderate" onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>Moderate Dependency</strong>
+                                                        <span>Top 3 customers account for 40%–60% of revenue</span>
+                                                        <span class="opt-tag tag-med">+15 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-customer" value="no" checked onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>No — Broad Customer Base</strong>
+                                                        <span>Retail or diversified clients with no single client dominance</span>
+                                                        <span class="opt-tag tag-low">+5 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Question 3 -->
+                                        <div class="question-card">
+                                            <div class="q-header">
+                                                <span class="q-num">3</span>
+                                                <div class="q-title-wrap">
+                                                    <h4>How serious could a business disruption be?</h4>
+                                                    <p class="text-muted">Impact of power outages, system failures, natural events, or supply chain bottlenecks.</p>
+                                                </div>
+                                            </div>
+                                            <div class="q-options-grid four-col">
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-disruption" value="severe" onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>Critical / Severe</strong>
+                                                        <span>Immediate total shutdown; daily revenue loss</span>
+                                                        <span class="opt-tag tag-critical">+30 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-disruption" value="high" onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>High Impact</strong>
+                                                        <span>Major operational delay; high recovery expenses</span>
+                                                        <span class="opt-tag tag-high">+20 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-disruption" value="moderate" checked onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>Moderate</strong>
+                                                        <span>Temporary delays; standard backup systems exist</span>
+                                                        <span class="opt-tag tag-med">+10 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-disruption" value="low" onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>Low Impact</strong>
+                                                        <span>Negligible disruption; fully redundant infrastructure</span>
+                                                        <span class="opt-tag tag-low">+5 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Question 4 -->
+                                        <div class="question-card">
+                                            <div class="q-header">
+                                                <span class="q-num">4</span>
+                                                <div class="q-title-wrap">
+                                                    <h4>Is the business following required rules and regulations?</h4>
+                                                    <p class="text-muted">Statutory filings, GST/tax compliance, labor safety, environmental & licensing adherence.</p>
+                                                </div>
+                                            </div>
+                                            <div class="q-options-grid">
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-compliance" value="full" checked onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>Fully Compliant</strong>
+                                                        <span>All statutory returns, audit records and licenses up-to-date</span>
+                                                        <span class="opt-tag tag-low">+5 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-compliance" value="partial" onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>Partially Compliant</strong>
+                                                        <span>Minor pending renewals or administrative delays</span>
+                                                        <span class="opt-tag tag-med">+15 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                                <label class="q-option-label">
+                                                    <input type="radio" name="wiz-q-compliance" value="noncompliant" onchange="assessmentWizard.updateOperationalScore()">
+                                                    <div class="q-opt-box">
+                                                        <strong>Non-Compliant / At Risk</strong>
+                                                        <span>Unresolved notices, tax disputes, or serious compliance gaps</span>
+                                                        <span class="opt-tag tag-critical">+30 Risk Points</span>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="wiz-nav-bar">
+                                        <button type="button" class="btn btn-outline" onclick="assessmentWizard.goToStep(3)">
+                                            <span>← Back to Financials</span>
+                                        </button>
+                                        <button type="button" class="btn btn-ghost" onclick="switchTab('overview')">
+                                            <span>Exit to Overview</span>
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <span>Review Entered Information →</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 5: REVIEW THE INFORMATION -->
+                    <div class="wiz-step-pane" id="wiz-step-5">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <span class="badge-tag">Step 5 of 8</span>
+                                    <h3>Review Entered Information</h3>
+                                    <p class="card-subtitle">Verify your input data. System automatically validates required denominators before computing ratios.</p>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline" onclick="assessmentWizard.goToStep(2)">Edit Details</button>
+                            </div>
+                            <div class="card-body">
+                                <!-- Validation Alert Box -->
+                                <div id="wiz-validation-box" class="wiz-validation-banner">
+                                    <!-- Populated dynamically: green pass or amber warning -->
+                                </div>
+
+                                <div class="review-grid">
+                                    <!-- Business Info Review -->
+                                    <div class="review-card">
+                                        <div class="rev-card-header">
+                                            <span class="rev-icon">🏢</span>
+                                            <h4>Business Profile</h4>
+                                        </div>
+                                        <div class="rev-list">
+                                            <div class="rev-item"><span class="lbl">Business Name:</span><strong id="rev-biz-name">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Industry Type:</span><strong id="rev-biz-type">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Scale / Size:</span><strong id="rev-biz-size">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Financial Year:</span><strong id="rev-biz-fy">--</strong></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Financial Info Review -->
+                                    <div class="review-card">
+                                        <div class="rev-card-header">
+                                            <span class="rev-icon">💰</span>
+                                            <h4>Financial Figures</h4>
+                                        </div>
+                                        <div class="rev-list">
+                                            <div class="rev-item"><span class="lbl">Current Assets:</span><strong id="rev-curr-assets">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Inventory:</span><strong id="rev-inventory">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Current Liabilities:</span><strong id="rev-curr-liab">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Total Debt:</span><strong id="rev-debt">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Owner's Equity:</span><strong id="rev-equity">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Revenue:</span><strong id="rev-revenue">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">COGS:</span><strong id="rev-cogs">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Operating Profit:</span><strong id="rev-op-profit">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Net Profit:</span><strong id="rev-net-profit">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Interest Expense:</span><strong id="rev-interest">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Average Receivables:</span><strong id="rev-receivables">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Credit Sales:</span><strong id="rev-credit-sales">--</strong></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Risk Questions Review -->
+                                    <div class="review-card">
+                                        <div class="rev-card-header">
+                                            <span class="rev-icon">🛡️</span>
+                                            <h4>Operational Risk Profile</h4>
+                                        </div>
+                                        <div class="rev-list">
+                                            <div class="rev-item"><span class="lbl">Supplier Dependency:</span><strong id="rev-q-supplier">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Customer Dependency:</span><strong id="rev-q-customer">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Disruption Impact:</span><strong id="rev-q-disruption">--</strong></div>
+                                            <div class="rev-item"><span class="lbl">Compliance Status:</span><strong id="rev-q-compliance">--</strong></div>
+                                            <div class="rev-item highlight"><span class="lbl">Operational Risk Score:</span><strong id="rev-op-score" class="text-amber">-- / 100</strong></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="wiz-nav-bar" style="margin-top: 28px;">
+                                    <button type="button" class="btn btn-outline" onclick="assessmentWizard.goToStep(4)">
+                                        <span>← Back to Risk Questions</span>
+                                    </button>
+                                    <button type="button" class="btn btn-ghost" onclick="switchTab('overview')">
+                                        <span>Exit to Overview</span>
+                                    </button>
+                                    <button type="button" class="btn btn-primary btn-lg" onclick="assessmentWizard.calculateAndShowResults()" id="btn-wiz-calculate">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                        <span>Calculate Risk &amp; View Results →</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 6: SHOW THE RESULTS -->
+                    <div class="wiz-step-pane" id="wiz-step-6">
+                        <!-- Risk Score Hero Card -->
+                        <div class="card wiz-score-hero">
+                            <div class="score-hero-grid">
+                                <div class="score-gauge-col">
+                                    <div class="score-circular-meter">
+                                        <svg viewBox="0 0 120 120" class="circular-chart">
+                                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8"/>
+                                            <path class="circle-fill" id="wiz-score-circle" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ffc021" stroke-width="8" stroke-dasharray="42, 100"/>
+                                        </svg>
+                                        <div class="meter-text">
+                                            <span class="meter-num" id="wiz-overall-score">42</span>
+                                            <span class="meter-total">/ 100</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="score-verdict-col">
+                                    <div class="verdict-tag-row">
+                                        <span class="badge-tag">Overall Assessment</span>
+                                        <span class="score-chip" id="wiz-risk-badge">Medium Risk</span>
+                                    </div>
+                                    <h2 id="wiz-verdict-heading">ABC Retail Store — Overall Score: 42/100 (Medium Risk)</h2>
+                                    <p class="wiz-verdict-desc" id="wiz-verdict-desc">
+                                        The enterprise shows moderate stability with healthy gross margins, but exhibits vulnerability 
+                                        due to single-supplier reliance, inventory holding, and trade debtor collection lag.
+                                    </p>
+                                    <div class="classification-bands-row">
+                                        <div class="band-pill" id="band-low">0–30: Low</div>
+                                        <div class="band-pill active" id="band-medium">31–60: Medium</div>
+                                        <div class="band-pill" id="band-high">61–80: High</div>
+                                        <div class="band-pill" id="band-critical">81–100: Critical</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5 Risk Category Breakdown Bars -->
+                        <div class="card" style="margin-top: 20px;">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Risk Category Breakdown</h3>
+                                    <p class="card-subtitle">Contribution across 5 key operational and financial pillars (Higher score = Greater risk exposure)</p>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="cat-bars-grid">
+                                    <div class="cat-bar-item">
+                                        <div class="cat-lbl-row">
+                                            <span>💧 Liquidity Risk (25% Weight)</span>
+                                            <strong id="bar-val-liq">35 / 100</strong>
+                                        </div>
+                                        <div class="cat-track"><div class="cat-progress" id="bar-fill-liq" style="width: 35%; background: var(--risk-medium);"></div></div>
+                                    </div>
+                                    <div class="cat-bar-item">
+                                        <div class="cat-lbl-row">
+                                            <span>📉 Debt & Solvency Risk (20% Weight)</span>
+                                            <strong id="bar-val-debt">40 / 100</strong>
+                                        </div>
+                                        <div class="cat-track"><div class="cat-progress" id="bar-fill-debt" style="width: 40%; background: var(--risk-medium);"></div></div>
+                                    </div>
+                                    <div class="cat-bar-item">
+                                        <div class="cat-lbl-row">
+                                            <span>📈 Profitability Risk (20% Weight)</span>
+                                            <strong id="bar-val-prof">30 / 100</strong>
+                                        </div>
+                                        <div class="cat-track"><div class="cat-progress" id="bar-fill-prof" style="width: 30%; background: var(--risk-low);"></div></div>
+                                    </div>
+                                    <div class="cat-bar-item">
+                                        <div class="cat-lbl-row">
+                                            <span>⚙️ Efficiency Risk (15% Weight)</span>
+                                            <strong id="bar-val-eff">45 / 100</strong>
+                                        </div>
+                                        <div class="cat-track"><div class="cat-progress" id="bar-fill-eff" style="width: 45%; background: var(--risk-medium);"></div></div>
+                                    </div>
+                                    <div class="cat-bar-item">
+                                        <div class="cat-lbl-row">
+                                            <span>🏭 Operational & Disruption Risk (20% Weight)</span>
+                                            <strong id="bar-val-op">65 / 100</strong>
+                                        </div>
+                                        <div class="cat-track"><div class="cat-progress" id="bar-fill-op" style="width: 65%; background: var(--risk-high);"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 8 Computed Financial Ratios Grid -->
+                        <div class="card" style="margin-top: 20px;">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Financial Ratios Analysis (8 Key Ratios)</h3>
+                                    <p class="card-subtitle">Automatically calculated from entered balance sheet and profit & loss inputs</p>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="ratios-table-container">
+                                    <table class="data-table" id="wiz-ratios-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Financial Ratio</th>
+                                                <th>Formula</th>
+                                                <th>Calculated Result</th>
+                                                <th>Benchmark Target</th>
+                                                <th>Status</th>
+                                                <th>Interpretation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="wiz-ratios-tbody">
+                                            <!-- Dynamically populated via JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Key Problems Found Box -->
+                        <div class="card" style="margin-top: 20px;">
+                            <div class="card-header">
+                                <div>
+                                    <h3>⚠️ Main Vulnerabilities & Problems Identified</h3>
+                                    <p class="card-subtitle">Specific operational and financial bottlenecks flagged by the scoring engine</p>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="problems-grid" id="wiz-problems-grid">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="wiz-nav-bar" style="margin-top: 24px;">
+                            <button type="button" class="btn btn-outline" onclick="assessmentWizard.goToStep(5)">
+                                <span>← Back to Review</span>
+                            </button>
+                            <button type="button" class="btn btn-ghost" onclick="switchTab('overview')">
+                                <span>Exit to Overview</span>
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="assessmentWizard.goToStep(7)">
+                                <span>View Suggestions & Action Plan →</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 7: GIVE SUGGESTIONS -->
+                    <div class="wiz-step-pane" id="wiz-step-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <span class="badge-tag">Step 7 of 8</span>
+                                    <h3>Practical Suggestions for Improvement</h3>
+                                    <p class="card-subtitle">Targeted management actions to strengthen working capital, mitigate debt, and accelerate collections</p>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="suggestions-cards-grid" id="wiz-suggestions-grid">
+                                    <!-- Populated dynamically via JS -->
+                                </div>
+
+                                <div class="wiz-nav-bar" style="margin-top: 28px;">
+                                    <button type="button" class="btn btn-outline" onclick="assessmentWizard.goToStep(6)">
+                                        <span>← Back to Results</span>
+                                    </button>
+                                    <button type="button" class="btn btn-ghost" onclick="switchTab('overview')">
+                                        <span>Exit to Overview</span>
+                                    </button>
+                                    <button type="button" class="btn btn-primary btn-lg" onclick="assessmentWizard.goToStep(8)">
+                                        <span>Generate Final Report →</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 8: FINAL REPORT -->
+                    <div class="wiz-step-pane" id="wiz-step-8">
+                        <div class="final-report-wrapper" id="printable-assessment-report">
+                            <!-- Report Header -->
+                            <div class="rep-header">
+                                <div class="rep-brand-block">
+                                    <div class="rep-logo-text">🛡️ Business Risk Assessment Report</div>
+                                    <div class="rep-subtext">Enterprise Governance & Quantitative Financial Telemetry</div>
+                                </div>
+                                <div class="rep-meta-block">
+                                    <div class="rep-meta-row"><span>Entity:</span> <strong id="rep-out-biz-name">ABC Retail Store</strong></div>
+                                    <div class="rep-meta-row"><span>Industry:</span> <strong id="rep-out-biz-type">Retail Store</strong></div>
+                                    <div class="rep-meta-row"><span>Size:</span> <strong id="rep-out-biz-size">Small Enterprise</strong></div>
+                                    <div class="rep-meta-row"><span>Financial Year:</span> <strong id="rep-out-biz-fy">FY 2024-25</strong></div>
+                                    <div class="rep-meta-row"><span>Report Date:</span> <strong id="rep-out-date">--</strong></div>
+                                </div>
+                            </div>
+
+                            <!-- Executive Score Banner -->
+                            <div class="rep-score-banner">
+                                <div class="rep-score-left">
+                                    <div class="rep-big-score" id="rep-overall-score">42</div>
+                                    <div class="rep-score-desc">
+                                        <div class="rep-score-tag" id="rep-score-tag">MEDIUM RISK</div>
+                                        <div class="rep-score-note">Overall composite risk score out of 100</div>
+                                    </div>
+                                </div>
+                                <div class="rep-score-right">
+                                    <div class="rep-pillar-pill">💧 Liquidity: <strong id="rep-score-liq">35</strong></div>
+                                    <div class="rep-pillar-pill">📉 Debt: <strong id="rep-score-debt">40</strong></div>
+                                    <div class="rep-pillar-pill">📈 Profit: <strong id="rep-score-prof">30</strong></div>
+                                    <div class="rep-pillar-pill">⚙️ Efficiency: <strong id="rep-score-eff">45</strong></div>
+                                    <div class="rep-pillar-pill">🏭 Operational: <strong id="rep-score-op">65</strong></div>
+                                </div>
+                            </div>
+
+                            <!-- Financial Ratios Summary Table -->
+                            <div class="rep-section">
+                                <h4 class="rep-sec-title">1. Financial Ratios Analysis</h4>
+                                <table class="rep-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Financial Ratio</th>
+                                            <th>Formula</th>
+                                            <th>Result</th>
+                                            <th>Target Benchmark</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rep-ratios-tbody">
+                                        <!-- Populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Key Findings -->
+                            <div class="rep-section">
+                                <h4 class="rep-sec-title">2. Key Business Problems &amp; Vulnerabilities</h4>
+                                <ul class="rep-bullet-list" id="rep-problems-list">
+                                    <!-- Populated dynamically -->
+                                </ul>
+                            </div>
+
+                            <!-- Recommendations -->
+                            <div class="rep-section">
+                                <h4 class="rep-sec-title">3. Practical Recommendations &amp; Strategic Roadmap</h4>
+                                <div class="rep-rec-grid" id="rep-suggestions-list">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Sign-off / Disclaimer -->
+                            <div class="rep-footer-signoff">
+                                <p class="rep-disclaimer">
+                                    <strong>Academic &amp; Governance Disclaimer:</strong> 
+                                    This report is generated for enterprise risk assessment and curriculum demonstration purposes based on entered financial statements and qualitative operational indicators. 
+                                    Thresholds and weights follow documented risk assessment guidelines.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Action Bar (Hidden when printing) -->
+                        <div class="rep-action-bar no-print">
+                            <button type="button" class="btn btn-outline" onclick="assessmentWizard.goToStep(7)">
+                                <span>← Back to Suggestions</span>
+                            </button>
+                            <button type="button" class="btn btn-outline tab-back-btn" onclick="switchTab('overview')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                                <span>← Back to Overview</span>
+                            </button>
+                            <button type="button" class="btn btn-emerald btn-lg" onclick="assessmentWizard.printReport()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                                <span>Download / Print Report (PDF)</span>
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="switchTab('financial')" title="Run Monte Carlo Stress Scenarios and Tornado Sensitivity on this active enterprise">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                <span>Stress & Sensitivity Simulator →</span>
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="assessmentWizard.exportToRegistry()" title="Add identified business risks to Enterprise Risk Registry and 5x5 Matrix">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                <span>Export to Risk Registry</span>
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="assessmentWizard.startNew()">
+                                <span>Start New Assessment</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -2142,10 +3049,10 @@ CREATE POLICY "Allow all on alerts" ON alerts FOR ALL USING (true) WITH CHECK (t
         <div class="modal-card modal-lg dossier-modal-card">
             <div class="modal-header dossier-header">
                 <div class="dossier-brand-title">
-                    <span class="mc-crest-sm">MC</span>
+                    <span class="mc-crest-sm">🛡️</span>
                     <div>
-                        <h3>Monte Carlo Fashions Limited — Executive Risk Dossier</h3>
-                        <p class="modal-subtitle">Official Board & Risk Committee Briefing · Prepared for Chief Risk Officer</p>
+                        <h3>Enterprise Business Risk Assessment — Executive Risk Dossier</h3>
+                        <p class="modal-subtitle">Official Executive Briefing & Multi-Pillar Quantitative Risk Assessment</p>
                     </div>
                 </div>
                 <div class="dossier-actions">
@@ -2160,8 +3067,8 @@ CREATE POLICY "Allow all on alerts" ON alerts FOR ALL USING (true) WITH CHECK (t
                 <div class="dossier-meta-grid">
                     <div class="dossier-meta-box">
                         <span class="d-label">Entity</span>
-                        <strong class="d-val">Monte Carlo Fashions Ltd</strong>
-                        <span class="d-sub">NSE: MONTECARLO | BSE: 538836</span>
+                        <strong class="d-val" id="dossier-biz-name">ABC Retail Store</strong>
+                        <span class="d-sub" id="dossier-biz-sub">Sector: Retail Enterprise | Financial Year: FY 2024-25</span>
                     </div>
                     <div class="dossier-meta-box">
                         <span class="d-label">Evaluation Framework</span>
@@ -2193,13 +3100,13 @@ CREATE POLICY "Allow all on alerts" ON alerts FOR ALL USING (true) WITH CHECK (t
                 <div class="dossier-section-title" style="margin-top: 20px;">3. Executive Risk Mitigation Mandates</div>
                 <div class="dossier-mandates" id="dossier-mandates">
                     <div class="mandate-item">
-                        <strong>❄️ Winter Demand Buffer:</strong> Maintain flexible manufacturing schedule to adjust woollen production if cold weather onset is delayed by &gt;2 weeks.
+                        <strong>📊 Seasonal Demand Buffer:</strong> Maintain flexible operational schedules to adjust production volume if market seasonal demand shifts by &gt;2 weeks.
                     </div>
                     <div class="mandate-item">
-                        <strong>🧶 Wool Sourcing Hedging:</strong> Secure 60-day forward contracts for Australian Merino wool imports to hedge against foreign currency and raw material price shocks.
+                        <strong>📦 Supply Chain Hedging:</strong> Secure 60-day forward contracts for primary vendor imports to hedge against foreign currency and raw material price shocks.
                     </div>
                     <div class="mandate-item">
-                        <strong>🏪 MBO Receivable Control:</strong> Institute strict credit limits of 60 days on distributor accounts and offer 2% prompt settlement discounts for collections within 30 days.
+                        <strong>💳 Channel Receivable Control:</strong> Institute strict credit limits of 45-60 days on distributor accounts and offer 2% prompt settlement discounts for collections within 30 days.
                     </div>
                 </div>
             </div>

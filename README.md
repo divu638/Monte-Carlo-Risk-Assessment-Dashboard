@@ -1,6 +1,6 @@
-# Monte Carlo Risk Engine 🛡️🎲
+# RiskAssess PRO — Business Risk Assessment Dashboard 🛡️🎲
 
-> **Enterprise Business Risk Assessment, Value-at-Risk (VaR) Engine & Three.js 3D Visualizer**  
+> **Enterprise Business Risk Assessment, Monte Carlo Value-at-Risk (VaR) Engine & Three.js 3D Visualizer**  
 > Built with Python Flask, SQLite / Supabase Cloud PostgreSQL, Three.js, and Vanilla CSS Glassmorphism.
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://monte-carlo-risk-assessment-dashboard.onrender.com/)
@@ -15,36 +15,39 @@
 
 ## 🌟 Key Features
 
-1. **Executive Overview & KPIs**:
+1. **8-Step Guided Business Risk Assessment Wizard**:
+   * Step-by-step diagnostic workflow: Business Profile, Working Capital & Balance Sheet, Operational Supplier/Customer Dependencies, Calculation & Classification, Actionable Suggestions, and Institutional Executive Dossier.
+   * Instant ratio calculations (Current Ratio, Quick Ratio, Debt-to-Equity, Net Margin, Operating Margin, Interest Coverage, Collection Days).
+
+2. **Executive Overview & Command Hub**:
    * Real-time metrics: Active Enterprise Risks, Critical/High Exposures, Total Financial VaR, and Governance Health Score (ISO 31000).
    * **3D Spatial Threat Topology (Three.js)**: Interactive 5×5 elevation heatmap with camera controls (3D Isometric, Top Plan, Horizon view, and Auto-Rotate).
    * **3D Domain Ring Chart (Three.js)**: Cylindrical animated 3D segments representing domain distributions with real-time risk counts.
 
-2. **Risk Registry & CRUD**:
+3. **Risk Registry & CRUD**:
    * Complete risk inventory table with multi-criteria filtering (Domain, Severity, Status).
    * Live search (`/` shortcut), inline status toggle, bulk batch updates, and single-click CSV export.
 
-3. **5×5 Risk Heatmap**:
+4. **5×5 Risk Heatmap**:
    * Likelihood vs. Impact probability matrix with interactive cell drill-down.
 
-4. **Monte Carlo VaR Simulation Engine**:
+5. **Monte Carlo VaR Simulation Engine**:
    * 1,000 to 10,000 statistical trials with log-normal severity distributions.
    * Calculates Mean Expected Loss, 95% Value-at-Risk (VaR), and Worst-Case Exposure with interactive distribution histograms.
 
-5. **Financial Analysis (Monte Carlo Fashions Ltd)**:
-   * Key financial ratio monitors: Current Ratio, Quick Ratio, Debt-to-Equity, ICR, ROE, ROCE.
-   * Stress-testing scenario presets (Severe Winter Delay, Raw Material Cost Surge, Liquidity Squeeze).
+6. **Financial Stress Testing & Sensitivity Analysis**:
+   * Key financial ratio monitors and stress-testing scenario presets (Severe Demand Shock, Supply Chain Inflation, Liquidity Squeeze).
    * **Tornado Sensitivity Analysis** chart mapping key operational risk drivers.
 
-6. **Audit Trail & Governance**:
+7. **Audit Trail & Governance**:
    * Immutable chronological logging of all additions, modifications, and deletions.
    * RBAC preview (Chief Risk Officer, Risk Analyst, External Auditor, Board Member).
    * Risk appetite threshold sliders and JSON/SQL data export.
 
-7. **Themes & Modern Aesthetics**:
-   * **Emerald Velvet & Gold** (Primary Dark Enterprise Theme).
+8. **Modern Linear/Stripe Deep Slate Aesthetics**:
+   * **Linear Slate Dark** (Primary Enterprise Theme with soft pastel badges & glassmorphism).
    * **Classic White & Luxury Light** (High-contrast Executive Light Mode).
-   * Fully responsive across mobile, tablet, and desktop viewports.
+   * Global Header Back Button and Breadcrumb navigation across all tabs.
 
 ---
 
