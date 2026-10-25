@@ -7,24 +7,24 @@
 
 :root, body.theme-emerald, body.dark-theme {
     /* ======================================================================
-       Palette: Linear / Stripe Modern Slate-Zinc & Soft Indigo
+       Palette: Luxury Dark Emerald, Slate-Pine & Mint Accents
        ====================================================================== */
-    --bg-base: #090D16;
-    --bg-surface: #0F172A;
-    --bg-surface-elevated: #162032;
-    --bg-card: rgba(17, 24, 39, 0.76);
-    --bg-card-hover: rgba(24, 34, 53, 0.90);
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-glass: rgba(255, 255, 255, 0.10);
-    --border-glow: rgba(99, 102, 241, 0.35);
+    --bg-base: #040D0A;
+    --bg-surface: #071914;
+    --bg-surface-elevated: #0C261F;
+    --bg-card: rgba(8, 28, 22, 0.78);
+    --bg-card-hover: rgba(12, 40, 31, 0.90);
+    --border-subtle: rgba(52, 211, 153, 0.10);
+    --border-glass: rgba(52, 211, 153, 0.14);
+    --border-glow: rgba(16, 185, 129, 0.40);
 
     /* Glass Morphism */
     --glass-blur: blur(20px);
     --glass-blur-heavy: blur(36px);
-    --glass-bg: rgba(15, 23, 42, 0.78);
-    --glass-bg-light: rgba(30, 41, 59, 0.55);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0) 50%);
+    --glass-bg: rgba(7, 25, 20, 0.82);
+    --glass-bg-light: rgba(12, 38, 30, 0.60);
+    --glass-border: rgba(52, 211, 153, 0.12);
+    --glass-shine: linear-gradient(135deg, rgba(52, 211, 153, 0.12) 0%, rgba(255, 255, 255, 0) 50%);
 
     /* High Contrast Typography */
     --text-primary: #F8FAFC;
@@ -52,21 +52,21 @@
     --risk-low-border: rgba(16, 185, 129, 0.28);
     --risk-low-glow: 0 4px 20px rgba(16, 185, 129, 0.14);
 
-    /* Brand Accents — Sleek Indigo / Sky / Emerald */
-    --accent-blue: #6366F1;
-    --accent-cyan: #38BDF8;
-    --accent-indigo: #4F46E5;
-    --accent-purple: #8B5CF6;
-    --accent-gradient: linear-gradient(135deg, #6366F1 0%, #38BDF8 50%, #34D399 100%);
-    --accent-glow: 0 0 28px rgba(99, 102, 241, 0.32);
+    /* Brand Accents — Vibrant Emerald / Mint / Jade */
+    --accent-blue: #10B981;
+    --accent-cyan: #34D399;
+    --accent-indigo: #059669;
+    --accent-purple: #14B8A6;
+    --accent-gradient: linear-gradient(135deg, #10B981 0%, #059669 50%, #34D399 100%);
+    --accent-glow: 0 0 28px rgba(16, 185, 129, 0.35);
 
     /* 3D Shadows & Transitions */
     --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
-    --shadow-card-hover: 0 16px 45px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(99, 102, 241, 0.3);
-    --shadow-glow: 0 0 35px rgba(99, 102, 241, 0.22);
+    --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.50), 0 0 0 1px rgba(52, 211, 153, 0.08);
+    --shadow-card-hover: 0 16px 45px rgba(0, 0, 0, 0.60), 0 0 0 1px rgba(16, 185, 129, 0.35);
+    --shadow-glow: 0 0 35px rgba(16, 185, 129, 0.28);
     --shadow-3d: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
 }
 
@@ -1834,7 +1834,7 @@ body.light-theme .btn-ai-pill:hover {
 .ambient-orb.orb-1 {
     width: 520px;
     height: 520px;
-    background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+    background: radial-gradient(circle, #10b981 0%, transparent 70%);
     top: -100px;
     left: 20%;
     animation-duration: 25s;
@@ -1842,7 +1842,7 @@ body.light-theme .btn-ai-pill:hover {
 .ambient-orb.orb-2 {
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+    background: radial-gradient(circle, #059669 0%, transparent 70%);
     bottom: -150px;
     right: 10%;
     animation-duration: 30s;
@@ -1851,7 +1851,7 @@ body.light-theme .btn-ai-pill:hover {
 .ambient-orb.orb-3 {
     width: 450px;
     height: 450px;
-    background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+    background: radial-gradient(circle, #34d399 0%, transparent 70%);
     top: 40%;
     right: 35%;
     animation-duration: 20s;

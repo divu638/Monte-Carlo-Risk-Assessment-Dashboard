@@ -121,17 +121,17 @@ function setAppTheme(themeName) {
 
     // Update all Three.js scenes background
     const bgColors = {
-        emerald: 0x090D16,
+        emerald: 0x040D0A,
         light: 0xe8ecf1
     };
-    const newBg = new THREE.Color(bgColors[themeName] || 0x090D16);
+    const newBg = new THREE.Color(bgColors[themeName] || 0x040D0A);
     if (STATE.threeScene && STATE.threeScene.scene) STATE.threeScene.scene.background = newBg;
     if (STATE.domainRingScene && STATE.domainRingScene.scene) STATE.domainRingScene.scene.background = newBg;
     if (STATE.financial3DScene && STATE.financial3DScene.scene) STATE.financial3DScene.scene.background = newBg;
     if (STATE.score3DScene && STATE.score3DScene.scene) STATE.score3DScene.scene.background = newBg;
 
     const themeTitles = {
-        emerald: '🌙 Dark Mode (Linear Slate)',
+        emerald: '🌙 Dark Mode (Emerald Green)',
         light: '☀️ Day Mode (Classic White)'
     };
     showToast(`Switched to ${themeTitles[themeName]}`, 'info');
