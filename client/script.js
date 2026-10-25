@@ -3152,7 +3152,7 @@ function renderDBStatus(info) {
 //  All 8 ratios from the project report + Risk Scoring Framework + Monte Carlo
 // ══════════════════════════════════════════════════════════════════════════
 
-// Monte Carlo Fashions Limited Corporate Financials (in INR Crores)
+// Global Corporate Financial Benchmark (in INR Crores)
 // Audited Annual Baseline: ₹1,085 Cr Revenue, ₹72 Cr PAT, ₹152 Cr EBITDA
 const FIN_CORPORATE_DATA = {
     currentAssets: 890,      // ₹890 Cr
@@ -3169,7 +3169,7 @@ const FIN_CORPORATE_DATA = {
     avgReceivables: 275      // ₹275 Cr
 };
 
-// Unit Store Scale (Monte Carlo Retail Store Unit - B.Com Project Base Case in Lakhs)
+// Unit Store Scale (Standard Retail Store Unit Base Case in Lakhs)
 const FIN_STORE_DATA = {
     currentAssets: 1500000,
     inventory: 550000,
@@ -3361,7 +3361,7 @@ function setFinancialScale(scale) {
     document.getElementById('fin-avg-inventory').value = s.avgInventory;
     document.getElementById('fin-avg-receivables').value = s.avgReceivables;
 
-    showToast(`Switched scale to ${isCorp ? 'Monte Carlo Corporate (₹ Cr)' : 'Unit Retail Store'}`, 'info');
+    showToast(`Switched scale to ${isCorp ? 'Global Corporate Enterprise (₹ Cr)' : 'Unit Retail Business'}`, 'info');
     calculateFinancialRatios();
     runFinancialMonteCarlo();
 }
