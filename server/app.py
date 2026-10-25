@@ -113,7 +113,7 @@ def check_rate_limit(endpoint_type="general"):
 
     # Rate limits per 60-second sliding window
     tier_limits = {
-        "simulate": 40,      # Monte Carlo compute intensive (max 40/min)
+        "simulate": 40,      # Quantitative simulation compute intensive (max 40/min)
         "reset": 8,          # Database re-seed/reset (max 8/min)
         "config": 15,        # Supabase config tests (max 15/min)
         "write": 60,         # Risk creation / updates / deletes (max 60/min)
@@ -363,7 +363,7 @@ def list_risks():
 
 @app.route("/api/risks/<int:risk_id>", methods=["GET"])
 def get_risk(risk_id):
-    """Get single risk details with Monte Carlo and trend projection."""
+    """Get single risk details with quantitative VaR simulation and trend projection."""
     try:
         if risk_id < 1 or risk_id > 1000000:
             return jsonify({"error": "Invalid risk identifier"}), 400
@@ -372,7 +372,7 @@ def get_risk(risk_id):
         if not risk:
             return jsonify({"error": "Risk not found"}), 404
 
-        # Monte Carlo loss projection
+        # Quantitative VaR loss projection
         financial = float(risk.get("financial_impact", 100000.0) or 100000.0)
         sim = run_monte_carlo(int(risk["likelihood"]), int(risk["impact"]), financial)
         forecast = generate_trend_forecast(int(risk["score"]), risk.get("trend", "stable"), risk.get("velocity", "Medium"))
@@ -518,7 +518,7 @@ def read_alert(alert_id):
 
 @app.route("/api/simulate", methods=["POST"])
 def simulate():
-    """Run interactive Monte Carlo loss simulation with bounded parameters to prevent CPU DoS."""
+    """Run interactive quantitative VaR loss simulation with bounded parameters to prevent CPU DoS."""
     try:
         data = request.get_json(silent=True) or {}
         likelihood = sanitize_integer(data.get("likelihood"), 1, 5, 3)
@@ -608,7 +608,7 @@ def generate_ai_mitigation_plan_text(name, category, likelihood, impact, score, 
 
 
 def run_monte_carlo(likelihood_val, impact_val, financial_base, iterations=3000):
-    """Run probabilistic Monte Carlo trial simulation on exposure with bounded iterations."""
+    """Run probabilistic trial simulation on exposure with bounded iterations."""
     p = likelihood_val / 5.0
     impact_factor = impact_val / 5.0
 

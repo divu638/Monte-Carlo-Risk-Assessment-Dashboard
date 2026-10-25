@@ -1,5 +1,5 @@
 """
-Monte Carlo Risk Engine — Project Launcher
+RiskGuard Pro — Enterprise Business Risk Assessment Dashboard Launcher
 Runs the Flask backend server from the server/ package.
 """
 
@@ -18,7 +18,7 @@ from app import app
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     print("\n" + "="*65)
-    print("  Monte Carlo Risk Engine -- Enterprise Risk Assessment Dashboard")
+    print("  RiskGuard Pro — Enterprise Business Risk Assessment Dashboard")
     print("  Client Folder: ./client")
     print("  Server Folder: ./server")
     print("  Database: Supabase (PostgreSQL Cloud) / Local SQLite Fallback")

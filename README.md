@@ -1,6 +1,6 @@
 # RiskAssess PRO — Business Risk Assessment Dashboard 🛡️🎲
 
-> **Enterprise Business Risk Assessment, Monte Carlo Value-at-Risk (VaR) Engine & Three.js 3D Visualizer**  
+> **Enterprise Business Risk Assessment, Quantitative Value-at-Risk (VaR) Engine & Three.js 3D Visualizer**  
 > Built with Python Flask, SQLite / Supabase Cloud PostgreSQL, Three.js, and Vanilla CSS Glassmorphism.
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://monte-carlo-risk-assessment-dashboard.onrender.com/)
@@ -31,7 +31,7 @@
 4. **5×5 Risk Heatmap**:
    * Likelihood vs. Impact probability matrix with interactive cell drill-down.
 
-5. **Monte Carlo VaR Simulation Engine**:
+5. **Quantitative VaR Simulation Engine**:
    * 1,000 to 10,000 statistical trials with log-normal severity distributions.
    * Calculates Mean Expected Loss, 95% Value-at-Risk (VaR), and Worst-Case Exposure with interactive distribution histograms.
 

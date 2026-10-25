@@ -1336,7 +1336,7 @@ body.light-theme .filter-select { color: #0f172a; }
 }
 .empty-icon { font-size: 2.4rem; margin-bottom: 14px; }
 
-/* ═══ TAB 4: Monte Carlo Simulator ═══ */
+/* ═══ TAB 4: Quantitative VaR Simulator ═══ */
 .range-slider {
     width: 100%; height: 6px;
     background: rgba(255,255,255,0.06); border-radius: 3px;
@@ -2509,7 +2509,7 @@ body.light-theme .fin-disclaimer {
 body.light-theme .rsd-score-label { color: var(--text-secondary); }
 body.light-theme .ratio-results-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); }
 
-/* ═══ Monte Carlo Fashions Corporate Bar & Institutional Suite ═══ */
+/* ═══ Corporate Executive Bar & Institutional Suite ═══ */
 .mc-corporate-bar {
     display: flex;
     align-items: center;
@@ -2669,7 +2669,7 @@ body.light-theme .ratio-results-list::-webkit-scrollbar-thumb { background: rgba
     color: var(--accent-cyan);
 }
 
-/* Monte Carlo Stress Scenario Presets */
+/* Quantitative Stress Scenario Presets */
 .mc-scenario-presets {
     margin-bottom: 18px;
     padding: 12px 14px;

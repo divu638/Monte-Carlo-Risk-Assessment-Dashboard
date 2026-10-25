@@ -1,5 +1,5 @@
 /**
- * Monte Carlo Brand Risk Engine — Enterprise Business Risk Assessment Dashboard
+ * RiskGuard Enterprise — Enterprise Business Risk Assessment & Quantitative Analytics Dashboard
  * Real-time REST API, Three.js 3D Risk Terrain, Chart.js Visualizations, and SQLite DB.
  * Professional Edition v2.4.0
  */
@@ -2276,7 +2276,7 @@ function updateThreeJSLandscape(matrixCells) {
     }
 }
 
-// ─── Monte Carlo VaR Simulator ─────────────────────────────────────────────
+// ─── Quantitative VaR Simulator ─────────────────────────────────────────────
 
 function initMonteCarloControls() {
     const lSlider = document.getElementById('sim-likelihood');
@@ -2350,7 +2350,7 @@ async function runMonteCarloSim() {
 
         // Render Histogram Chart
         renderSimHistogram(data.histogram);
-        showToast('Monte Carlo simulation completed', 'success');
+        showToast('Quantitative simulation completed', 'success');
     } catch (err) {
         showToast('Error during simulation run', 'error');
         if (statusBadge) statusBadge.textContent = 'Error';
@@ -2713,7 +2713,7 @@ function switchTab(tabName, filterSeverity = null, recordHistory = true) {
         overview: 'Executive Overview',
         registry: 'Enterprise Risk Registry',
         matrix: '5×5 Probability × Impact Heatmap',
-        analytics: 'Monte Carlo Value-at-Risk Simulator',
+        analytics: 'Quantitative Value-at-Risk Simulator',
         financial: 'Stress Testing & Sensitivity Analysis',
         assessment: 'Business Risk Assessment — 8-Step Flow',
         audit: 'Audit Trail & Compliance Log',
@@ -2738,7 +2738,7 @@ function switchTab(tabName, filterSeverity = null, recordHistory = true) {
                 assessment: 'Assessment Wizard (8 Steps)',
                 registry: 'Risk Registry',
                 matrix: '3D Risk Heatmap',
-                analytics: 'Monte Carlo VaR',
+                analytics: 'Quantitative VaR',
                 financial: 'Stress Testing',
                 audit: 'Audit Trail',
                 admin: 'Admin Console'
@@ -2836,7 +2836,7 @@ function exportRegistryToCSV() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `MonteCarlo_Risk_Registry_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `Enterprise_Risk_Registry_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -2962,7 +2962,7 @@ function initSupabaseControls() {
 
     // Copy SQL button
     document.getElementById('btn-copy-sql')?.addEventListener('click', async () => {
-        const sql = `-- Monte Carlo Risk Engine — Supabase Table Setup SQL
+        const sql = `-- Enterprise Risk Engine — Supabase Table Setup SQL
 CREATE TABLE IF NOT EXISTS risks (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -3149,7 +3149,7 @@ function renderDBStatus(info) {
 
 // ══════════════════════════════════════════════════════════════════════════
 //  FINANCIAL ANALYSIS MODULE (B.Com Component)
-//  All 8 ratios from the project report + Risk Scoring Framework + Monte Carlo
+//  All 8 ratios from the project report + Risk Scoring Framework + Quantitative Simulation
 // ══════════════════════════════════════════════════════════════════════════
 
 // Global Corporate Financial Benchmark (in INR Crores)
@@ -3367,7 +3367,7 @@ function setFinancialScale(scale) {
 }
 
 /**
- * Apply Monte Carlo scenario presets
+ * Apply quantitative scenario presets
  */
 function applyScenarioPreset(preset) {
     document.querySelectorAll('.scenario-chip').forEach(c => c.classList.remove('active'));
@@ -3732,7 +3732,7 @@ function renderRecommendations(ratios) {
 }
 
 /**
- * Financial Monte Carlo Simulation
+ * Financial Quantitative Simulation
  * Simulates net profit outcomes based on revenue/expense uncertainty
  * Computes Expected Profit, VaR 95%, VaR 99%, and Conditional VaR (Expected Shortfall)
  */
@@ -3812,7 +3812,7 @@ function runFinancialMonteCarlo() {
         renderFinSimHistogram(profits);
         renderTornadoChart(data);
 
-        if (btn) { btn.disabled = false; btn.querySelector('span').textContent = 'Execute Monte Carlo Simulation'; }
+        if (btn) { btn.disabled = false; btn.querySelector('span').textContent = 'Execute Quantitative Simulation'; }
     }, 60);
 }
 
@@ -4367,7 +4367,7 @@ function exportDatabaseJSON() {
 function exportDatabaseSQL() {
     const risks = STATE.risks || [];
     let sql = `-- ==========================================================================
--- Business Risk Assessment Dashboard · Powered by Monte Carlo Risk Engine
+-- Business Risk Assessment Dashboard · Powered by Enterprise Risk Engine
 -- Enterprise Risk Registry & Governance Schema (PostgreSQL / Supabase)
 -- Generated: ${new Date().toISOString()}
 -- ==========================================================================
@@ -5502,7 +5502,7 @@ const assessmentWizard = {
         setSyncPill('sync-it-val', ratios.inventoryTurnover !== null ? ratios.inventoryTurnover.toFixed(2) + 'x' : 'N/A');
         setSyncPill('sync-dd-val', ratios.collectionDays !== null ? Math.round(ratios.collectionDays) + ' days' : 'N/A');
 
-        // Sync with existing hidden inputs for Monte Carlo Stress Engine
+        // Sync with existing hidden inputs for Stress Engine
         const syncMap = {
             'fin-current-assets': f.currentAssets,
             'fin-inventory': f.inventory,
@@ -5522,7 +5522,7 @@ const assessmentWizard = {
             if (el) el.value = val;
         }
 
-        // Pre-compute sensitivity and Monte Carlo for the active enterprise
+        // Pre-compute sensitivity and quantitative simulation for the active enterprise
         try {
             if (typeof calculateFinancialRatios === 'function') calculateFinancialRatios();
             if (typeof runFinancialMonteCarlo === 'function') runFinancialMonteCarlo();

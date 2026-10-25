@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Risk Assessment Dashboard — Enterprise Risk Analytics & Monte Carlo Engine</title>
-    <meta name="description" content="Business Risk Assessment Dashboard with financial ratio analysis, operational resilience scoring, and Monte Carlo Value-at-Risk simulation.">
-    <meta name="keywords" content="Business risk assessment, financial ratios, Monte Carlo simulation, VaR, risk matrix, probability simulation">
+    <title>Business Risk Assessment Dashboard — Enterprise Risk Analytics & Quantitative VaR Engine</title>
+    <meta name="description" content="Business Risk Assessment Dashboard with financial ratio analysis, operational resilience scoring, and Quantitative Value-at-Risk simulation.">
+    <meta name="keywords" content="Business risk assessment, financial ratios, quantitative risk simulation, VaR, risk matrix, probability simulation">
     <meta name="author" content="Business Risk Assessment Platform">
     <!-- Favicon: Modern Risk Shield & Probability Crest -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g' cx='35%25' cy='30%25' r='75%25'><stop offset='0%25' stop-color='%2310b981'/><stop offset='60%25' stop-color='%23059669'/><stop offset='100%25' stop-color='%23022c22'/></radialGradient></defs><circle cx='50' cy='50' r='47' fill='url(%23g)' stroke='%2338bdf8' stroke-width='3'/><path d='M50 20 L72 28 V48 C72 65 60 76 50 80 C40 76 28 65 28 48 V28 L50 20 Z' stroke='%23fff' stroke-width='3' fill='none'/><path d='M34 58 Q44 58 48 38 Q50 30 52 38 Q56 58 66 58' stroke='%2338bdf8' stroke-width='3' fill='none'/></svg>">
@@ -45,7 +45,7 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
             <div class="brand">
-                <div class="brand-icon mc-round-logo" id="brand-logo-crest" title="Business Risk Assessment Dashboard · Powered by Monte Carlo Simulation Engine">
+                <div class="brand-icon mc-round-logo" id="brand-logo-crest" title="Business Risk Assessment Dashboard · Powered by Quantitative Risk Simulation Engine">
                     <!-- Clean Modern Shield & Stochastic Probability Risk Crest -->
                     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Risk Assessment Emblem">
                         <defs>
@@ -78,7 +78,7 @@
                         <circle cx="5.5" cy="32" r="1.5" fill="#38BDF8"/>
                         <!-- Modern Risk Shield Outline -->
                         <path d="M32 14 L46 19 V31 C46 41 39 48 32 51 C25 48 18 41 18 31 V19 L32 14 Z" stroke="url(#raGrad)" stroke-width="2" fill="rgba(16, 185, 129, 0.12)" filter="url(#raGlow)"/>
-                        <!-- Monte Carlo Bell Curve Arc across Shield -->
+                        <!-- Probabilistic Bell Curve Arc across Shield -->
                         <path d="M22 38 Q28 38 30 26 Q32 20 34 26 Q36 38 42 38" stroke="url(#raCyanGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
                         <!-- VaR Mean Probability Node -->
                         <circle cx="32" cy="22" r="2.8" fill="#FFFFFF" filter="url(#raGlow)"/>
@@ -168,7 +168,7 @@
                         <path d="M13 17V5"/>
                         <path d="M8 17v-3"/>
                     </svg>
-                    <span>Monte Carlo VaR</span>
+                    <span>Quantitative VaR</span>
                 </button>
 
                 <button class="nav-item" data-tab="financial" id="nav-financial">
@@ -391,7 +391,7 @@
                         <div class="hub-headline">
                             <span class="hub-tag-pill">⚡ ENTERPRISE RISK ANALYTICS · ISO 31000 PROTOCOL</span>
                             <h2>Business Risk Intelligence &amp; Quantitative Simulation Engine</h2>
-                            <p>End-to-end framework combining institutional 8-step business risk diagnosis, Three.js 3D spatial heatmap analysis, and Monte Carlo Value-at-Risk modeling.</p>
+                            <p>End-to-end framework combining institutional 8-step business risk diagnosis, Three.js 3D spatial heatmap analysis, and Quantitative Value-at-Risk modeling.</p>
                         </div>
                         <button class="btn btn-primary" onclick="switchTab('assessment'); if(window.assessmentWizard) window.assessmentWizard.startNew();" id="btn-banner-start-wiz" style="background: linear-gradient(135deg, #6366F1 0%, #3B82F6 100%); box-shadow: 0 4px 18px rgba(99, 102, 241, 0.4);">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -416,14 +416,14 @@
                             </div>
                         </div>
 
-                        <!-- Action Card 2: Monte Carlo Simulation -->
+                        <!-- Action Card 2: Quantitative Simulation -->
                         <div class="hub-card" onclick="switchTab('analytics');">
                             <div class="hub-card-top">
                                 <div class="hub-card-icon">🎲</div>
                                 <span class="hub-card-badge">Quant Model</span>
                             </div>
                             <div class="hub-card-body">
-                                <h4>Monte Carlo VaR Engine</h4>
+                                <h4>Quantitative VaR Engine</h4>
                                 <p>Execute 3,000+ stochastic trials to generate normal distributions, 95% Confidence Value-at-Risk, and portfolio downside.</p>
                             </div>
                             <div class="hub-card-footer">
@@ -820,12 +820,12 @@
                 </div>
             </section>
 
-            <!-- TAB 4: MONTE CARLO VaR ANALYTICS -->
+            <!-- TAB 4: QUANTITATIVE VaR ANALYTICS -->
             <section id="tab-analytics" class="tab-pane">
                 <div class="tab-context-banner">
                     <div class="tcb-left">
                         <span class="badge-tag">Quant Engine</span>
-                        <h3>Monte Carlo Value-at-Risk (VaR) Simulator</h3>
+                        <h3>Quantitative Value-at-Risk (VaR) Simulator</h3>
                         <p class="text-muted">10,000 statistical iterations estimating aggregate financial loss probability distribution</p>
                     </div>
                     <div class="tcb-right">
@@ -837,11 +837,11 @@
                 </div>
 
                 <div class="visualizer-row">
-                    <!-- Monte Carlo Configuration Card -->
+                    <!-- Quantitative Configuration Card -->
                     <div class="card sim-config-card">
                         <div class="card-header">
                             <div>
-                                <h3>Probabilistic Monte Carlo Simulator</h3>
+                                <h3>Probabilistic Value-at-Risk Simulator</h3>
                                 <p class="card-subtitle">Calculate 95% Value-at-Risk (VaR) and distribution curve</p>
                             </div>
                         </div>
@@ -881,7 +881,7 @@
 
                                 <button type="submit" class="btn btn-primary btn-block" id="btn-run-sim">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                    <span>Execute Monte Carlo Simulation</span>
+                                    <span>Execute Quantitative Simulation</span>
                                 </button>
                             </form>
                         </div>
@@ -1081,7 +1081,7 @@
                             </div>
                         </div>
 
-                        <!-- Hidden Inputs for Backwards Compatibility & Monte Carlo Stress Engine -->
+                        <!-- Hidden Inputs for Backwards Compatibility & Stress Engine -->
                         <div style="display:none;" aria-hidden="true">
                             <input type="number" id="fin-current-assets" value="1500000">
                             <input type="number" id="fin-inventory" value="550000">
@@ -1114,11 +1114,11 @@
                     </div>
                 </div>
 
-                <!-- Financial Monte Carlo & Stress Presets -->
+                <!-- Financial Stress Presets -->
                     <div class="card">
                         <div class="card-header">
                             <div>
-                                <h3>Monte Carlo Stress Testing & Scenario Engine</h3>
+                                <h3>Quantitative Stress Testing & Scenario Engine</h3>
                                 <p class="card-subtitle">Probabilistic simulation of enterprise margin shocks, demand contraction & working capital lags</p>
                             </div>
                             <span class="badge-tag" id="sim-scenario-badge">Base Case Active</span>
@@ -1126,7 +1126,7 @@
                         <div class="card-body">
                             <!-- Scenario Presets -->
                             <div class="mc-scenario-presets">
-                                <span class="scenario-label">Monte Carlo Stress Scenarios:</span>
+                                <span class="scenario-label">Enterprise Stress Scenarios:</span>
                                 <div class="scenario-chips">
                                     <button type="button" class="scenario-chip" id="chip-mild-winter" onclick="applyScenarioPreset('mild-winter')">📉 Demand Drop Shock</button>
                                     <button type="button" class="scenario-chip" id="chip-wool-spike" onclick="applyScenarioPreset('wool-spike')">📦 Supply Cost Inflation</button>
@@ -1161,7 +1161,7 @@
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-block" id="btn-run-fin-sim">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                    <span>Execute Monte Carlo Simulation</span>
+                                    <span>Execute Quantitative Simulation</span>
                                 </button>
                             </form>
                             <div class="fin-sim-results" id="fin-sim-results" style="display:none;">
@@ -1198,7 +1198,7 @@
                 <div class="card" style="margin-top: 24px;">
                     <div class="card-header">
                         <div>
-                            <h3>Tornado Sensitivity Analysis — Monte Carlo Key Risk Drivers</h3>
+                            <h3>Tornado Sensitivity Analysis — Enterprise Key Risk Drivers</h3>
                             <p class="card-subtitle">Deterministic sensitivity of Net Profit (PAT) to operational, supply chain, and weather shocks</p>
                         </div>
                         <span class="badge-tag">Sensitivity Variance (₹)</span>
@@ -1427,7 +1427,7 @@
                                             <span class="role-rank-badge">Corporate Risk Office</span>
                                         </div>
                                     </div>
-                                    <p class="role-desc">Manages risk registry, runs 50k Monte Carlo iterations, modifies scenario stresses, exports financial sensitivity charts.</p>
+                                    <p class="role-desc">Manages risk registry, runs 50k quantitative iterations, modifies scenario stresses, exports financial sensitivity charts.</p>
                                     <ul class="role-caps-list">
                                         <li><span class="cap-check">✔</span> Add & Edit Registry Vectors</li>
                                         <li><span class="cap-check">✔</span> 50,000 Iteration Simulations</li>
@@ -1765,7 +1765,7 @@
                                     <div class="tile-icon-box">🧹</div>
                                     <div class="tile-content">
                                         <h4>Purge Simulation Transient Cache</h4>
-                                        <p>Frees memory buffers by purging client-side Monte Carlo probability distributions without touching database records.</p>
+                                        <p>Frees memory buffers by purging client-side probability distributions without touching database records.</p>
                                     </div>
                                     <button class="btn btn-outline" onclick="purgeSimCache()">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -2622,7 +2622,7 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                                 <span>Download / Print Report (PDF)</span>
                             </button>
-                            <button type="button" class="btn btn-primary" onclick="switchTab('financial')" title="Run Monte Carlo Stress Scenarios and Tornado Sensitivity on this active enterprise">
+                            <button type="button" class="btn btn-primary" onclick="switchTab('financial')" title="Run Quantitative Stress Scenarios and Tornado Sensitivity on this active enterprise">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                                 <span>Stress & Sensitivity Simulator →</span>
                             </button>
@@ -2851,7 +2851,7 @@
                 </div>
 
                 <div class="detail-section">
-                    <h4>6-Month Projected Risk Trajectory (Monte Carlo & AI Trend)</h4>
+                    <h4>6-Month Projected Risk Trajectory (Quantitative & AI Trend)</h4>
                     <div class="chart-body" style="height: 200px;">
                         <canvas id="detail-forecast-chart"></canvas>
                     </div>
@@ -3044,7 +3044,7 @@ CREATE POLICY "Allow all on alerts" ON alerts FOR ALL USING (true) WITH CHECK (t
         </div>
     </div>
 
-    <!-- MODAL 5: MONTE CARLO EXECUTIVE RISK DOSSIER (PDF / PRINT READY) -->
+    <!-- MODAL 5: EXECUTIVE RISK DOSSIER (PDF / PRINT READY) -->
     <div class="modal-backdrop" id="modal-monte-carlo-dossier">
         <div class="modal-card modal-lg dossier-modal-card">
             <div class="modal-header dossier-header">
@@ -3067,13 +3067,13 @@ CREATE POLICY "Allow all on alerts" ON alerts FOR ALL USING (true) WITH CHECK (t
                 <div class="dossier-meta-grid">
                     <div class="dossier-meta-box">
                         <span class="d-label">Entity</span>
-                        <strong class="d-val" id="dossier-biz-name">ABC Retail Store</strong>
-                        <span class="d-sub" id="dossier-biz-sub">Sector: Retail Enterprise | Financial Year: FY 2024-25</span>
+                        <strong class="d-val" id="dossier-biz-name">Enterprise Business Unit</strong>
+                        <span class="d-sub" id="dossier-biz-sub">Sector: Corporate Enterprise | Financial Year: FY 2024-25</span>
                     </div>
                     <div class="dossier-meta-box">
                         <span class="d-label">Evaluation Framework</span>
-                        <strong class="d-val">ISO 31000 + B.Com Risk Matrix</strong>
-                        <span class="d-sub">8 Financial Ratios + 5k MC Runs</span>
+                        <strong class="d-val">ISO 31000 + ERM Matrix</strong>
+                        <span class="d-sub">8 Financial Ratios + 5k Quant Runs</span>
                     </div>
                     <div class="dossier-meta-box">
                         <span class="d-label">Composite Risk Index</span>
@@ -3083,7 +3083,7 @@ CREATE POLICY "Allow all on alerts" ON alerts FOR ALL USING (true) WITH CHECK (t
                     <div class="dossier-meta-box">
                         <span class="d-label">Timestamp</span>
                         <strong class="d-val" id="dossier-timestamp">--</strong>
-                        <span class="d-sub">Audit Reference: #MCF-2026-Q3</span>
+                        <span class="d-sub">Audit Reference: #RISK-2026-Q3</span>
                     </div>
                 </div>
 
@@ -3092,7 +3092,7 @@ CREATE POLICY "Allow all on alerts" ON alerts FOR ALL USING (true) WITH CHECK (t
                     <!-- Populated dynamically via JS -->
                 </div>
 
-                <div class="dossier-section-title" style="margin-top: 20px;">2. Monte Carlo Simulation: Value at Risk (VaR) & Downside Exposure</div>
+                <div class="dossier-section-title" style="margin-top: 20px;">2. Quantitative Risk Simulation: Value at Risk (VaR) & Downside Exposure</div>
                 <div class="dossier-sim-summary" id="dossier-sim-summary">
                     <!-- Populated dynamically via JS -->
                 </div>
