@@ -3,13 +3,13 @@
 > **Enterprise Business Risk Assessment, Quantitative Value-at-Risk (VaR) Engine & Three.js 3D Visualizer**  
 > Built with Python Flask, SQLite / Supabase Cloud PostgreSQL, Three.js, and Vanilla CSS Glassmorphism.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://monte-carlo-risk-assessment-dashboard.onrender.com/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://business-risk-assessment-dashboard-1.onrender.com/)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0%2B-green.svg)](https://flask.palletsprojects.com/)
 [![Three.js](https://img.shields.io/badge/Three.js-r128-black.svg)](https://threejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-🌐 **Live Production App**: **[https://monte-carlo-risk-assessment-dashboard.onrender.com](https://monte-carlo-risk-assessment-dashboard.onrender.com)**
+🌐 **Live Production App**: **[https://business-risk-assessment-dashboard-1.onrender.com](https://business-risk-assessment-dashboard-1.onrender.com)**
 
 ---
 
@@ -55,8 +55,8 @@
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/<your-username>/monte-carlo-risk-engine.git
-cd monte-carlo-risk-engine
+git clone https://github.com/divu638/Business-Risk-Assessment-Dashboard.git
+cd Business-Risk-Assessment-Dashboard
 ```
 
 ### 2. Install Dependencies
