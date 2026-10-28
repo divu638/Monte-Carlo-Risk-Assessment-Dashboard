@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiskGuard Pro — Enterprise Business Risk Assessment Platform</title>
+    <meta name="description" content="RiskGuard Pro: The enterprise-grade risk assessment platform with quantitative VaR simulation, AI-powered risk scoring, and real-time analytics dashboards.">
+    <meta name="keywords" content="business risk assessment, enterprise risk management, VaR simulation, risk analytics, risk dashboard">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g' cx='35%25' cy='30%25' r='75%25'><stop offset='0%25' stop-color='%2310b981'/><stop offset='60%25' stop-color='%23059669'/><stop offset='100%25' stop-color='%23022c22'/></radialGradient></defs><circle cx='50' cy='50' r='47' fill='url(%23g)' stroke='%2338bdf8' stroke-width='3'/><path d='M50 20 L72 28 V48 C72 65 60 76 50 80 C40 76 28 65 28 48 V28 L50 20 Z' stroke='%23fff' stroke-width='3' fill='none'/></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script>
+    // Clean any old demo tokens immediately
+    if (localStorage.getItem('rg_token') === 'demo-token') { localStorage.removeItem('rg_token'); localStorage.removeItem('rg_user'); }
+    if (sessionStorage.getItem('rg_token') === 'demo-token') { sessionStorage.removeItem('rg_token'); sessionStorage.removeItem('rg_user'); }
+    </script>
+    <style>
+        /* ============================================================
+           RiskGuard Pro — Landing / Home Page
+           Dark Emerald · Glassmorphism · 3D Depth
+        ============================================================ */
+        :root {
+            --bg:           #040D0A;
+            --bg-s:         #071914;
+            --g:            #10B981;
+            --mint:         #34D399;
+            --cyan:         #38BDF8;
+            --teal:         #14B8A6;
+            --tp:           #F8FAFC;
+            --ts:           #94A3B8;
+            --tm:           #64748B;
+            --glass:        rgba(7,25,20,0.72);
+            --gb:           rgba(52,211,153,0.14);
+            --smooth:       0.3s cubic-bezier(0.4,0,0.2,1);
+            --spring:       0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        html{scroll-behavior:smooth;}
+        body{
+            font-family:'Plus Jakarta Sans','Inter',sans-serif;
+            background:var(--bg); color:var(--tp);
+            overflow-x:hidden; line-height:1.6;
+        }
+
+        /* ── Ambient BG ─────────────────────────────── */
+        .ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+        .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:0.30;animation:float 10s ease-in-out infinite;}
+        .o1{width:700px;height:700px;background:radial-gradient(circle,#10B981,transparent 70%);top:-200px;left:-200px;animation-delay:0s;}
+        .o2{width:500px;height:500px;background:radial-gradient(circle,#059669,transparent 70%);bottom:-150px;right:-150px;animation-delay:-4s;}
+        .o3{width:350px;height:350px;background:radial-gradient(circle,#38BDF8,transparent 70%);top:40%;left:60%;opacity:0.12;animation-delay:-7s;}
+        .o4{width:250px;height:250px;background:radial-gradient(circle,#14B8A6,transparent 70%);top:15%;right:8%;opacity:0.18;animation-delay:-2s;}
+        .o5{width:200px;height:200px;background:radial-gradient(circle,#34D399,transparent 70%);bottom:20%;left:10%;opacity:0.14;animation-delay:-5s;}
+        .grid-mesh{
+            position:absolute;inset:0;
+            background-image:linear-gradient(rgba(52,211,153,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(52,211,153,0.035) 1px,transparent 1px);
+            background-size:56px 56px;
+        }
+        @keyframes float{0%,100%{transform:translateY(0) scale(1);}40%{transform:translateY(-30px) scale(1.05);}70%{transform:translateY(18px) scale(0.97);}}
+
+        /* ── Particles ──────────────────────────────── */
+        #pc{position:fixed;inset:0;z-index:1;pointer-events:none;}
+
+        /* ── Glow cursor ────────────────────────────── */
+        #gc{position:fixed;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,0.05) 0%,transparent 70%);pointer-events:none;z-index:2;transform:translate(-50%,-50%);transition:opacity .3s;}
+
+        /* ── Navbar ─────────────────────────────────── */
+        .nav{
+            position:fixed;top:0;left:0;right:0;z-index:100;
+            display:flex;align-items:center;justify-content:space-between;
+            padding:0 48px;height:68px;
+            background:rgba(4,13,10,0.75);
+            border-bottom:1px solid rgba(52,211,153,0.10);
+            backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+            transition:all var(--smooth);
+        }
+        .nav.scrolled{background:rgba(4,13,10,0.92);border-color:rgba(52,211,153,0.16);}
+        .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+        .nav-logo{width:38px;height:38px;filter:drop-shadow(0 0 10px rgba(16,185,129,0.5));}
+        .nav-name{font-size:1.1rem;font-weight:800;letter-spacing:-0.3px;background:linear-gradient(135deg,#34D399,#10B981,#38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .nav-links{display:flex;align-items:center;gap:8px;}
+        .nav-link{padding:8px 16px;color:var(--ts);font-size:0.875rem;font-weight:500;text-decoration:none;border-radius:8px;transition:all var(--smooth);}
+        .nav-link:hover{color:var(--tp);background:rgba(52,211,153,0.08);}
+        .nav-cta{
+            padding:9px 22px;
+            background:linear-gradient(135deg,#10B981,#059669);
+            border:none;border-radius:10px;
+            color:#fff;font-family:inherit;font-size:0.875rem;font-weight:700;
+            cursor:pointer;text-decoration:none;
+            box-shadow:0 4px 16px rgba(16,185,129,0.30);
+            transition:all var(--smooth);
+        }
+        .nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(16,185,129,0.45);}
+
+        /* ── Main Content ───────────────────────────── */
+        main{position:relative;z-index:10;}
+
+        /* ── HERO ───────────────────────────────────── */
+        .hero{
+            min-height:100vh;
+            display:flex;flex-direction:column;
+            align-items:center;justify-content:center;
+            text-align:center;padding:100px 24px 80px;
+            position:relative;
+        }
+
+        .hero-badge{
+            display:inline-flex;align-items:center;gap:8px;
+            padding:7px 18px;margin-bottom:32px;
+            background:rgba(16,185,129,0.10);
+            border:1px solid rgba(52,211,153,0.25);
+            border-radius:99px;
+            font-size:0.78rem;font-weight:600;color:var(--mint);
+            letter-spacing:0.5px;
+            animation:fadeUp 0.6s ease both;
+        }
+        .badge-dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);animation:pulse 2s infinite;}
+
+        .hero-title{
+            font-size:clamp(2.8rem,6vw,5rem);
+            font-weight:800;
+            line-height:1.08;
+            letter-spacing:-2px;
+            margin-bottom:24px;
+            animation:fadeUp 0.6s ease 0.1s both;
+        }
+        .hero-title .line1{display:block;color:var(--tp);}
+        .hero-title .line2{
+            display:block;
+            background:linear-gradient(135deg,#34D399 0%,#10B981 40%,#38BDF8 100%);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+        }
+
+        .hero-desc{
+            max-width:620px;
+            font-size:1.1rem;font-weight:400;
+            color:var(--ts);line-height:1.7;
+            margin-bottom:48px;
+            animation:fadeUp 0.6s ease 0.2s both;
+        }
+
+        .hero-actions{
+            display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
+            animation:fadeUp 0.6s ease 0.3s both;
+        }
+
+        .btn-hero-primary{
+            display:inline-flex;align-items:center;gap:10px;
+            padding:15px 32px;
+            background:linear-gradient(135deg,#10B981 0%,#059669 60%,#34D399 100%);
+            border:none;border-radius:14px;
+            color:#fff;font-family:inherit;font-size:1rem;font-weight:700;
+            cursor:pointer;text-decoration:none;
+            position:relative;overflow:hidden;
+            box-shadow:0 8px 32px rgba(16,185,129,0.40);
+            transition:all var(--smooth);
+        }
+        .btn-hero-primary::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transition:left .5s ease;}
+        .btn-hero-primary:hover::before{left:100%;}
+        .btn-hero-primary:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(16,185,129,0.55);}
+        .btn-hero-primary svg{width:20px;height:20px;}
+
+        .btn-hero-secondary{
+            display:inline-flex;align-items:center;gap:10px;
+            padding:15px 32px;
+            background:rgba(7,25,20,0.70);
+            border:1px solid rgba(52,211,153,0.20);
+            border-radius:14px;
+            color:var(--ts);font-family:inherit;font-size:1rem;font-weight:600;
+            cursor:pointer;text-decoration:none;
+            backdrop-filter:blur(12px);
+            transition:all var(--smooth);
+        }
+        .btn-hero-secondary:hover{border-color:rgba(52,211,153,0.45);color:var(--tp);background:rgba(52,211,153,0.07);transform:translateY(-2px);}
+        .btn-hero-secondary svg{width:18px;height:18px;}
+
+        /* Scroll indicator */
+        .scroll-hint{
+            position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+            display:flex;flex-direction:column;align-items:center;gap:6px;
+            color:var(--tm);font-size:0.72rem;font-weight:500;letter-spacing:1px;text-transform:uppercase;
+            animation:fadeUp 0.6s ease 0.6s both;
+        }
+        .scroll-arrow{width:20px;height:20px;animation:bounce 1.8s ease-in-out infinite;}
+        @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(6px);}}
+
+        /* Hero dashboard mockup */
+        .hero-mockup{
+            margin-top:64px;
+            max-width:900px;width:100%;
+            background:var(--glass);
+            border:1px solid var(--gb);
+            border-radius:20px;
+            backdrop-filter:blur(24px);
+            padding:20px;
+            box-shadow:0 40px 80px rgba(0,0,0,0.60),inset 0 1px 0 rgba(52,211,153,0.15);
+            position:relative;overflow:hidden;
+            animation:fadeUp 0.7s ease 0.4s both;
+        }
+        .hero-mockup::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.60),rgba(16,185,129,0.80),rgba(52,211,153,0.60),transparent);}
+        .mockup-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(52,211,153,0.08);}
+        .mockup-dot{width:12px;height:12px;border-radius:50%;}
+        .mockup-dot.r{background:#F87171;box-shadow:0 0 6px rgba(248,113,113,0.5);}
+        .mockup-dot.y{background:#FBBF24;box-shadow:0 0 6px rgba(251,191,36,0.5);}
+        .mockup-dot.g{background:#34D399;box-shadow:0 0 6px rgba(52,211,153,0.5);}
+        .mockup-url{flex:1;background:rgba(4,13,10,0.60);border:1px solid rgba(52,211,153,0.10);border-radius:6px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--tm);}
+        .mockup-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+        .mkpi{background:rgba(4,13,10,0.60);border:1px solid rgba(52,211,153,0.10);border-radius:10px;padding:12px 14px;}
+        .mkpi-label{font-size:0.65rem;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+        .mkpi-val{font-size:1.2rem;font-weight:800;font-family:'JetBrains Mono',monospace;}
+        .mkpi-val.g{color:var(--mint);}
+        .mkpi-val.r{color:#F87171;}
+        .mkpi-val.y{color:#FBBF24;}
+        .mkpi-val.c{color:var(--cyan);}
+        .mockup-charts{display:grid;grid-template-columns:2fr 1fr;gap:10px;}
+        .mchart{background:rgba(4,13,10,0.60);border:1px solid rgba(52,211,153,0.10);border-radius:10px;padding:14px;height:100px;position:relative;overflow:hidden;}
+        .mchart-label{font-size:0.65rem;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+        .mchart-bars{display:flex;align-items:flex-end;gap:4px;height:60px;}
+        .mbar{border-radius:3px 3px 0 0;background:linear-gradient(to top,#10B981,#34D399);opacity:0.8;transition:all .3s;}
+        .mchart-line{position:absolute;bottom:14px;left:14px;right:14px;height:50px;}
+        .mchart-line svg{width:100%;height:100%;}
+
+        /* ── Stats Row ──────────────────────────────── */
+        .stats-section{padding:60px 48px;position:relative;}
+        .stats-grid{
+            display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+            background:rgba(52,211,153,0.08);
+            border:1px solid rgba(52,211,153,0.10);
+            border-radius:20px;overflow:hidden;
+            max-width:1100px;margin:0 auto;
+        }
+        .stat-card{
+            background:rgba(4,13,10,0.80);
+            padding:36px 28px;text-align:center;
+            position:relative;overflow:hidden;
+            transition:all var(--smooth);
+        }
+        .stat-card:hover{background:rgba(16,185,129,0.06);}
+        .stat-card::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:40%;height:1px;background:linear-gradient(90deg,transparent,var(--mint),transparent);opacity:0;}
+        .stat-card:hover::after{opacity:1;}
+        .stat-num{font-size:2.8rem;font-weight:800;font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg,#34D399,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:8px;}
+        .stat-label{font-size:0.82rem;color:var(--ts);font-weight:500;}
+        .stat-sub{font-size:0.72rem;color:var(--tm);margin-top:4px;}
+
+        /* ── Features ───────────────────────────────── */
+        .features-section{padding:80px 48px;}
+        .section-tag{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(16,185,129,0.08);border:1px solid rgba(52,211,153,0.18);border-radius:99px;font-size:0.75rem;font-weight:700;color:var(--mint);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:20px;}
+        .section-title{font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-1px;line-height:1.12;margin-bottom:16px;}
+        .section-title .hl{background:linear-gradient(135deg,#34D399,#10B981,#38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .section-desc{font-size:1rem;color:var(--ts);max-width:560px;line-height:1.7;margin-bottom:56px;}
+
+        .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1100px;margin:0 auto;}
+        .feat-card{
+            background:var(--glass);
+            border:1px solid rgba(52,211,153,0.12);
+            border-radius:20px;
+            padding:32px 28px;
+            position:relative;overflow:hidden;
+            transition:all var(--smooth);
+            cursor:default;
+        }
+        .feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.40),transparent);opacity:0;transition:opacity var(--smooth);}
+        .feat-card:hover{border-color:rgba(52,211,153,0.28);transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,0.40),0 0 0 1px rgba(52,211,153,0.12);}
+        .feat-card:hover::before{opacity:1;}
+        .feat-icon{width:52px;height:52px;border-radius:14px;background:rgba(16,185,129,0.12);border:1px solid rgba(52,211,153,0.20);display:flex;align-items:center;justify-content:center;margin-bottom:20px;transition:all var(--smooth);}
+        .feat-card:hover .feat-icon{background:rgba(16,185,129,0.20);box-shadow:0 0 20px rgba(16,185,129,0.20);}
+        .feat-icon svg{width:26px;height:26px;color:var(--mint);}
+        .feat-title{font-size:1.05rem;font-weight:700;margin-bottom:10px;color:var(--tp);}
+        .feat-desc{font-size:0.875rem;color:var(--ts);line-height:1.65;}
+        .feat-tag{display:inline-block;margin-top:16px;padding:3px 10px;background:rgba(16,185,129,0.10);border-radius:6px;font-size:0.70rem;font-weight:600;color:var(--mint);letter-spacing:0.3px;}
+
+        /* ── How it works ───────────────────────────── */
+        .how-section{padding:80px 48px;}
+        .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1100px;margin:0 auto;position:relative;}
+        .steps-grid::before{content:'';position:absolute;top:36px;left:18%;right:18%;height:1px;background:linear-gradient(90deg,rgba(52,211,153,0.10),rgba(52,211,153,0.30),rgba(52,211,153,0.10));z-index:0;}
+        .step-card{text-align:center;padding:28px 20px;position:relative;z-index:1;}
+        .step-num{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,rgba(16,185,129,0.20),rgba(5,150,105,0.15));border:2px solid rgba(52,211,153,0.30);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.4rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--mint);box-shadow:0 0 20px rgba(16,185,129,0.15);}
+        .step-title{font-size:1rem;font-weight:700;margin-bottom:10px;}
+        .step-desc{font-size:0.875rem;color:var(--ts);line-height:1.6;}
+
+        /* ── CTA Section ────────────────────────────── */
+        .cta-section{
+            padding:100px 48px;
+            text-align:center;
+        }
+        .cta-card{
+            max-width:760px;margin:0 auto;
+            background:var(--glass);
+            border:1px solid rgba(52,211,153,0.16);
+            border-radius:28px;
+            padding:64px 48px;
+            position:relative;overflow:hidden;
+            box-shadow:0 40px 80px rgba(0,0,0,0.50),inset 0 1px 0 rgba(52,211,153,0.20);
+        }
+        .cta-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.70),rgba(16,185,129,0.90),rgba(52,211,153,0.70),transparent);}
+        .cta-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:400px;height:200px;background:radial-gradient(circle,rgba(16,185,129,0.12),transparent 70%);pointer-events:none;}
+        .cta-title{font-size:clamp(2rem,4vw,2.8rem);font-weight:800;letter-spacing:-1px;margin-bottom:16px;}
+        .cta-desc{font-size:1rem;color:var(--ts);max-width:480px;margin:0 auto 40px;line-height:1.7;}
+        .cta-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+
+        /* ── Footer ─────────────────────────────────── */
+        footer{
+            border-top:1px solid rgba(52,211,153,0.08);
+            padding:32px 48px;
+            display:flex;align-items:center;justify-content:space-between;
+            flex-wrap:wrap;gap:16px;
+        }
+        .footer-brand{display:flex;align-items:center;gap:10px;}
+        .footer-brand svg{width:28px;height:28px;filter:drop-shadow(0 0 6px rgba(16,185,129,0.4));}
+        .footer-brand span{font-size:0.95rem;font-weight:700;background:linear-gradient(135deg,#34D399,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .footer-links{display:flex;gap:24px;}
+        .footer-links a{font-size:0.82rem;color:var(--tm);text-decoration:none;transition:color var(--smooth);}
+        .footer-links a:hover{color:var(--mint);}
+        .footer-copy{font-size:0.78rem;color:var(--tm);}
+
+        /* ── Animations ─────────────────────────────── */
+        @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+        @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+        /* ── Intersection observer fade-in ──────────── */
+        .reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease;}
+        .reveal.visible{opacity:1;transform:translateY(0);}
+        .reveal-delay-1{transition-delay:0.1s;}
+        .reveal-delay-2{transition-delay:0.2s;}
+        .reveal-delay-3{transition-delay:0.3s;}
+        .reveal-delay-4{transition-delay:0.4s;}
+        .reveal-delay-5{transition-delay:0.5s;}
+
+        /* ── Responsive ─────────────────────────────── */
+        @media(max-width:900px){
+            .nav{padding:0 20px;}
+            .nav-links{gap:4px;}
+            .nav-link{display:none;}
+            .features-grid,.steps-grid{grid-template-columns:1fr;}
+            .mockup-kpis{grid-template-columns:repeat(2,1fr);}
+            .mockup-charts{grid-template-columns:1fr;}
+            .stats-grid{grid-template-columns:repeat(2,1fr);}
+            .features-section,.how-section,.stats-section,.cta-section{padding:60px 24px;}
+            .hero{padding:90px 20px 60px;}
+            footer{padding:24px 20px;flex-direction:column;align-items:flex-start;}
+        }
+        @media(max-width:540px){
+            .hero-title{font-size:2.4rem;letter-spacing:-1px;}
+            .stats-grid{grid-template-columns:1fr 1fr;}
+            .cta-card{padding:40px 24px;}
+        }
+    </style>
+</head>
+<body>
+
+<!-- Ambient -->
+<div class="ambient">
+    <div class="orb o1"></div><div class="orb o2"></div>
+    <div class="orb o3"></div><div class="orb o4"></div><div class="orb o5"></div>
+    <div class="grid-mesh"></div>
+</div>
+<div id="gc"></div>
+<canvas id="pc"></canvas>
+
+<!-- ══ NAVBAR ══════════════════════════════════════ -->
+<nav class="nav" id="navbar">
+    <a href="home.html" class="nav-brand">
+        <svg class="nav-logo" viewBox="0 0 64 64" fill="none">
+            <defs>
+                <linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#34D399"/><stop offset="100%" stop-color="#059669"/></linearGradient>
+                <radialGradient id="nc" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#0f2923"/><stop offset="100%" stop-color="#020d0b"/></radialGradient>
+            </defs>
+            <circle cx="32" cy="32" r="30" fill="url(#nc)"/>
+            <circle cx="32" cy="32" r="28" stroke="url(#ng)" stroke-width="1.5" opacity="0.7"/>
+            <path d="M32 14 L46 19 V31 C46 41 39 48 32 51 C25 48 18 41 18 31 V19 L32 14 Z" stroke="url(#ng)" stroke-width="2" fill="rgba(16,185,129,0.10)"/>
+            <path d="M26 30 L30 34 L38 26" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="nav-name">RiskGuard Pro</span>
+    </a>
+    <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how" class="nav-link">How It Works</a>
+        <a href="auth.html" class="nav-link" id="nav-signin-link">Sign In</a>
+        <a href="auth.html?tab=signup" class="nav-cta" id="nav-cta-btn">Create Account</a>
+    </div>
+</nav>
+
+<main>
+
+<!-- ══ HERO ════════════════════════════════════════ -->
+<section class="hero" id="hero">
+
+    <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Enterprise Risk Intelligence Platform · v2.0
+    </div>
+
+    <h1 class="hero-title">
+        <span class="line1">Quantify Every Risk.</span>
+        <span class="line2">Protect What Matters.</span>
+    </h1>
+
+    <p class="hero-desc">
+        The enterprise-grade risk assessment platform built for modern businesses.
+        Run Monte Carlo simulations, score risks in real-time, and get actionable
+        insights — all in one powerful dashboard.
+    </p>
+
+    <div class="hero-actions">
+        <a href="auth.html?redirect=assessment" class="btn-hero-primary" id="btn-start-assessment">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Start Risk Assessment
+        </a>
+        <a href="#features" class="btn-hero-secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            See How It Works
+        </a>
+    </div>
+
+    <!-- Dashboard Mockup Preview -->
+    <div class="hero-mockup">
+        <div class="mockup-bar">
+            <div class="mockup-dot r"></div>
+            <div class="mockup-dot y"></div>
+            <div class="mockup-dot g"></div>
+            <div class="mockup-url">riskguard.pro/dashboard · Risk Assessment Engine Active</div>
+        </div>
+        <div class="mockup-kpis">
+            <div class="mkpi"><div class="mkpi-label">Total Risks</div><div class="mkpi-val c">24</div></div>
+            <div class="mkpi"><div class="mkpi-label">Critical</div><div class="mkpi-val r">3</div></div>
+            <div class="mkpi"><div class="mkpi-label">Risk Score</div><div class="mkpi-val y">72.4</div></div>
+            <div class="mkpi"><div class="mkpi-label">Protected</div><div class="mkpi-val g">86%</div></div>
+        </div>
+        <div class="mockup-charts">
+            <div class="mchart">
+                <div class="mchart-label">Risk Distribution by Category</div>
+                <div class="mchart-bars" id="mock-bars"></div>
+            </div>
+            <div class="mchart">
+                <div class="mchart-label">VaR Trend</div>
+                <svg class="mchart-line" viewBox="0 0 120 50" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#10B981" stop-opacity="0.4"/>
+                            <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M0 40 C15 35 25 20 40 18 C55 16 65 28 80 22 C95 16 108 10 120 8" stroke="#10B981" stroke-width="2" fill="none"/>
+                    <path d="M0 40 C15 35 25 20 40 18 C55 16 65 28 80 22 C95 16 108 10 120 8 L120 50 L0 50 Z" fill="url(#lineGrad)"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-hint">
+        <span>Scroll to explore</span>
+        <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+</section>
+
+<!-- ══ STATS ════════════════════════════════════════ -->
+<section class="stats-section reveal" id="stats">
+    <div class="stats-grid">
+        <div class="stat-card reveal reveal-delay-1">
+            <div class="stat-num" id="cnt-risks">0</div>
+            <div class="stat-label">Risks Assessed</div>
+            <div class="stat-sub">Across all industries</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-2">
+            <div class="stat-num" id="cnt-sim">0%</div>
+            <div class="stat-label">Simulation Accuracy</div>
+            <div class="stat-sub">Monte Carlo validated</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-3">
+            <div class="stat-num" id="cnt-time">0s</div>
+            <div class="stat-label">Avg Assessment Time</div>
+            <div class="stat-sub">8-step guided flow</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-4">
+            <div class="stat-num" id="cnt-sec">0</div>
+            <div class="stat-label">Security Checks</div>
+            <div class="stat-sub">OWASP hardened</div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ FEATURES ═════════════════════════════════════ -->
+<section class="features-section" id="features">
+    <div style="text-align:center;max-width:1100px;margin:0 auto;">
+        <div class="section-tag reveal">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Platform Features
+        </div>
+        <h2 class="section-title reveal"><span class="hl">Everything you need</span> to manage risk</h2>
+        <p class="section-desc reveal" style="margin:0 auto 56px;">From initial risk identification to real-time monitoring — RiskGuard Pro handles the entire risk lifecycle with enterprise precision.</p>
+    </div>
+    <div class="features-grid">
+
+        <div class="feat-card reveal reveal-delay-1">
+            <div class="feat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="feat-title">8-Step Assessment Wizard</div>
+            <div class="feat-desc">Guided risk assessment flow covering identification, likelihood scoring, impact analysis, and mitigation planning — step by step.</div>
+            <span class="feat-tag">GUIDED FLOW</span>
+        </div>
+
+        <div class="feat-card reveal reveal-delay-2">
+            <div class="feat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="feat-title">Quantitative VaR Engine</div>
+            <div class="feat-desc">Run Monte Carlo simulations with 10,000+ iterations. Get probabilistic Value-at-Risk estimates and confidence intervals instantly.</div>
+            <span class="feat-tag">MONTE CARLO</span>
+        </div>
+
+        <div class="feat-card reveal reveal-delay-3">
+            <div class="feat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+            </div>
+            <div class="feat-title">5×5 Risk Heat Matrix</div>
+            <div class="feat-desc">Interactive probability-impact matrix with color-coded risk zones. Instantly visualize your entire risk landscape at a glance.</div>
+            <span class="feat-tag">VISUAL ANALYTICS</span>
+        </div>
+
+        <div class="feat-card reveal reveal-delay-1">
+            <div class="feat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <div class="feat-title">Executive KPI Dashboard</div>
+            <div class="feat-desc">Real-time KPIs including total exposure, risk velocity, mitigation rates, and financial impact aggregated across all categories.</div>
+            <span class="feat-tag">REAL-TIME</span>
+        </div>
+
+        <div class="feat-card reveal reveal-delay-2">
+            <div class="feat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="feat-title">Security Hardened API</div>
+            <div class="feat-desc">OWASP-compliant backend with CSP headers, rate limiting, path traversal protection, XSS sanitization, and zero-leakage error handling.</div>
+            <span class="feat-tag">ENTERPRISE SECURITY</span>
+        </div>
+
+        <div class="feat-card reveal reveal-delay-3">
+            <div class="feat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            </div>
+            <div class="feat-title">Dual Database Engine</div>
+            <div class="feat-desc">Supabase PostgreSQL cloud primary with automatic SQLite local fallback. Your data is always safe, online or offline.</div>
+            <span class="feat-tag">CLOUD + LOCAL</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- ══ HOW IT WORKS ══════════════════════════════════ -->
+<section class="how-section" id="how">
+    <div style="text-align:center;max-width:1100px;margin:0 auto;">
+        <div class="section-tag reveal">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Simple Process
+        </div>
+        <h2 class="section-title reveal">From <span class="hl">sign up</span> to insights in minutes</h2>
+        <p class="section-desc reveal" style="margin:0 auto 56px;">Getting started with RiskGuard Pro is quick and straightforward. No complex setup required.</p>
+    </div>
+    <div class="steps-grid">
+        <div class="step-card reveal reveal-delay-1">
+            <div class="step-num">01</div>
+            <div class="feat-icon" style="margin:0 auto 16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div class="step-title">Create Your Account</div>
+            <div class="step-desc">Sign up free in 30 seconds. No credit card required. Get instant access to all features.</div>
+        </div>
+        <div class="step-card reveal reveal-delay-2">
+            <div class="step-num">02</div>
+            <div class="feat-icon" style="margin:0 auto 16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="step-title">Run Risk Assessment</div>
+            <div class="step-desc">Use the 8-step guided wizard to identify, score, and prioritize risks for your business.</div>
+        </div>
+        <div class="step-card reveal reveal-delay-3">
+            <div class="step-num">03</div>
+            <div class="feat-icon" style="margin:0 auto 16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <div class="step-title">Get Actionable Insights</div>
+            <div class="step-desc">View real-time dashboards, run simulations, and monitor your risk posture continuously.</div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ CTA ══════════════════════════════════════════ -->
+<section class="cta-section">
+    <div class="cta-card reveal">
+        <div class="cta-glow"></div>
+        <div class="hero-badge" style="margin-bottom:24px;">
+            <span class="badge-dot"></span>
+            Free 30-Day Enterprise Trial · No Credit Card
+        </div>
+        <h2 class="cta-title">Ready to assess your <span style="background:linear-gradient(135deg,#34D399,#10B981,#38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">business risks?</span></h2>
+        <p class="cta-desc">Join today and get full access to all features including VaR simulation, risk matrix, audit logs, and enterprise-grade analytics.</p>
+        <div class="cta-actions">
+            <a href="auth.html" class="btn-hero-primary" id="btn-cta-start">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Start Free Assessment
+            </a>
+            <a href="auth.html" class="btn-hero-secondary" id="btn-cta-signin">
+                Already have an account? Sign In
+            </a>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- ══ FOOTER ══════════════════════════════════════════ -->
+<footer>
+    <div class="footer-brand">
+        <svg viewBox="0 0 64 64" fill="none">
+            <defs><linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#34D399"/><stop offset="100%" stop-color="#059669"/></linearGradient><radialGradient id="fc" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#0f2923"/><stop offset="100%" stop-color="#020d0b"/></radialGradient></defs>
+            <circle cx="32" cy="32" r="30" fill="url(#fc)"/><circle cx="32" cy="32" r="28" stroke="url(#fg)" stroke-width="1.5" opacity="0.7"/>
+            <path d="M32 14 L46 19 V31 C46 41 39 48 32 51 C25 48 18 41 18 31 V19 L32 14 Z" stroke="url(#fg)" stroke-width="2" fill="rgba(16,185,129,0.10)"/>
+            <path d="M26 30 L30 34 L38 26" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>RiskGuard Pro</span>
+    </div>
+    <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#how">How It Works</a>
+        <a href="auth.html">Sign In</a>
+        <a href="auth.html">Sign Up</a>
+    </div>
+    <div class="footer-copy">&copy; 2025 RiskGuard Pro. Enterprise Risk Intelligence.</div>
+</footer>
+
+<script>
+/* ============================================================
+   RiskGuard Pro — Landing Page JS
+============================================================ */
+
+// ── Glow cursor ──────────────────────────────────────────────
+const gc = document.getElementById('gc');
+document.addEventListener('mousemove', e => { gc.style.left = e.clientX+'px'; gc.style.top = e.clientY+'px'; });
+
+// ── Particles ─────────────────────────────────────────────────
+const canvas = document.getElementById('pc');
+const ctx = canvas.getContext('2d');
+function rs(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+rs(); window.addEventListener('resize', rs);
+const pts = Array.from({length:70},()=>({
+    x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+    r:Math.random()*1.8+0.3, a:Math.random()*0.4+0.06,
+    vx:(Math.random()-.5)*.18, vy:(Math.random()-.5)*.18,
+    c:['52,211,153','56,189,248','16,185,129'][Math.floor(Math.random()*3)]
+}));
+(function dl(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pts.forEach(p=>{
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(${p.c},${p.a})`;
+        ctx.shadowColor=`rgba(${p.c},.8)`; ctx.shadowBlur=4; ctx.fill();
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0||p.x>canvas.width) p.vx*=-1;
+        if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    });
+    requestAnimationFrame(dl);
+})();
+
+// ── Navbar scroll effect ──────────────────────────────────────
+window.addEventListener('scroll',()=>{
+    document.getElementById('navbar').classList.toggle('scrolled', scrollY>40);
+});
+
+// ── Intersection Observer (reveal on scroll) ──────────────────
+const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// ── Mock bars ────────────────────────────────────────────────
+const heights=[45,70,55,85,40,65];
+const colors=['#F87171','#FB923C','#FBBF24','#10B981','#38BDF8','#34D399'];
+document.getElementById('mock-bars').innerHTML = heights.map((h,i)=>
+    `<div class="mbar" style="flex:1;height:${h}%;background:linear-gradient(to top,${colors[i]},${colors[i]}88);"></div>`
+).join('');
+
+// ── Animated counters ─────────────────────────────────────────
+function animateCount(el, target, suffix='', duration=1800){
+    const start = performance.now();
+    const num = parseFloat(target);
+    const isDecimal = String(target).includes('.');
+    (function step(now){
+        const p = Math.min((now-start)/duration, 1);
+        const ease = 1-Math.pow(1-p,3);
+        const cur = isDecimal ? (num*ease).toFixed(1) : Math.floor(num*ease);
+        el.textContent = cur + suffix;
+        if(p<1) requestAnimationFrame(step);
+    })(start);
+}
+
+const statsIo = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+        if(e.isIntersecting){
+            animateCount(document.getElementById('cnt-risks'),'10000','+');
+            animateCount(document.getElementById('cnt-sim'),'99.2','%');
+            animateCount(document.getElementById('cnt-time'),'45','s');
+            animateCount(document.getElementById('cnt-sec'),'12','+');
+            statsIo.disconnect();
+        }
+    });
+},{threshold:0.4});
+statsIo.observe(document.getElementById('stats'));
+
+// ── Check if already logged in — show "Go to Dashboard" ──────
+(function checkSession(){
+    // Purge any stale demo tokens
+    if (localStorage.getItem('rg_token') === 'demo-token') {
+        localStorage.removeItem('rg_token');
+        localStorage.removeItem('rg_user');
+    }
+    if (sessionStorage.getItem('rg_token') === 'demo-token') {
+        sessionStorage.removeItem('rg_token');
+        sessionStorage.removeItem('rg_user');
+    }
+
+    const token   = localStorage.getItem('rg_token') || sessionStorage.getItem('rg_token');
+    const userRaw = localStorage.getItem('rg_user')  || sessionStorage.getItem('rg_user');
+    let user = null;
+    try { if (userRaw) user = JSON.parse(userRaw); } catch(e){}
+
+    const navSignin = document.getElementById('nav-signin-link');
+    const navCta   = document.getElementById('nav-cta-btn');
+    const btnStart = document.getElementById('btn-start-assessment');
+    const btnCta   = document.getElementById('btn-cta-start');
+    const btnCtaIn = document.getElementById('btn-cta-signin');
+
+    // ONLY consider logged in if real account and valid token exists
+    if(token && token !== 'demo-token' && user && (user.firstname || user.email)){
+        if(navSignin){
+            const name = (user.firstname || user.name || 'User');
+            navSignin.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:7px;height:7px;border-radius:50%;background:#10B981;box-shadow:0 0 6px #10B981;"></span>Hi, ${name}</span>`;
+            navSignin.href='index.html';
+        }
+        if(navCta){ navCta.textContent='Open Dashboard'; navCta.href='index.html'; }
+        if(btnStart){
+            btnStart.href='index.html#assessment';
+        }
+        if(btnCta){
+            btnCta.href='index.html#assessment';
+        }
+        if(btnCtaIn){
+            btnCtaIn.textContent = 'Go to Dashboard →';
+            btnCtaIn.href = 'index.html';
+        }
+
+        // Show Logout button in home navbar
+        const navContainer = document.querySelector('.nav-links');
+        if (navContainer && !document.getElementById('nav-logout-btn')) {
+            const logoutBtn = document.createElement('button');
+            logoutBtn.id = 'nav-logout-btn';
+            logoutBtn.type = 'button';
+            logoutBtn.className = 'nav-link';
+            logoutBtn.innerHTML = '<span style="color:#F87171;display:inline-flex;align-items:center;gap:4px;font-weight:600;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</span>';
+            logoutBtn.style.cssText = 'background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:6px 12px;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all 0.2s;';
+            logoutBtn.onmouseover = function() { this.style.background = 'rgba(239,68,68,0.25)'; };
+            logoutBtn.onmouseout = function() { this.style.background = 'rgba(239,68,68,0.12)'; };
+            logoutBtn.onclick = function() {
+                localStorage.removeItem('rg_token');
+                localStorage.removeItem('rg_user');
+                localStorage.removeItem('rg_remember');
+                sessionStorage.removeItem('rg_token');
+                sessionStorage.removeItem('rg_user');
+                window.location.replace('auth.html?logged_out=1');
+            };
+            navContainer.appendChild(logoutBtn);
+        }
+    } else {
+        // Not logged in — default state: all buttons require Login/Signup
+        if(navSignin){ navSignin.textContent='Sign In'; navSignin.href='auth.html'; }
+        if(navCta)  { navCta.textContent='Create Account'; navCta.href='auth.html?tab=signup'; }
+        if(btnStart){ btnStart.href='auth.html?redirect=assessment'; }
+        if(btnCta)  { btnCta.href='auth.html?redirect=assessment'; }
+        if(btnCtaIn){ btnCtaIn.href='auth.html'; }
+    }
+})();
+</script>
+</body>
+</html>

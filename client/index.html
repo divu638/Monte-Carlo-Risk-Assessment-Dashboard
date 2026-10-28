@@ -19,6 +19,22 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="dark-theme theme-emerald">
+    <!-- ── Auth Guard: Redirect to login if not authenticated ── -->
+    <script>
+    (function authGuard() {
+        var token = localStorage.getItem('rg_token') || sessionStorage.getItem('rg_token');
+        if (!token || token === 'demo-token') {
+            localStorage.removeItem('rg_token');
+            localStorage.removeItem('rg_user');
+            sessionStorage.removeItem('rg_token');
+            sessionStorage.removeItem('rg_user');
+            // Not authenticated — redirect to login page
+            var target = (window.location.hash.indexOf('assessment') !== -1) ? 'auth.html?redirect=assessment' : 'auth.html';
+            window.location.replace(target);
+        }
+    })();
+    </script>
+
     <!-- 3D Ambient Depth Mesh & Floating Glass Particles -->
     <div class="ambient-glow-mesh" aria-hidden="true">
         <div class="ambient-orb orb-1"></div>
@@ -89,6 +105,11 @@
                     <h2>RiskAssess<span>PRO</span></h2>
                     <span class="brand-tag">BUSINESS RISK DASHBOARD</span>
                 </div>
+                <!-- Sidebar Collapse / Expand Toggle Button -->
+                <button type="button" class="sidebar-toggle-btn" id="btn-sidebar-collapse" onclick="toggleSidebarCollapse()" title="Collapse / Expand Sidebar (Ctrl+B)">
+                    <svg class="toggle-icon-collapse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                    <svg class="toggle-icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none;"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
             </div>
 
             <!-- Database Connection Badge -->
@@ -113,7 +134,7 @@
             <!-- Navigation Links -->
             <div class="nav-section-label">CORE PLATFORM</div>
             <nav class="nav-menu">
-                <button class="nav-item active" data-tab="overview" id="nav-overview">
+                <button class="nav-item active" data-tab="overview" id="nav-overview" data-tooltip="Executive Overview">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="7" height="7"/>
                         <rect x="14" y="3" width="7" height="7"/>
@@ -123,7 +144,7 @@
                     <span>Executive Overview</span>
                 </button>
 
-                <button class="nav-item" data-tab="assessment" id="nav-assessment">
+                <button class="nav-item" data-tab="assessment" id="nav-assessment" data-tooltip="Assessment Wizard (8 Steps)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                         <polyline points="14 2 14 8 20 8"/>
@@ -137,7 +158,7 @@
 
                 <div class="nav-section-label" style="margin-top: 10px;">RISK &amp; QUANT ANALYTICS</div>
 
-                <button class="nav-item" data-tab="registry" id="nav-registry">
+                <button class="nav-item" data-tab="registry" id="nav-registry" data-tooltip="Enterprise Risk Registry">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="8" y1="6" x2="21" y2="6"/>
                         <line x1="8" y1="12" x2="21" y2="12"/>
@@ -150,7 +171,7 @@
                     <span class="nav-badge" id="nav-risk-count">0</span>
                 </button>
 
-                <button class="nav-item" data-tab="matrix" id="nav-matrix">
+                <button class="nav-item" data-tab="matrix" id="nav-matrix" data-tooltip="3D Risk Heatmap">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
                         <line x1="3" y1="9" x2="21" y2="9"/>
@@ -161,7 +182,7 @@
                     <span>3D Risk Heatmap</span>
                 </button>
 
-                <button class="nav-item" data-tab="analytics" id="nav-analytics">
+                <button class="nav-item" data-tab="analytics" id="nav-analytics" data-tooltip="Quantitative VaR Simulation">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 3v18h18"/>
                         <path d="M18 17V9"/>
@@ -171,7 +192,7 @@
                     <span>Quantitative VaR</span>
                 </button>
 
-                <button class="nav-item" data-tab="financial" id="nav-financial">
+                <button class="nav-item" data-tab="financial" id="nav-financial" data-tooltip="Stress Testing & Sensitivity">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="1" x2="12" y2="23"/>
                         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
@@ -181,7 +202,7 @@
 
                 <div class="nav-section-label" style="margin-top: 10px;">GOVERNANCE &amp; REPORTS</div>
 
-                <button class="nav-item" data-tab="audit" id="nav-audit">
+                <button class="nav-item" data-tab="audit" id="nav-audit" data-tooltip="Audit Trail & Compliance Log">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
                         <polyline points="12 6 12 12 16 14"/>
@@ -189,27 +210,39 @@
                     <span>Audit Trail</span>
                 </button>
 
-                <button class="nav-item" data-tab="admin" id="nav-admin">
+                <button class="nav-item" data-tab="admin" id="nav-admin" data-tooltip="Admin Governance Console">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                         <circle cx="12" cy="11" r="3"/>
                         <path d="M12 8v2"/>
                     </svg>
                     <span>Admin &amp; Settings</span>
+                    <span class="nav-badge" id="nav-admin-badge" style="background: rgba(245, 158, 11, 0.2); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.35);">Admin</span>
                 </button>
             </nav>
 
             <!-- Sidebar Footer -->
             <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="avatar">CRO</div>
-                    <div class="user-info">
-                        <span class="user-name">Chief Risk Officer</span>
-                        <span class="user-role">Risk Management Office</span>
+                <div class="user-profile" id="sidebar-user-profile" style="position: relative; display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar" id="sidebar-user-avatar" title="Authenticated User Profile">CRO</div>
+                    <div class="user-info" style="flex: 1; min-width: 0;">
+                        <span class="user-name" id="sidebar-user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; font-weight: 600;">Chief Risk Officer</span>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 3px;">
+                            <span class="role-badge-pill role-admin" id="sidebar-role-badge">👑 Admin</span>
+                            <button type="button" class="btn-role-quick-toggle" id="btn-quick-toggle-role" onclick="toggleUserRoleQuick()" title="Switch between Admin and Normal User roles">⇄ Switch</button>
+                        </div>
                     </div>
+                    <button type="button" class="btn-logout-icon" id="btn-sidebar-logout" onclick="logoutUser()" title="Logout Session" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #F87171; padding: 6px 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; font-size: 0.72rem; font-weight: 600; flex-shrink: 0;" onmouseover="this.style.background='rgba(239,68,68,0.28)';this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.12)';this.style.color='#F87171';">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        <span>Logout</span>
+                    </button>
                 </div>
-                <div class="sidebar-version">
-                    <span>Business Risk Engine v2.4.0 · ISO 31000</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+                    <a href="home.html" style="font-size: 0.72rem; color: #34D399; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.color='#10B981';" onmouseout="this.style.color='#34D399';">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                        Landing Page
+                    </a>
+                    <span style="font-size: 0.65rem; color: var(--text-muted); opacity: 0.6;">ISO 31000 · v2.4</span>
                 </div>
             </div>
         </aside>
@@ -220,7 +253,11 @@
             <header class="top-header">
                 <div class="header-titles">
                     <!-- Global Navigation Breadcrumb & Back Action -->
-                    <div class="breadcrumb-nav-row" id="breadcrumb-nav-row">
+                    <div class="breadcrumb-nav-row" id="breadcrumb-nav-row" style="display: flex; align-items: center; gap: 8px;">
+                        <!-- Open / Close Sidebar Header Button -->
+                        <button type="button" class="header-sidebar-toggle-btn" id="btn-header-toggle-sidebar" onclick="toggleSidebarCollapse()" title="Toggle Sidebar Navigation (Open / Close)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                        </button>
                         <button type="button" class="header-back-btn" id="btn-header-back" onclick="navigateBack()" title="Go back to previous page" style="display: none;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                             <span>Back</span>
@@ -310,6 +347,17 @@
                             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
                         </svg>
                     </button>
+
+                    <!-- Top Header Quick User & Logout Badge -->
+                    <div class="header-user-badge" id="header-user-badge" style="display: flex; align-items: center; gap: 8px; padding: 4px 6px 4px 10px; background: rgba(7, 25, 20, 0.7); border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 99px;">
+                        <span style="width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 6px #10B981;"></span>
+                        <span id="header-user-name" style="font-size: 0.78rem; font-weight: 600; color: #F8FAFC; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">User</span>
+                        <span class="role-badge-pill role-admin" id="header-role-badge" onclick="toggleUserRoleQuick()" style="cursor: pointer;" title="Click to toggle between Admin and Normal User roles">👑 Admin</span>
+                        <button type="button" class="btn-logout-header" id="btn-header-logout" onclick="logoutUser()" title="Logout Session" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #F87171; padding: 4px 10px; border-radius: 99px; font-size: 0.74rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.3)';this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.15)';this.style.color='#F87171';">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span>Logout</span>
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -451,12 +499,12 @@
 
                     <div class="hub-footer-bar">
                         <div class="hub-sample-info">
-                            <span class="hub-sample-pill">Demo Case Study</span>
-                            <span>Want to explore a completed evaluation? Load <strong>ABC Retail Store</strong> (Retail Supermarket, ₹2.8M Capital)</span>
+                            <span class="hub-sample-pill">Direct Evaluation</span>
+                            <span>Direct financial statements upload (Balance Sheet &amp; P&amp;L) with automated ratio telemetry</span>
                         </div>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="switchTab('assessment'); if(window.assessmentWizard) window.assessmentWizard.loadSample();" id="btn-banner-sample-wiz">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            <span>Load ABC Retail Store Sample</span>
+                        <button type="button" class="btn btn-emerald btn-sm" onclick="switchTab('assessment'); if(window.assessmentWizard) window.assessmentWizard.startNew();" id="btn-banner-sample-wiz">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            <span>Launch Risk Assessment</span>
                         </button>
                     </div>
                 </div>
@@ -469,7 +517,7 @@
                             <div class="header-titles-exec">
                                 <div class="exec-badge-row">
                                     <span class="exec-tag-pill">ISO 31000 ERM PROTOCOL</span>
-                                    <span class="exec-tag-pill highlight" id="exec-active-entity-badge">ACTIVE BUSINESS: ABC RETAIL STORE</span>
+                                    <span class="exec-tag-pill highlight" id="exec-active-entity-badge">ACTIVE BUSINESS: ENTERPRISE EVALUATION</span>
                                 </div>
                                 <h3>3D Risk Spatial Topology — Enterprise Heat Matrix</h3>
                                 <p class="card-subtitle">Interactive 5×5 likelihood × impact risk landscape with real-time VaR elevation mapping</p>
@@ -643,6 +691,26 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 6-Month Projected Risk Trajectory (with Confidence Band) -->
+                <div class="visualizer-row">
+                    <div class="card chart-card-wide" id="card-forecast-trend">
+                        <div class="card-header">
+                            <div>
+                                <h3>6-Month Projected Risk Trajectory</h3>
+                                <p class="card-subtitle">Empirical trajectory projection with 95% upper and lower statistical confidence bands</p>
+                            </div>
+                            <div class="matrix-legend-row">
+                                <span class="legend-box leg-high">■ Upper Bound (95%)</span>
+                                <span class="legend-box leg-low">■ Expected Score</span>
+                                <span class="legend-box leg-med">■ Lower Bound (95%)</span>
+                            </div>
+                        </div>
+                        <div class="card-body chart-body" style="height: 280px; position: relative;">
+                            <canvas id="forecast-trend-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- TAB 2: RISK REGISTRY -->
@@ -739,6 +807,37 @@
                             </thead>
                             <tbody id="risks-tbody">
                                 <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- B7: Action Tracker & Task Mitigation Ledger -->
+                <div class="card table-card mt-4" id="action-tracker-card" style="margin-top:24px;">
+                    <div class="card-header" style="flex-wrap:wrap;gap:10px">
+                        <div>
+                            <h3>Risk Register Action Tracker & Tasks (ISO 31000)</h3>
+                            <p class="card-subtitle">Actionable mitigation tasks assigned to risk owners with live status tracking</p>
+                        </div>
+                        <div style="display:flex;gap:8px">
+                            <button class="btn btn-sm btn-outline" onclick="loadActionTasks()">↻ Refresh Tasks</button>
+                            <button class="btn btn-sm btn-primary" onclick="openNewTaskModal()">+ Add Mitigation Task</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table" id="action-tasks-table">
+                            <thead>
+                                <tr>
+                                    <th>Mitigation Action</th>
+                                    <th>Category</th>
+                                    <th>Owner / Assignee</th>
+                                    <th>Status</th>
+                                    <th>Target Due Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="action-tasks-tbody">
+                                <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted)">Loading action tasks...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -924,6 +1023,35 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Methodology & Mathematical Assumptions Card (ISO 31000 / Quant Standards) -->
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <div>
+                            <h3>Quantitative VaR Engine — Methodology & Mathematical Assumptions</h3>
+                            <p class="card-subtitle">Formal statistical framework governing the Monte Carlo loss distribution</p>
+                        </div>
+                        <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.4);">NumPy Vectorized</span>
+                    </div>
+                    <div class="card-body" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px;">
+                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                            <h4 style="color: #34D399; font-size: 0.9rem; margin-bottom: 8px;">1. Event Probability Formulation (p)</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Annual event likelihood is calibrated from the 1–5 qualitative score: p = Likelihood / 5.0, yielding probabilities ranging from 20% (Rare) to 100% (Almost Certain).</p>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                            <h4 style="color: #38BDF8; font-size: 0.9rem; margin-bottom: 8px;">2. Severity Distribution: Log-Normal(μ, σ)</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Loss severity follows a right-skewed Log-Normal distribution LN(μ, σ²) where μ = ln(Impact / 5.0 + 0.1) and shape parameter σ = 0.35, capturing catastrophic tail risk.</p>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                            <h4 style="color: #FBBF24; font-size: 0.9rem; margin-bottom: 8px;">3. Value-at-Risk Definition (VaR 95%)</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">95% Value-at-Risk represents the empirical 95th percentile of the cumulative distribution over 3,000–10,000 Monte Carlo trials: P(Loss ≤ VaR₀.₉₅) = 0.95.</p>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                            <h4 style="color: #F87171; font-size: 0.9rem; margin-bottom: 8px;">4. Independence Assumption</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">Individual trials are treated as independent draws from compound Poisson-LogNormal loss processes, with cross-domain stress correlations modeled in Scenario Stress Testing.</p>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- TAB 5: FINANCIAL ANALYSIS (B.Com Component) -->
@@ -1046,16 +1174,16 @@
                     <div class="card-header">
                         <div class="sync-card-titles">
                             <span class="badge-tag highlight">Live Assessment Telemetry</span>
-                            <h3 id="sync-active-entity-title">Active Enterprise: ABC Retail Store</h3>
+                            <h3 id="sync-active-entity-title">Active Enterprise: Risk Evaluation Active</h3>
                             <p class="card-subtitle">Real-time parameters and financial ratios dynamically bound to the 8-Step Risk Assessment Workflow</p>
                         </div>
                         <div class="sync-card-actions">
                             <button class="btn btn-sm btn-primary" onclick="switchTab('assessment')" id="btn-goto-wizard">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                <span>Edit in Assessment Flow</span>
+                                <span>Open Assessment Flow</span>
                             </button>
-                            <button class="btn btn-sm btn-outline" onclick="assessmentWizard.loadSample()" id="btn-resync-sample">
-                                <span>Load ABC Sample</span>
+                            <button class="btn btn-sm btn-outline" onclick="assessmentWizard.startNew()" id="btn-resync-sample">
+                                <span>New Assessment</span>
                             </button>
                         </div>
                     </div>
@@ -1350,8 +1478,54 @@
 
             <!-- TAB 7: ENTERPRISE ADMIN & GOVERNANCE PORTAL -->
             <section id="tab-admin" class="tab-pane">
-                <!-- Admin Header Hero Banner -->
-                <div class="admin-hero-banner">
+                <!-- Restricted Access Gate (Visible for Normal User) -->
+                <div class="admin-access-gate" id="admin-access-gate" style="display: none;">
+                    <div class="gate-card">
+                        <div class="gate-icon-circle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <span class="gate-tag">RESTRICTED GOVERNANCE CONSOLE</span>
+                        <h2>Administrator Privileges Required</h2>
+                        <p>Aap abhi <strong>Normal User (Risk Analyst)</strong> mode mein hain. Enterprise Governance, Risk Appetite Policy calibrations, Database Purge/Seed aur Master System Settings sirf <strong>Super Admin (CRO)</strong> role ke paas reserved hain.</p>
+                        
+                        <div class="gate-capabilities-row">
+                            <div class="gate-cap-card user-cap">
+                                <div class="cap-header">👤 Normal User Scope (Aapka Active Access)</div>
+                                <ul>
+                                    <li>✔ Executive Overview &amp; 3D Heat Matrix</li>
+                                    <li>✔ 8-Step Business Risk Assessment Wizard</li>
+                                    <li>✔ Direct Financial Statements Telemetry</li>
+                                    <li>✔ Quantitative Monte Carlo VaR Simulation</li>
+                                    <li>✔ Stress Testing Scenarios &amp; Risk Registry</li>
+                                </ul>
+                            </div>
+                            <div class="gate-cap-card admin-cap">
+                                <div class="cap-header">👑 Admin Exclusive Scope (Protected Area)</div>
+                                <ul>
+                                    <li>🔒 Board Risk Appetite Overrides</li>
+                                    <li>🔒 Supabase Cloud DB Purge &amp; Re-seed</li>
+                                    <li>🔒 Master Audit Trail Deletion</li>
+                                    <li>🔒 Webhook Alerts &amp; Institutional Dossier Sign-off</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="gate-actions-row">
+                            <button type="button" class="btn btn-primary" onclick="setUserRole('admin')" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border-color: #F59E0B; box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                <span>Switch to Admin Mode (Instant CRO Elevation)</span>
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="switchTab('overview')">
+                                Back to Executive Overview
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Console Main Content (Visible only for Admin) -->
+                <div id="admin-console-content">
+                    <!-- Admin Header Hero Banner -->
+                    <div class="admin-hero-banner">
                     <div class="admin-hero-left">
                         <div class="admin-tag-row">
                             <span class="admin-hero-tag">
@@ -1776,6 +1950,7 @@
                         </div>
                     </div>
                 </div>
+                </div><!-- /#admin-console-content -->
             </section>
 
             <!-- TAB 8: STEP-BY-STEP BUSINESS RISK ASSESSMENT WIZARD (STEPS 1-8) -->
@@ -1794,13 +1969,9 @@
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
                                     <span>Exit to Overview</span>
                                 </button>
-                                <button class="btn btn-sm btn-outline" onclick="assessmentWizard.startNew()" id="wiz-btn-quick-new" title="Clear inputs and start a new assessment">
+                                <button class="btn btn-sm btn-primary" onclick="assessmentWizard.startNew()" id="wiz-btn-quick-new" title="Clear inputs and start a new assessment">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                     <span>New Assessment</span>
-                                </button>
-                                <button class="btn btn-sm btn-emerald" onclick="assessmentWizard.loadSample()" id="wiz-btn-quick-sample" title="Load ABC Retail Store Sample Report">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                    <span>Load ABC Retail Store</span>
                                 </button>
                             </div>
                         </div>
@@ -1820,7 +1991,7 @@
                                 <div class="step-connector"></div>
                                 <div class="step-node" data-step="3" onclick="assessmentWizard.goToStep(3)">
                                     <div class="step-circle">3</div>
-                                    <span class="step-label">Financials</span>
+                                    <span class="step-label">Statements</span>
                                 </div>
                                 <div class="step-connector"></div>
                                 <div class="step-node" data-step="4" onclick="assessmentWizard.goToStep(4)">
@@ -1857,18 +2028,14 @@
                             <div class="wiz-hero-badge">Step 1 of 8 · Application Overview</div>
                             <h1 class="wiz-hero-title">Business Risk Assessment Dashboard</h1>
                             <p class="wiz-hero-desc">
-                                A comprehensive, automated risk analysis platform. Enter your enterprise details and financial information, 
-                                answer key operational risk questions, and receive an instant multi-dimensional risk diagnosis with actionable guidance.
+                                A comprehensive, automated risk analysis platform. Attach enterprise financial statements directly (Balance Sheet &amp; P&amp;L), 
+                                review key operational risk parameters, and receive an instant multi-dimensional risk diagnosis with actionable guidance.
                             </p>
 
                             <div class="wiz-hero-cta-group">
                                 <button class="btn btn-primary btn-lg" onclick="assessmentWizard.goToStep(2)" id="btn-wiz-start-new">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                    <span>Start New Assessment</span>
-                                </button>
-                                <button class="btn btn-outline btn-lg" onclick="assessmentWizard.loadSample()" id="btn-wiz-load-sample">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                    <span>View Sample Report (ABC Retail Store)</span>
+                                    <span>Start Risk Assessment</span>
                                 </button>
                                 <button class="btn btn-outline btn-lg tab-back-btn" onclick="switchTab('overview')">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1880,7 +2047,7 @@
                                 <div class="wf-feat-card">
                                     <div class="wf-feat-icon">📊</div>
                                     <h4>8 Core Financial Ratios</h4>
-                                    <p>Current, Quick, Debt-to-Equity, Net Margin, Operating Margin, ICR, Inventory Turnover & Receivable Days.</p>
+                                    <p>Current, Quick, Debt-to-Equity, Net Margin, Operating Margin, ICR, Inventory Turnover &amp; Receivable Days.</p>
                                 </div>
                                 <div class="wf-feat-card">
                                     <div class="wf-feat-icon">🛡️</div>
@@ -1916,19 +2083,19 @@
                                     <div class="wiz-form-grid">
                                         <div class="form-group">
                                             <label for="wiz-biz-name">Business Name <span class="text-critical">*</span></label>
-                                            <input type="text" id="wiz-biz-name" class="form-control" placeholder="e.g. ABC Retail Store" required value="ABC Retail Store">
-                                            <span class="form-hint">Official registered entity or operating store name</span>
+                                            <input type="text" id="wiz-biz-name" class="form-control" placeholder="e.g. Acme Enterprises Ltd" required value="">
+                                            <span class="form-hint">Official registered entity or operating company name</span>
                                         </div>
 
                                         <div class="form-group">
                                             <label for="wiz-biz-type">Type of Business <span class="text-critical">*</span></label>
                                             <select id="wiz-biz-type" class="form-control" required>
-                                                <option value="Retail Store" selected>Retail Store / Multi-Brand Outlet</option>
-                                                <option value="Garment Manufacturing">Garment & Textile Manufacturing</option>
-                                                <option value="Wholesale Distributor">Wholesale & B2B Distribution</option>
-                                                <option value="IT & Software Services">IT, Tech & Software Services</option>
-                                                <option value="Healthcare & Pharma">Healthcare, Clinic & Pharmacy</option>
-                                                <option value="Food & Hospitality">Food, Beverage & Hospitality</option>
+                                                <option value="Manufacturing" selected>Manufacturing &amp; Industrial Production</option>
+                                                <option value="Retail Store">Retail Store / Consumer Goods</option>
+                                                <option value="Wholesale Distributor">Wholesale &amp; B2B Distribution</option>
+                                                <option value="IT & Software Services">IT, Tech &amp; Software Services</option>
+                                                <option value="Healthcare & Pharma">Healthcare, Clinic &amp; Pharmacy</option>
+                                                <option value="Logistics & Transport">Logistics &amp; Transport Services</option>
                                                 <option value="General Services">General Commercial Services</option>
                                             </select>
                                             <span class="form-hint">Sector industry profile</span>
@@ -1964,7 +2131,7 @@
                                             <span>Exit to Overview</span>
                                         </button>
                                         <button type="submit" class="btn btn-primary">
-                                            <span>Continue to Financial Information →</span>
+                                            <span>Continue to Financial Statements →</span>
                                         </button>
                                     </div>
                                 </form>
@@ -1972,96 +2139,241 @@
                         </div>
                     </div>
 
-                    <!-- STEP 3: ENTER FINANCIAL INFORMATION -->
+                    <!-- STEP 3: DIRECT FINANCIAL STATEMENTS -->
                     <div class="wiz-step-pane" id="wiz-step-3">
                         <div class="card">
                             <div class="card-header">
                                 <div>
                                     <span class="badge-tag">Step 3 of 8</span>
-                                    <h3>Enter Financial Information</h3>
-                                    <p class="card-subtitle">Key balance sheet, profit & loss, and working capital figures (enter in ₹ Rupees)</p>
+                                    <h3>Direct Financial Statements (P&amp;L &amp; Balance Sheet)</h3>
+                                    <p class="card-subtitle">Attach company financial statements directly via document upload or select an audited sector statement — automated extraction eliminates manual data entry.</p>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-outline" onclick="assessmentWizard.fillSampleFinancials()">Fill Sample Data</button>
+                                <div style="display: flex; gap: 8px;">
+                                    <button type="button" class="btn btn-sm btn-emerald" onclick="document.getElementById('wiz-stmt-file-input').click();">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                        <span>Upload File</span>
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div id="wiz-step3-error-banner" class="wiz-error-alert" style="display:none;"></div>
                                 <form id="form-financial-info" onsubmit="event.preventDefault(); assessmentWizard.goToStep(4);">
-                                    <h4 class="wiz-section-title">1. Balance Sheet & Liquidity Assets</h4>
-                                    <div class="wiz-form-grid">
-                                        <div class="form-group">
-                                            <label for="wiz-current-assets">Current Assets (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-current-assets" class="form-control" value="1500000" min="0" step="any" required>
-                                            <span class="form-hint">Cash, bank balance, debtors & inventory</span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="wiz-inventory">Inventory / Stock (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-inventory" class="form-control" value="550000" min="0" step="any" required>
-                                            <span class="form-hint">Finished goods and raw materials</span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="wiz-current-liabilities">Current Liabilities (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-current-liabilities" class="form-control" value="1000000" min="0" step="any" required>
-                                            <span class="form-hint">Creditors, short-term dues payable within 1 year</span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="wiz-total-debt">Total Debt / Borrowings (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-total-debt" class="form-control" value="900000" min="0" step="any" required>
-                                            <span class="form-hint">Bank loans, overdrafts and external debt</span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="wiz-equity">Owner's / Shareholders' Equity (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-equity" class="form-control" value="1200000" min="0" step="any" required>
-                                            <span class="form-hint">Capital invested plus retained earnings</span>
+
+                                    <!-- 1. Direct Statement Dropzone -->
+                                    <div class="stmt-dropzone" id="stmt-dropzone" onclick="document.getElementById('wiz-stmt-file-input').click();" ondragover="handleStmtDragOver(event)" ondragleave="handleStmtDragLeave(event)" ondrop="handleStmtDrop(event)">
+                                        <input type="file" id="wiz-stmt-file-input" style="display:none;" accept=".xlsx,.xls,.csv,.pdf,.json,.txt" onchange="handleStatementFile(event)">
+                                        <div class="stmt-dropzone-inner">
+                                            <div class="stmt-drop-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="36" height="36"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="12"/><line x1="15" y1="15" x2="12" y2="12"/></svg>
+                                            </div>
+                                            <div class="stmt-drop-text">
+                                                <h4>Direct Financial Statement Upload (Balance Sheet &amp; Income Statement)</h4>
+                                                <p>Drop your audited financial statement file here or <span class="highlight-link">click to browse</span></p>
+                                                <div class="stmt-formats-row">
+                                                    <span class="stmt-fmt-badge">📄 Balance Sheet (PDF / Excel)</span>
+                                                    <span class="stmt-fmt-badge">📊 Income Statement / P&amp;L (.xlsx, .csv)</span>
+                                                    <span class="stmt-fmt-badge">📑 Audited Annual Statements</span>
+                                                    <span class="stmt-fmt-badge" style="color:#34D399;border-color:rgba(52,211,153,0.3);">⚡ Instant Auto-Extraction</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <h4 class="wiz-section-title" style="margin-top: 24px;">2. Income Statement & Profitability</h4>
-                                    <div class="wiz-form-grid">
-                                        <div class="form-group">
-                                            <label for="wiz-revenue">Total Revenue / Sales (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-revenue" class="form-control" value="4000000" min="0" step="any" required>
-                                            <span class="form-hint">Gross annual turnover</span>
+                                    <!-- 2. Attached Statement Status Badge -->
+                                    <div id="stmt-attached-banner" class="stmt-attached-card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; margin: 14px 0; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(52, 211, 153, 0.3); border-radius: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; color: #34D399; font-size: 1.1rem; font-weight: 700;">
+                                                ✓
+                                            </div>
+                                            <div>
+                                                <div style="font-weight: 700; color: #fff; font-size: 0.88rem;" id="stmt-active-doc-title">Audited Financial Statements (FY 2024-25)</div>
+                                                <div style="font-size: 0.74rem; color: #94A3B8;" id="stmt-active-doc-desc">Direct Balance Sheet &amp; P&amp;L statements attached · Zero manual typing required</div>
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label for="wiz-cogs">Cost of Goods Sold (COGS) (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-cogs" class="form-control" value="2400000" min="0" step="any" required>
-                                            <span class="form-hint">Direct purchase and production cost</span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="wiz-operating-profit">Operating Profit (EBIT) (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-operating-profit" class="form-control" value="400000" min="0" step="any" required>
-                                            <span class="form-hint">Profit before interest and tax</span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="wiz-net-profit">Net Profit (PAT) (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-net-profit" class="form-control" value="200000" min="0" step="any" required>
-                                            <span class="form-hint">Bottom-line final profit after all costs</span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="wiz-interest">Interest Expense (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-interest" class="form-control" value="100000" min="0" step="any" required>
-                                            <span class="form-hint">Annual interest paid on loans and debt</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span class="badge-emerald" id="stmt-status-pill">Active Statement</span>
+                                            <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('wiz-stmt-file-input').click();">Replace File</button>
                                         </div>
                                     </div>
 
-                                    <h4 class="wiz-section-title" style="margin-top: 24px;">3. Working Capital & Trade Turnover</h4>
-                                    <div class="wiz-form-grid">
-                                        <div class="form-group">
-                                            <label for="wiz-avg-inventory">Average Inventory (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-avg-inventory" class="form-control" value="533333" min="0" step="any" required>
-                                            <span class="form-hint">(Opening Inventory + Closing Inventory) ÷ 2</span>
+                                    <!-- 3. One-Click Industry Statement Presets -->
+                                    <div style="margin: 20px 0 16px;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                                            <h4 class="wiz-section-title" style="margin: 0;">Or Attach Direct Audited Statement Presets:</h4>
+                                            <span style="font-size: 0.72rem; color: #94A3B8;">1-Click Instant Sector Statement</span>
                                         </div>
-                                        <div class="form-group">
-                                            <label for="wiz-avg-receivables">Average Trade Receivables (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-avg-receivables" class="form-control" value="400000" min="0" step="any" required>
-                                            <span class="form-hint">Average outstanding customer receivables</span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="wiz-credit-sales">Annual Credit Sales (₹) <span class="text-critical">*</span></label>
-                                            <input type="number" id="wiz-credit-sales" class="form-control" value="3000000" min="0" step="any" required>
-                                            <span class="form-hint">Total sales made on credit terms (usually 60–80% of revenue)</span>
+                                        <div class="stmt-presets-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                                            <div class="stmt-preset-card active" id="preset-manufacturing" onclick="applyFinancialPreset('manufacturing')" role="button" tabindex="0">
+                                                <div class="preset-icon">🏭</div>
+                                                <div class="preset-info">
+                                                    <div class="preset-title">Manufacturing Plant</div>
+                                                    <div class="preset-meta">Turnover: ₹12.5 Cr · EBIT: ₹1.4 Cr</div>
+                                                    <span class="preset-tag">Audited P&amp;L + B/S</span>
+                                                </div>
+                                            </div>
+                                            <div class="stmt-preset-card" id="preset-retail" onclick="applyFinancialPreset('retail')" role="button" tabindex="0">
+                                                <div class="preset-icon">🛒</div>
+                                                <div class="preset-info">
+                                                    <div class="preset-title">Retail Supermarket</div>
+                                                    <div class="preset-meta">Turnover: ₹6.8 Cr · EBIT: ₹52 L</div>
+                                                    <span class="preset-tag">Audited P&amp;L + B/S</span>
+                                                </div>
+                                            </div>
+                                            <div class="stmt-preset-card" id="preset-tech" onclick="applyFinancialPreset('tech')" role="button" tabindex="0">
+                                                <div class="preset-icon">💻</div>
+                                                <div class="preset-info">
+                                                    <div class="preset-title">IT &amp; Tech Services</div>
+                                                    <div class="preset-meta">Turnover: ₹10.5 Cr · EBIT: ₹2.2 Cr</div>
+                                                    <span class="preset-tag">Audited P&amp;L + B/S</span>
+                                                </div>
+                                            </div>
+                                            <div class="stmt-preset-card" id="preset-healthcare" onclick="applyFinancialPreset('healthcare')" role="button" tabindex="0">
+                                                <div class="preset-icon">🏥</div>
+                                                <div class="preset-info">
+                                                    <div class="preset-title">Healthcare &amp; Pharma</div>
+                                                    <div class="preset-meta">Turnover: ₹14.0 Cr · EBIT: ₹1.8 Cr</div>
+                                                    <span class="preset-tag">Audited P&amp;L + B/S</span>
+                                                </div>
+                                            </div>
+                                            <div class="stmt-preset-card" id="preset-logistics" onclick="applyFinancialPreset('logistics')" role="button" tabindex="0">
+                                                <div class="preset-icon">🚚</div>
+                                                <div class="preset-info">
+                                                    <div class="preset-title">Logistics &amp; Cargo</div>
+                                                    <div class="preset-meta">Turnover: ₹8.4 Cr · EBIT: ₹95 L</div>
+                                                    <span class="preset-tag">Audited P&amp;L + B/S</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+
+                                    <!-- 4. Executive Financial Statements Telemetry Table -->
+                                    <div class="stmt-table-card">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                            <h4 style="font-size: 0.95rem; font-weight: 700; color: #F8FAFC; margin: 0;">Extracted Financial Statements Telemetry</h4>
+                                            <span style="font-size: 0.72rem; color: #34D399; font-weight: 600;">Direct Statement Analysis Active</span>
+                                        </div>
+
+                                        <div class="stmt-grid-tables">
+                                            <!-- Income Statement -->
+                                            <div>
+                                                <h5 style="font-size: 0.82rem; color: #38BDF8; font-weight: 700; margin-bottom: 8px;">📈 Profit &amp; Loss Statement (Income)</h5>
+                                                <table class="stmt-table">
+                                                    <thead><tr><th>Line Item</th><th style="text-align:right;">Amount (₹)</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td>Revenue from Operations</td><td class="val-col" id="disp-revenue">₹1,25,00,000</td></tr>
+                                                        <tr><td>Cost of Goods Sold (COGS)</td><td class="val-col" id="disp-cogs">₹75,00,000</td></tr>
+                                                        <tr class="highlight-row"><td>Gross Profit</td><td class="val-col" id="disp-gross-profit">₹50,00,000 (40.0%)</td></tr>
+                                                        <tr><td>Operating Profit (EBIT)</td><td class="val-col" id="disp-ebit">₹14,00,000</td></tr>
+                                                        <tr><td>Interest Expenses</td><td class="val-col" id="disp-interest">₹2,50,000</td></tr>
+                                                        <tr class="highlight-row"><td>Net Profit (PAT)</td><td class="val-col" id="disp-net-profit">₹8,50,000 (6.8%)</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <!-- Balance Sheet -->
+                                            <div>
+                                                <h5 style="font-size: 0.82rem; color: #34D399; font-weight: 700; margin-bottom: 8px;">🏛️ Balance Sheet (Financial Position)</h5>
+                                                <table class="stmt-table">
+                                                    <thead><tr><th>Line Item</th><th style="text-align:right;">Amount (₹)</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td>Current Assets (Cash &amp; Receivables)</td><td class="val-col" id="disp-current-assets">₹4,50,00,000</td></tr>
+                                                        <tr><td>Inventory &amp; Finished Stock</td><td class="val-col" id="disp-inventory">₹1,80,00,000</td></tr>
+                                                        <tr><td>Current Liabilities (Short-Term)</td><td class="val-col" id="disp-current-liab">₹2,80,00,000</td></tr>
+                                                        <tr><td>Total Debt &amp; Borrowings</td><td class="val-col" id="disp-total-debt">₹3,20,00,000</td></tr>
+                                                        <tr class="highlight-row"><td>Shareholders' Equity</td><td class="val-col" id="disp-equity">₹4,80,00,000</td></tr>
+                                                        <tr><td>Annual Credit Sales</td><td class="val-col" id="disp-credit-sales">₹9,50,00,000</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- KPI Telemetry Bar -->
+                                        <div class="stmt-kpi-bar">
+                                            <div class="stmt-kpi-item">
+                                                <div class="stmt-kpi-label">Current Ratio</div>
+                                                <div class="stmt-kpi-val" id="disp-kpi-cr">1.61x</div>
+                                            </div>
+                                            <div class="stmt-kpi-item">
+                                                <div class="stmt-kpi-label">Quick Ratio</div>
+                                                <div class="stmt-kpi-val" id="disp-kpi-qr">0.96x</div>
+                                            </div>
+                                            <div class="stmt-kpi-item">
+                                                <div class="stmt-kpi-label">Debt-to-Equity</div>
+                                                <div class="stmt-kpi-val" id="disp-kpi-de">0.67x</div>
+                                            </div>
+                                            <div class="stmt-kpi-item">
+                                                <div class="stmt-kpi-label">Net Profit Margin</div>
+                                                <div class="stmt-kpi-val" id="disp-kpi-npm">6.8%</div>
+                                            </div>
+                                            <div class="stmt-kpi-item">
+                                                <div class="stmt-kpi-label">Interest Coverage</div>
+                                                <div class="stmt-kpi-val" id="disp-kpi-icr">5.6x</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 5. Collapsible Optional Adjustment Form (Hidden by default, keeps existing models 100% compatible) -->
+                                    <details style="margin: 12px 0 16px; padding: 10px 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
+                                        <summary style="font-size: 0.8rem; font-weight: 600; color: #34D399; cursor: pointer; user-select: none;">
+                                            ⚙️ Optional: View or Fine-Tune Detailed Statement Figures
+                                        </summary>
+                                        <div style="margin-top: 14px;">
+                                            <div class="wiz-form-grid">
+                                                <div class="form-group">
+                                                    <label for="wiz-current-assets">Current Assets (₹)</label>
+                                                    <input type="number" id="wiz-current-assets" class="form-control" value="45000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-inventory">Inventory / Stock (₹)</label>
+                                                    <input type="number" id="wiz-inventory" class="form-control" value="18000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-current-liabilities">Current Liabilities (₹)</label>
+                                                    <input type="number" id="wiz-current-liabilities" class="form-control" value="28000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-total-debt">Total Debt / Borrowings (₹)</label>
+                                                    <input type="number" id="wiz-total-debt" class="form-control" value="32000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-equity">Shareholders' Equity (₹)</label>
+                                                    <input type="number" id="wiz-equity" class="form-control" value="48000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-revenue">Total Revenue / Sales (₹)</label>
+                                                    <input type="number" id="wiz-revenue" class="form-control" value="125000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-cogs">Cost of Goods Sold (COGS) (₹)</label>
+                                                    <input type="number" id="wiz-cogs" class="form-control" value="75000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-operating-profit">Operating Profit (EBIT) (₹)</label>
+                                                    <input type="number" id="wiz-operating-profit" class="form-control" value="14000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-net-profit">Net Profit (PAT) (₹)</label>
+                                                    <input type="number" id="wiz-net-profit" class="form-control" value="8500000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-interest">Interest Expense (₹)</label>
+                                                    <input type="number" id="wiz-interest" class="form-control" value="2500000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-avg-inventory">Average Inventory (₹)</label>
+                                                    <input type="number" id="wiz-avg-inventory" class="form-control" value="17500000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-avg-receivables">Average Receivables (₹)</label>
+                                                    <input type="number" id="wiz-avg-receivables" class="form-control" value="12000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="wiz-credit-sales">Annual Credit Sales (₹)</label>
+                                                    <input type="number" id="wiz-credit-sales" class="form-control" value="95000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </details>
 
                                     <div class="wiz-nav-bar">
                                         <button type="button" class="btn btn-outline" onclick="assessmentWizard.goToStep(2)">
@@ -2377,10 +2689,9 @@
                                         <span class="badge-tag">Overall Assessment</span>
                                         <span class="score-chip" id="wiz-risk-badge">Medium Risk</span>
                                     </div>
-                                    <h2 id="wiz-verdict-heading">ABC Retail Store — Overall Score: 42/100 (Medium Risk)</h2>
+                                    <h2 id="wiz-verdict-heading">Enterprise Risk Evaluation — Multi-Factor Analysis</h2>
                                     <p class="wiz-verdict-desc" id="wiz-verdict-desc">
-                                        The enterprise shows moderate stability with healthy gross margins, but exhibits vulnerability 
-                                        due to single-supplier reliance, inventory holding, and trade debtor collection lag.
+                                        Multi-dimensional enterprise risk profile computed across liquidity, leverage, operating profit margins, efficiency, and operational resilience.
                                     </p>
                                     <div class="classification-bands-row">
                                         <div class="band-pill" id="band-low">0–30: Low</div>
@@ -2538,7 +2849,7 @@
                                     <div class="rep-subtext">Enterprise Governance & Quantitative Financial Telemetry</div>
                                 </div>
                                 <div class="rep-meta-block">
-                                    <div class="rep-meta-row"><span>Entity:</span> <strong id="rep-out-biz-name">ABC Retail Store</strong></div>
+                                    <div class="rep-meta-row"><span>Entity:</span> <strong id="rep-out-biz-name">Acme Enterprises Ltd</strong></div>
                                     <div class="rep-meta-row"><span>Industry:</span> <strong id="rep-out-biz-type">Retail Store</strong></div>
                                     <div class="rep-meta-row"><span>Size:</span> <strong id="rep-out-biz-size">Small Enterprise</strong></div>
                                     <div class="rep-meta-row"><span>Financial Year:</span> <strong id="rep-out-biz-fy">FY 2024-25</strong></div>
@@ -2596,6 +2907,17 @@
                                 <h4 class="rep-sec-title">3. Practical Recommendations &amp; Strategic Roadmap</h4>
                                 <div class="rep-rec-grid" id="rep-suggestions-list">
                                     <!-- Populated dynamically -->
+                            <!-- B6: Explainable Risk Score & Waterfall Attribution -->
+                            <div class="rep-section" id="rep-explainable-section">
+                                <h4 class="rep-sec-title">4. Explainable Risk Score & Domain Attribution Waterfall</h4>
+                                <div id="rep-waterfall-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(52,211,153,0.2);border-radius:10px;padding:16px;">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                                        <span style="font-size:0.875rem;color:var(--text-secondary)">Starting Baseline Ideal Health: <strong>100.0 pts</strong></span>
+                                        <span class="badge badge-emerald" id="rep-waterfall-final-badge">Final Health Score</span>
+                                    </div>
+                                    <div id="rep-waterfall-bars" style="display:flex;flex-direction:column;gap:8px;">
+                                        <!-- Populated dynamically via JS -->
+                                    </div>
                                 </div>
                             </div>
 
@@ -3121,5 +3443,62 @@ CREATE POLICY "Allow all on alerts" ON alerts FOR ALL USING (true) WITH CHECK (t
 
     <!-- Application Script -->
     <script src="script.js"></script>
+
+    <!-- User Session & Deep-link Assessment Script -->
+    <script>
+    function logoutUser() {
+        try {
+            localStorage.removeItem('rg_token');
+            localStorage.removeItem('rg_user');
+            localStorage.removeItem('rg_remember');
+            sessionStorage.removeItem('rg_token');
+            sessionStorage.removeItem('rg_user');
+            if (typeof showToast === 'function') {
+                showToast('✓ Successfully logged out. Redirecting...', 'info');
+            }
+        } catch(e) {}
+        setTimeout(function() {
+            window.location.replace('auth.html?logged_out=1');
+        }, 200);
+    }
+    window.logoutUser = logoutUser;
+
+    (function initUserSession() {
+        var userRaw = localStorage.getItem('rg_user') || sessionStorage.getItem('rg_user');
+        if (userRaw) {
+            try {
+                var user = JSON.parse(userRaw);
+                var fullName = (user.firstname ? (user.firstname + ' ' + (user.lastname || '')).trim() : (user.name || 'Risk Officer'));
+                var role = user.company ? (user.company + ' · Risk Team') : (user.role || 'Enterprise User');
+                var initials = (user.firstname ? user.firstname[0] : (fullName[0] || 'R')).toUpperCase();
+                if (user.lastname) initials += user.lastname[0].toUpperCase();
+
+                var nameEl = document.getElementById('sidebar-user-name');
+                var roleEl = document.getElementById('sidebar-user-role');
+                var avEl   = document.getElementById('sidebar-user-avatar');
+                var hNameEl = document.getElementById('header-user-name');
+
+                if (nameEl) nameEl.textContent = fullName;
+                if (roleEl) roleEl.textContent = role;
+                if (avEl) avEl.textContent = initials || 'RO';
+                if (hNameEl) hNameEl.textContent = fullName;
+            } catch(e) {}
+        }
+
+        // Auto launch assessment wizard if deep-linked via #assessment
+        if (window.location.hash.indexOf('assessment') !== -1) {
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    if (typeof switchTab === 'function') {
+                        switchTab('assessment');
+                    }
+                    if (window.assessmentWizard && typeof window.assessmentWizard.startNew === 'function') {
+                        window.assessmentWizard.startNew();
+                    }
+                }, 400);
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

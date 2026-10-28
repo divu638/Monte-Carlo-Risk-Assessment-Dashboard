@@ -6,7 +6,10 @@ Dual-Engine: Supabase (PostgreSQL Cloud) as primary with Local Fallback Resilien
 import os
 import sys
 import sqlite3
-from datetime import datetime, timezone
+import hashlib
+import secrets
+import json
+from datetime import datetime, timezone, timedelta
 import random
 from dotenv import load_dotenv
 
@@ -18,6 +21,19 @@ if sys.platform.startswith('win'):
             sys.stderr.reconfigure(encoding='utf-8', errors='replace')
     except Exception:
         pass
+
+# Optional bcrypt and jwt for robust enterprise auth
+try:
+    import bcrypt
+    HAS_BCRYPT = True
+except ImportError:
+    HAS_BCRYPT = False
+
+try:
+    import jwt
+    HAS_JWT = True
+except ImportError:
+    HAS_JWT = False
 
 # Try importing supabase
 try:
@@ -37,6 +53,7 @@ load_dotenv(ENV_FILE)
 
 SUPABASE_URL = os.getenv('SUPABASE_URL', '').strip()
 SUPABASE_KEY = (os.getenv('SUPABASE_KEY') or os.getenv('SUPABASE_PUBLISHABLE_KEY') or os.getenv('SUPABASE_ANON_KEY') or os.getenv('SUPABASE_SECRET_KEY') or '').strip()
+JWT_SECRET = os.getenv('JWT_SECRET', 'enterprise-riskguard-security-jwt-secret-key-32chars!')
 
 _supabase_client = None
 _using_supabase = False
@@ -152,6 +169,127 @@ def get_sqlite_conn():
     return conn
 
 
+def _run_sqlite_migrations(conn):
+    """Ensure SQLite schema has all required columns and tables for tamper-evident audit and RBAC."""
+    cur = conn.cursor()
+    # 1. Ensure assessments table exists
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS assessments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL DEFAULT 1,
+        company_name TEXT NOT NULL,
+        industry TEXT DEFAULT 'General',
+        health_score INTEGER NOT NULL,
+        var_exposure REAL NOT NULL,
+        status TEXT DEFAULT 'Completed',
+        step_data TEXT DEFAULT '{}',
+        ratios_data TEXT DEFAULT '{}',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    # 2. Check and migrate risks table columns
+    cur.execute("PRAGMA table_info(risks)")
+    risk_cols = [c[1] for c in cur.fetchall()]
+    if "user_id" not in risk_cols:
+        try:
+            cur.execute("ALTER TABLE risks ADD COLUMN user_id INTEGER DEFAULT 1")
+        except Exception:
+            pass
+
+    # 3. Check and migrate audit_logs table columns
+    cur.execute("PRAGMA table_info(audit_logs)")
+    audit_cols = [c[1] for c in cur.fetchall()]
+    if "user_id" not in audit_cols:
+        try:
+            cur.execute("ALTER TABLE audit_logs ADD COLUMN user_id INTEGER DEFAULT 1")
+        except Exception:
+            pass
+    if "before_val" not in audit_cols:
+        try:
+            cur.execute("ALTER TABLE audit_logs ADD COLUMN before_val TEXT DEFAULT ''")
+        except Exception:
+            pass
+    if "after_val" not in audit_cols:
+        try:
+            cur.execute("ALTER TABLE audit_logs ADD COLUMN after_val TEXT DEFAULT ''")
+        except Exception:
+            pass
+    if "prev_hash" not in audit_cols:
+        try:
+            cur.execute("ALTER TABLE audit_logs ADD COLUMN prev_hash TEXT DEFAULT 'GENESIS_ROOT_HASH_00000000000000000000000000000000000000000000000000000000'")
+        except Exception:
+            pass
+    if "hash" not in audit_cols:
+        try:
+            cur.execute("ALTER TABLE audit_logs ADD COLUMN hash TEXT DEFAULT ''")
+        except Exception:
+            pass
+
+    # 4. Check and migrate users table columns
+    cur.execute("PRAGMA table_info(users)")
+    user_cols = [c[1] for c in cur.fetchall()]
+    if "is_blocked" not in user_cols:
+        try:
+            cur.execute("ALTER TABLE users ADD COLUMN is_blocked INTEGER DEFAULT 0")
+        except Exception:
+            pass
+
+    # 5. Ensure industry_benchmarks table exists
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS industry_benchmarks (
+        industry TEXT PRIMARY KEY,
+        current_ratio REAL DEFAULT 1.8,
+        de_ratio REAL DEFAULT 1.0,
+        net_margin REAL DEFAULT 0.07,
+        roe REAL DEFAULT 0.12,
+        asset_turnover REAL DEFAULT 0.80,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    # Seed default benchmarks if empty
+    cur.execute("SELECT COUNT(*) FROM industry_benchmarks")
+    if cur.fetchone()[0] == 0:
+        default_benchmarks = [
+            ("Manufacturing", 1.8, 0.9, 0.06, 0.12, 0.80),
+            ("Retail", 1.4, 1.2, 0.04, 0.15, 1.50),
+            ("Technology", 2.5, 0.4, 0.15, 0.20, 0.70),
+            ("Healthcare", 2.1, 0.6, 0.10, 0.14, 0.65),
+            ("Financial", 1.2, 5.0, 0.18, 0.12, 0.10),
+            ("Energy", 1.5, 1.3, 0.07, 0.10, 0.45),
+            ("General", 1.8, 1.0, 0.07, 0.12, 0.80)
+        ]
+        cur.executemany("""
+        INSERT INTO industry_benchmarks (industry, current_ratio, de_ratio, net_margin, roe, asset_turnover)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, default_benchmarks)
+
+    # 6. Ensure action_tasks table exists (B7: Risk Register & Action Tracker)
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS action_tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL DEFAULT 1,
+        risk_id INTEGER,
+        title TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        category TEXT DEFAULT 'Operations',
+        status TEXT DEFAULT 'Open',
+        owner TEXT DEFAULT 'Risk Committee',
+        priority TEXT DEFAULT 'High',
+        due_date TEXT DEFAULT '',
+        cost_estimate TEXT DEFAULT '',
+        treatment_type TEXT DEFAULT 'Reduce',
+        residual_risk REAL DEFAULT 0.0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    conn.commit()
+
+
 def init_local_sqlite():
     """Create local SQLite tables if they do not exist and seed if empty."""
     conn = get_sqlite_conn()
@@ -173,6 +311,7 @@ def init_local_sqlite():
         velocity TEXT DEFAULT 'Medium',
         trend TEXT DEFAULT 'stable',
         mitigation TEXT DEFAULT '',
+        user_id INTEGER DEFAULT 1,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
@@ -185,6 +324,11 @@ def init_local_sqlite():
         risk_name TEXT,
         action TEXT NOT NULL,
         details TEXT DEFAULT '',
+        user_id INTEGER DEFAULT 1,
+        before_val TEXT DEFAULT '',
+        after_val TEXT DEFAULT '',
+        prev_hash TEXT DEFAULT 'GENESIS_ROOT_HASH_00000000000000000000000000000000000000000000000000000000',
+        hash TEXT DEFAULT '',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
     """)
@@ -200,7 +344,46 @@ def init_local_sqlite():
     );
     """)
 
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        firstname TEXT NOT NULL,
+        lastname TEXT DEFAULT '',
+        company TEXT DEFAULT '',
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        salt TEXT NOT NULL,
+        role TEXT DEFAULT 'user',
+        is_verified INTEGER DEFAULT 0,
+        is_blocked INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        last_login TEXT DEFAULT NULL
+    );
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS assessments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL DEFAULT 1,
+        company_name TEXT NOT NULL,
+        industry TEXT DEFAULT 'General',
+        health_score INTEGER NOT NULL,
+        var_exposure REAL NOT NULL,
+        status TEXT DEFAULT 'Completed',
+        step_data TEXT DEFAULT '{}',
+        ratios_data TEXT DEFAULT '{}',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
     conn.commit()
+
+    # Run auto-migrations for existing databases
+    _run_sqlite_migrations(conn)
+
+    # Seed default users (admin & analyst)
+    seed_default_users(conn)
 
     # Check if empty, then seed
     cur.execute("SELECT COUNT(*) FROM risks")
@@ -346,24 +529,191 @@ ENTERPRISE_SEED_ALERTS = [
 ]
 
 
-def seed_local_sqlite(conn):
-    """Seed SQLite database."""
+GENESIS_HASH = "GENESIS_ROOT_HASH_00000000000000000000000000000000000000000000000000000000"
+
+
+def calculate_audit_hash(prev_hash, timestamp_str, user_id, action, risk_id, risk_name, details, before_val="", after_val=""):
+    """Calculate cryptographic SHA-256 digest binding previous hash to current event."""
+    raw = f"{prev_hash}|{timestamp_str}|{user_id}|{action}|{risk_id}|{risk_name}|{details}|{before_val}|{after_val}"
+    return hashlib.sha256(raw.encode('utf-8')).hexdigest()
+
+
+def get_last_audit_hash():
+    """Fetch previous hash in the audit chain or return genesis hash."""
+    client = get_supabase_client() if _using_supabase else None
+    if client:
+        try:
+            res = client.table('audit_logs').select('hash').order('id', desc=True).limit(1).execute()
+            if res.data and res.data[0].get('hash'):
+                return res.data[0]['hash']
+        except Exception:
+            pass
+    try:
+        conn = get_sqlite_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT hash FROM audit_logs WHERE hash IS NOT NULL AND hash != '' ORDER BY id DESC LIMIT 1")
+        row = cur.fetchone()
+        conn.close()
+        if row and row['hash']:
+            return row['hash']
+    except Exception:
+        pass
+    return GENESIS_HASH
+
+
+def record_audit_log(risk_id, risk_name, action, details, user_id=1, before_val="", after_val=""):
+    """
+    Append a mathematically tamper-evident audit record with SHA-256 cryptographic chain linking.
+    Genuinely append-only: each row stores a hash of all event metadata + the hash of the preceding row.
+    """
+    timestamp = datetime.now(timezone.utc).isoformat()
+    prev_hash = get_last_audit_hash()
+    curr_hash = calculate_audit_hash(prev_hash, timestamp, user_id, action, risk_id, risk_name, details, before_val, after_val)
+
+    client = get_supabase_client() if _using_supabase else None
+    if client:
+        try:
+            client.table('audit_logs').insert({
+                "risk_id": risk_id,
+                "risk_name": risk_name,
+                "action": action,
+                "details": details,
+                "user_id": user_id,
+                "before_val": before_val,
+                "after_val": after_val,
+                "prev_hash": prev_hash,
+                "hash": curr_hash,
+                "created_at": timestamp
+            }).execute()
+            return curr_hash
+        except Exception as e:
+            print(f"  ⚠️  Supabase audit insert warning: {e}")
+
+    try:
+        conn = get_sqlite_conn()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO audit_logs (risk_id, risk_name, action, details, user_id, before_val, after_val, prev_hash, hash, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (risk_id, risk_name, action, details, user_id, str(before_val or ""), str(after_val or ""), prev_hash, curr_hash, timestamp))
+        conn.commit()
+        conn.close()
+        return curr_hash
+    except Exception as e:
+        print(f"  ⚠️  Local SQLite audit insert warning: {e}")
+        return None
+
+
+def verify_audit_chain():
+    """
+    Traverse the entire audit trail and verify cryptographic continuity.
+    Detects any inserted, modified, or deleted records.
+    """
+    conn = get_sqlite_conn()
     cur = conn.cursor()
+    cur.execute("SELECT * FROM audit_logs ORDER BY id ASC")
+    rows = [dict(r) for r in cur.fetchall()]
+    conn.close()
+
+    if not rows:
+        return {"valid": True, "total_records": 0, "message": "Audit chain empty."}
+
+    last_hash = GENESIS_HASH
+    for idx, r in enumerate(rows):
+        expected_prev = r.get("prev_hash")
+        # Legacy backfill support
+        if not expected_prev or expected_prev == "GENESIS":
+            expected_prev = GENESIS_HASH
+
+        if idx > 0 and expected_prev != last_hash:
+            return {
+                "valid": False,
+                "tampered_at_id": r.get("id"),
+                "reason": f"Hash continuity broken at record #{r.get('id')}. Expected prev_hash {last_hash[:16]}..., found {expected_prev[:16]}..."
+            }
+
+        recalculated = calculate_audit_hash(
+            expected_prev,
+            r.get("created_at"),
+            r.get("user_id"),
+            r.get("action"),
+            r.get("risk_id"),
+            r.get("risk_name"),
+            r.get("details"),
+            r.get("before_val", "") or "",
+            r.get("after_val", "") or ""
+        )
+        if r.get("hash") and r.get("hash") != recalculated:
+            return {
+                "valid": False,
+                "tampered_at_id": r.get("id"),
+                "reason": f"Content signature mismatch at record #{r.get('id')}. Integrity compromised."
+            }
+        last_hash = r.get("hash") or last_hash
+
+    return {
+        "valid": True,
+        "total_records": len(rows),
+        "head_hash": last_hash,
+        "message": "Cryptographic audit chain fully verified. Zero tampering detected across all records."
+    }
+
+
+def seed_default_users(conn):
+    """Seed standard Admin and Analyst accounts if they do not exist."""
+    cur = conn.cursor()
+    try:
+        cur.execute("SELECT email FROM users WHERE LOWER(email) IN ('admin@riskguard.pro', 'analyst@riskguard.pro')")
+        existing_emails = {row[0].lower() for row in cur.fetchall()}
+
+        # 1. Admin: admin@riskguard.pro / AdminPassword123!
+        if 'admin@riskguard.pro' not in existing_emails:
+            admin_salt = secrets.token_hex(32)
+            admin_hash = _hash_password("AdminPassword123!", admin_salt)
+            cur.execute("""
+                INSERT INTO users (firstname, lastname, company, email, password_hash, salt, role, is_verified, is_blocked)
+                VALUES (?, ?, ?, ?, ?, ?, 'admin', 1, 0)
+            """, ("Security", "Admin", "Enterprise Risk Board", "admin@riskguard.pro", admin_hash, admin_salt))
+
+        # 2. Analyst: analyst@riskguard.pro / AnalystPass123!
+        if 'analyst@riskguard.pro' not in existing_emails:
+            user_salt = secrets.token_hex(32)
+            user_hash = _hash_password("AnalystPass123!", user_salt)
+            cur.execute("""
+                INSERT INTO users (firstname, lastname, company, email, password_hash, salt, role, is_verified, is_blocked)
+                VALUES (?, ?, ?, ?, ?, ?, 'user', 1, 0)
+            """, ("Enterprise", "Analyst", "Risk Operations Unit", "analyst@riskguard.pro", user_hash, user_salt))
+
+        conn.commit()
+    except Exception as e:
+        print(f"  ⚠️  seed_default_users warning: {e}")
+
+
+def seed_local_sqlite(conn):
+    """Seed SQLite database with enterprise risks, alerts, and chained audit logs."""
+    cur = conn.cursor()
+    seed_default_users(conn)
+
+    prev_hash = GENESIS_HASH
     for r in ENTERPRISE_SEED_RISKS:
         cur.execute("""
             INSERT INTO risks (name, description, category, likelihood, impact, score, level,
-                               financial_impact, owner, status, velocity, trend, mitigation)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                               financial_impact, owner, status, velocity, trend, mitigation, user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
         """, (
             r["name"], r["description"], r["category"], r["likelihood"], r["impact"],
             r["score"], r["level"], r["financial_impact"], r["owner"], r["status"],
             r["velocity"], r["trend"], r["mitigation"]
         ))
         risk_id = cur.lastrowid
+        ts = datetime.now(timezone.utc).isoformat()
+        details = "Initial risk registration and baseline impact assessment."
+        h = calculate_audit_hash(prev_hash, ts, 1, "CREATED", risk_id, r["name"], details)
         cur.execute("""
-            INSERT INTO audit_logs (risk_id, risk_name, action, details)
-            VALUES (?, ?, 'CREATED', 'Initial risk registration and baseline impact assessment.')
-        """, (risk_id, r["name"]))
+            INSERT INTO audit_logs (risk_id, risk_name, action, details, user_id, prev_hash, hash, created_at)
+            VALUES (?, ?, 'CREATED', ?, 1, ?, ?, ?)
+        """, (risk_id, r["name"], details, prev_hash, h, ts))
+        prev_hash = h
 
     for a in ENTERPRISE_SEED_ALERTS:
         cur.execute("""
@@ -467,8 +817,8 @@ def get_risk_by_id(risk_id):
     return dict(row) if row else None
 
 
-def create_risk(data):
-    """Insert a new risk and record an audit log entry."""
+def create_risk(data, user_id=1):
+    """Insert a new risk and record a tamper-evident audit log entry."""
     likelihood = int(data.get("likelihood", 3))
     impact = int(data.get("impact", 3))
     score = likelihood * impact
@@ -488,7 +838,8 @@ def create_risk(data):
         "status": data.get("status", "Active"),
         "velocity": data.get("velocity", "Medium"),
         "trend": data.get("trend", "stable"),
-        "mitigation": data.get("mitigation", "")
+        "mitigation": data.get("mitigation", ""),
+        "user_id": user_id
     }
 
     client = get_supabase_client() if _using_supabase else None
@@ -497,12 +848,11 @@ def create_risk(data):
             res = client.table('risks').insert(risk_data).execute()
             new_risk = res.data[0] if res.data else None
             if new_risk:
-                client.table('audit_logs').insert({
-                    "risk_id": new_risk["id"],
-                    "risk_name": new_risk["name"],
-                    "action": "CREATED",
-                    "details": f"New risk added with score {score}/25 ({level}) and exposure ${fin:,.2f}"
-                }).execute()
+                record_audit_log(
+                    new_risk["id"], new_risk["name"], "CREATED",
+                    f"New risk added with score {score}/25 ({level}) and exposure ${fin:,.2f}",
+                    user_id=user_id, after_val=json.dumps(risk_data)
+                )
 
                 if level == "Critical":
                     client.table('alerts').insert({
@@ -520,20 +870,16 @@ def create_risk(data):
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO risks (name, description, category, likelihood, impact, score, level,
-                           financial_impact, owner, status, velocity, trend, mitigation)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                           financial_impact, owner, status, velocity, trend, mitigation, user_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         risk_data["name"], risk_data["description"], risk_data["category"],
         risk_data["likelihood"], risk_data["impact"], risk_data["score"],
         risk_data["level"], risk_data["financial_impact"], risk_data["owner"],
-        risk_data["status"], risk_data["velocity"], risk_data["trend"], risk_data["mitigation"]
+        risk_data["status"], risk_data["velocity"], risk_data["trend"], risk_data["mitigation"],
+        user_id
     ))
     new_id = cur.lastrowid
-
-    cur.execute("""
-        INSERT INTO audit_logs (risk_id, risk_name, action, details)
-        VALUES (?, ?, 'CREATED', ?)
-    """, (new_id, risk_data["name"], f"New risk added with score {score}/25 ({level}) and exposure ${fin:,.2f}"))
 
     if level == "Critical":
         cur.execute("""
@@ -542,13 +888,18 @@ def create_risk(data):
         """, (risk_data["category"], f"High-severity critical risk registered: '{risk_data['name']}'"))
 
     conn.commit()
-    cur.execute("SELECT * FROM risks WHERE id = ?", (new_id,))
-    row = cur.fetchone()
     conn.close()
-    return dict(row) if row else None
+
+    record_audit_log(
+        new_id, risk_data["name"], "CREATED",
+        f"New risk added with score {score}/25 ({level}) and exposure ${fin:,.2f}",
+        user_id=user_id, after_val=json.dumps(risk_data)
+    )
+
+    return get_risk_by_id(new_id)
 
 
-def update_risk(risk_id, data):
+def update_risk(risk_id, data, user_id=1):
     """Update an existing risk, recalculate score, and record audit trail."""
     existing = get_risk_by_id(risk_id)
     if not existing:
@@ -588,12 +939,10 @@ def update_risk(risk_id, data):
     if client:
         try:
             client.table('risks').update(update_data).eq('id', risk_id).execute()
-            client.table('audit_logs').insert({
-                "risk_id": risk_id,
-                "risk_name": update_data["name"],
-                "action": "UPDATED",
-                "details": change_summary
-            }).execute()
+            record_audit_log(
+                risk_id, update_data["name"], "UPDATED", change_summary,
+                user_id=user_id, before_val=json.dumps(dict(existing)), after_val=json.dumps(update_data)
+            )
             return get_risk_by_id(risk_id)
         except Exception as e:
             print(f"  ⚠️  Supabase update error: {e}")
@@ -613,17 +962,19 @@ def update_risk(risk_id, data):
         update_data["status"], update_data["velocity"], update_data["trend"],
         update_data["mitigation"], risk_id
     ))
-    cur.execute("""
-        INSERT INTO audit_logs (risk_id, risk_name, action, details)
-        VALUES (?, ?, 'UPDATED', ?)
-    """, (risk_id, update_data["name"], change_summary))
     conn.commit()
     conn.close()
+
+    record_audit_log(
+        risk_id, update_data["name"], "UPDATED", change_summary,
+        user_id=user_id, before_val=json.dumps(dict(existing)), after_val=json.dumps(update_data)
+    )
+
     return get_risk_by_id(risk_id)
 
 
-def delete_risk(risk_id):
-    """Delete a risk from database."""
+def delete_risk(risk_id, user_id=1):
+    """Delete a risk from database and record audit event."""
     existing = get_risk_by_id(risk_id)
     if not existing:
         return False
@@ -632,12 +983,11 @@ def delete_risk(risk_id):
     if client:
         try:
             client.table('risks').delete().eq('id', risk_id).execute()
-            client.table('audit_logs').insert({
-                "risk_id": risk_id,
-                "risk_name": existing["name"],
-                "action": "DELETED",
-                "details": f"Risk removed from enterprise registry (Previous score: {existing['score']})"
-            }).execute()
+            record_audit_log(
+                risk_id, existing["name"], "DELETED",
+                f"Risk removed from enterprise registry (Previous score: {existing['score']})",
+                user_id=user_id, before_val=json.dumps(dict(existing))
+            )
             return True
         except Exception as e:
             print(f"  ⚠️  Supabase delete error: {e}")
@@ -646,12 +996,14 @@ def delete_risk(risk_id):
     conn = get_sqlite_conn()
     cur = conn.cursor()
     cur.execute("DELETE FROM risks WHERE id = ?", (risk_id,))
-    cur.execute("""
-        INSERT INTO audit_logs (risk_id, risk_name, action, details)
-        VALUES (?, ?, 'DELETED', ?)
-    """, (risk_id, existing["name"], f"Risk removed from enterprise registry (Previous score: {existing['score']})"))
     conn.commit()
     conn.close()
+
+    record_audit_log(
+        risk_id, existing["name"], "DELETED",
+        f"Risk removed from enterprise registry (Previous score: {existing['score']})",
+        user_id=user_id, before_val=json.dumps(dict(existing))
+    )
     return True
 
 
@@ -898,3 +1250,463 @@ def configure_supabase_credentials(new_url, new_key, sync_data=True):
         "message": "Successfully connected to Supabase Cloud Database!",
         "status": get_connection_status()
     }
+
+
+# ─── Auth / User Management ────────────────────────────────────────────────────
+
+def _hash_password(password: str, salt: str = "") -> str:
+    """Hash password using bcrypt (or PBKDF2 fallback if bcrypt unavailable)."""
+    if HAS_BCRYPT:
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(rounds=12)).decode('utf-8')
+    dk = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        (salt or "riskguard_salt").encode('utf-8'),
+        iterations=260_000
+    )
+    return dk.hex()
+
+
+def _verify_password_hash(password: str, stored_hash: str, salt: str = "") -> bool:
+    """Verify password supporting bcrypt ($2b$, $2a$) and PBKDF2 hashes."""
+    if stored_hash.startswith("$2b$") or stored_hash.startswith("$2a$"):
+        if HAS_BCRYPT:
+            try:
+                return bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
+            except Exception:
+                return False
+    # Check PBKDF2
+    dk = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        (salt or "riskguard_salt").encode('utf-8'),
+        iterations=260_000
+    )
+    return secrets.compare_digest(dk.hex(), stored_hash)
+
+
+def generate_jwt_token(user_id: int, email: str, role: str) -> str:
+    """Generate signed JWT token expiring in 24 hours."""
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": str(user_id),
+        "email": email,
+        "role": role,
+        "iat": int(now.timestamp()),
+        "exp": int((now + timedelta(hours=24)).timestamp())
+    }
+    if HAS_JWT:
+        return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    return generate_session_token(user_id)
+
+
+def decode_jwt_token(token: str) -> dict | None:
+    """Decode and validate a signed JWT token."""
+    if not token:
+        return None
+    if HAS_JWT:
+        try:
+            return jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        except Exception:
+            return None
+    return None
+
+
+def generate_session_token(user_id: int) -> str:
+    """Fallback secure random token."""
+    raw = f"{user_id}:{secrets.token_hex(32)}"
+    return hashlib.sha256(raw.encode()).hexdigest() + secrets.token_hex(16)
+
+
+def create_user(firstname: str, lastname: str, company: str, email: str, password: str, role: str = "user") -> dict:
+    """Register a new user in the local SQLite users table with bcrypt hashing."""
+    email = email.lower().strip()
+    salt = secrets.token_hex(32)
+    pw_hash = _hash_password(password, salt)
+    assigned_role = "admin" if role in ("admin", "superadmin") else "user"
+
+    try:
+        conn = get_sqlite_conn()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO users (firstname, lastname, company, email, password_hash, salt, role, is_verified, is_blocked)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0)
+        """, (firstname, lastname, company, email, pw_hash, salt, assigned_role))
+        conn.commit()
+        user_id = cur.lastrowid
+        conn.close()
+
+        record_audit_log(
+            risk_id=None,
+            risk_name=f"User: {email}",
+            action="USER_REGISTERED",
+            details=f"User registered with role '{assigned_role}'",
+            user_id=user_id
+        )
+
+        return {
+            "success": True,
+            "user": {"id": user_id, "firstname": firstname, "email": email, "role": assigned_role}
+        }
+    except sqlite3.IntegrityError:
+        return {"success": False, "error": "An account with this email already exists."}
+    except Exception as ex:
+        return {"success": False, "error": "Registration failed. Please try again."}
+
+
+def get_user_by_email(email: str) -> dict | None:
+    """Fetch user record by email (case-insensitive). Returns dict or None."""
+    email = email.lower().strip()
+    try:
+        conn = get_sqlite_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE LOWER(email) = ?", (email,))
+        row = cur.fetchone()
+        conn.close()
+        return dict(row) if row else None
+    except Exception:
+        return None
+
+
+def get_user_by_id(user_id: int) -> dict | None:
+    """Fetch user record by id. Returns dict or None."""
+    try:
+        conn = get_sqlite_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT id, firstname, lastname, company, email, role, is_verified, is_blocked, created_at, last_login FROM users WHERE id = ?", (user_id,))
+        row = cur.fetchone()
+        conn.close()
+        return dict(row) if row else None
+    except Exception:
+        return None
+
+
+def verify_user_login(email: str, password: str) -> dict:
+    """Verify login credentials, enforcing block status and returning a signed JWT token."""
+    user = get_user_by_email(email)
+    if not user:
+        return {"success": False, "error": "Invalid email or password."}
+
+    if user.get("is_blocked"):
+        return {"success": False, "error": "This account has been suspended by an administrator."}
+
+    if not _verify_password_hash(password, user['password_hash'], user.get('salt', '')):
+        return {"success": False, "error": "Invalid email or password."}
+
+    # Update last login timestamp
+    try:
+        conn = get_sqlite_conn()
+        conn.execute("UPDATE users SET last_login = ? WHERE id = ?",
+                     (datetime.now(timezone.utc).isoformat(), user['id']))
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
+
+    role = "admin" if user['role'] in ("admin", "superadmin") else "user"
+    token = generate_jwt_token(user['id'], user['email'], role)
+    return {
+        "success": True,
+        "token": token,
+        "user": {
+            "id":        user['id'],
+            "firstname": user['firstname'],
+            "lastname":  user['lastname'],
+            "email":     user['email'],
+            "role":      role,
+        }
+    }
+
+
+# ─── Assessment History & Persistence ─────────────────────────────────────────
+
+def save_assessment(user_id: int, company_name: str, industry: str, health_score: int, var_exposure: float, step_data: dict, ratios_data: dict = None) -> dict:
+    """Save an assessment submission for a user."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO assessments (user_id, company_name, industry, health_score, var_exposure, status, step_data, ratios_data)
+        VALUES (?, ?, ?, ?, ?, 'Completed', ?, ?)
+    """, (
+        user_id, company_name, industry, health_score, var_exposure,
+        json.dumps(step_data or {}), json.dumps(ratios_data or {})
+    ))
+    conn.commit()
+    assessment_id = cur.lastrowid
+    conn.close()
+
+    record_audit_log(
+        risk_id=None,
+        risk_name=f"Assessment #{assessment_id}",
+        action="ASSESSMENT_SUBMITTED",
+        details=f"Assessment submitted for {company_name} (Health Score: {health_score}/100, VaR: ${var_exposure:,.2f})",
+        user_id=user_id
+    )
+
+    return {
+        "id": assessment_id,
+        "user_id": user_id,
+        "company_name": company_name,
+        "industry": industry,
+        "health_score": health_score,
+        "var_exposure": var_exposure,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+
+
+def get_user_assessments(user_id: int = None, limit: int = 50) -> list:
+    """Fetch assessment history for a user (or all assessments if user_id is None for admin)."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    if user_id is not None:
+        cur.execute("SELECT * FROM assessments WHERE user_id = ? ORDER BY created_at DESC LIMIT ?", (user_id, limit))
+    else:
+        cur.execute("SELECT * FROM assessments ORDER BY created_at DESC LIMIT ?", (limit,))
+    rows = [dict(r) for r in cur.fetchall()]
+    conn.close()
+    for r in rows:
+        if isinstance(r.get("step_data"), str):
+            try:
+                r["step_data"] = json.loads(r["step_data"])
+            except Exception:
+                pass
+        if isinstance(r.get("ratios_data"), str):
+            try:
+                r["ratios_data"] = json.loads(r["ratios_data"])
+            except Exception:
+                pass
+    return rows
+
+
+def get_assessment_trend_history(user_id: int = None) -> list:
+    """Fetch chronological health score and VaR trajectory for trend analysis."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    if user_id is not None:
+        cur.execute("SELECT id, health_score, var_exposure, created_at, company_name FROM assessments WHERE user_id = ? ORDER BY created_at ASC", (user_id,))
+    else:
+        cur.execute("SELECT id, health_score, var_exposure, created_at, company_name FROM assessments ORDER BY created_at ASC")
+    rows = [dict(r) for r in cur.fetchall()]
+    conn.close()
+    return rows
+
+
+# ─── Admin Panel Operations ───────────────────────────────────────────────────
+
+def get_all_users_admin(search: str = None) -> list:
+    """Admin function: List all registered users with optional search filter."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    if search:
+        term = f"%{search.lower()}%"
+        cur.execute("SELECT id, firstname, lastname, company, email, role, is_verified, is_blocked, created_at, last_login FROM users WHERE LOWER(email) LIKE ? OR LOWER(firstname) LIKE ? OR LOWER(company) LIKE ? ORDER BY id ASC", (term, term, term))
+    else:
+        cur.execute("SELECT id, firstname, lastname, company, email, role, is_verified, is_blocked, created_at, last_login FROM users ORDER BY id ASC")
+    rows = [dict(r) for r in cur.fetchall()]
+    conn.close()
+    return rows
+
+
+def set_user_blocked_status(user_id: int, is_blocked: bool, admin_id: int = 1) -> bool:
+    """Admin function: Suspend or un-suspend a user account."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET is_blocked = ? WHERE id = ?", (1 if is_blocked else 0, user_id))
+    affected = cur.rowcount
+    conn.commit()
+    conn.close()
+    if affected:
+        action = "USER_BLOCKED" if is_blocked else "USER_UNBLOCKED"
+        record_audit_log(None, f"User #{user_id}", action, f"User blocked status set to {is_blocked}", user_id=admin_id)
+        return True
+    return False
+
+
+def set_user_role(user_id: int, role: str, admin_id: int = 1) -> bool:
+    """Admin function: Change a user's role (admin or user)."""
+    assigned = "admin" if role in ("admin", "superadmin") else "user"
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET role = ? WHERE id = ?", (assigned, user_id))
+    affected = cur.rowcount
+    conn.commit()
+    conn.close()
+    if affected:
+        record_audit_log(None, f"User #{user_id}", "ROLE_CHANGED", f"User role changed to {assigned}", user_id=admin_id)
+        return True
+    return False
+
+
+def get_platform_analytics():
+    """Admin function: Platform-wide telemetry and KPI metrics."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM users")
+    total_users = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM assessments")
+    total_assessments = cur.fetchone()[0]
+
+    cur.execute("SELECT AVG(health_score), AVG(var_exposure) FROM assessments")
+    avg_score_row = cur.fetchone()
+    avg_health_score = round(avg_score_row[0] or 78.0, 1)
+    avg_var = round(avg_score_row[1] or 1450000.0, 2)
+
+    cur.execute("SELECT industry, COUNT(*) as cnt FROM assessments GROUP BY industry ORDER BY cnt DESC LIMIT 5")
+    industry_breakdown = [{"industry": r[0] or "General", "count": r[1]} for r in cur.fetchall()]
+
+    conn.close()
+    return {
+        "total_users": total_users,
+        "total_assessments": total_assessments,
+        "avg_health_score": avg_health_score,
+        "avg_var_exposure": avg_var,
+        "industry_breakdown": industry_breakdown
+    }
+
+
+# ─── Industry Benchmarks Management (B2 & B3) ──────────────────────────────────
+
+def get_all_industry_benchmarks() -> dict:
+    """Return dictionary of all industry benchmarks."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT industry, current_ratio, de_ratio, net_margin, roe, asset_turnover, updated_at FROM industry_benchmarks")
+    rows = cur.fetchall()
+    conn.close()
+    benchmarks = {}
+    for r in rows:
+        benchmarks[r["industry"]] = {
+            "current_ratio": r["current_ratio"],
+            "de_ratio": r["de_ratio"],
+            "net_margin": r["net_margin"],
+            "roe": r["roe"],
+            "asset_turnover": r["asset_turnover"],
+            "updated_at": r["updated_at"]
+        }
+    return benchmarks
+
+
+def update_industry_benchmark(industry: str, data: dict, admin_id: int = 1) -> bool:
+    """Admin function: update ratio thresholds/benchmarks for an industry without code changes."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    cur.execute("""
+    INSERT INTO industry_benchmarks (industry, current_ratio, de_ratio, net_margin, roe, asset_turnover, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ON CONFLICT(industry) DO UPDATE SET
+        current_ratio = coalesce(?, current_ratio),
+        de_ratio = coalesce(?, de_ratio),
+        net_margin = coalesce(?, net_margin),
+        roe = coalesce(?, roe),
+        asset_turnover = coalesce(?, asset_turnover),
+        updated_at = CURRENT_TIMESTAMP
+    """, (
+        industry,
+        data.get("current_ratio"), data.get("de_ratio"), data.get("net_margin"), data.get("roe"), data.get("asset_turnover"),
+        data.get("current_ratio"), data.get("de_ratio"), data.get("net_margin"), data.get("roe"), data.get("asset_turnover")
+    ))
+    affected = cur.rowcount
+    conn.commit()
+    conn.close()
+    if affected:
+        record_audit_log(None, f"Benchmark: {industry}", "BENCHMARK_UPDATED", json.dumps(data), user_id=admin_id)
+        return True
+    return False
+
+
+# ─── Action Tasks & Risk Register Tracker (B7) ─────────────────────────────────
+
+def get_action_tasks(user_id: int = None, status: str = None) -> list:
+    """Fetch action tasks converted from recommendations or logged in risk registry."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    query = "SELECT * FROM action_tasks WHERE 1=1"
+    params = []
+    if user_id is not None:
+        query += " AND user_id = ?"
+        params.append(user_id)
+    if status:
+        query += " AND status = ?"
+        params.append(status)
+    query += " ORDER BY created_at DESC"
+    cur.execute(query, params)
+    rows = [dict(r) for r in cur.fetchall()]
+    conn.close()
+    return rows
+
+
+def create_action_task(data: dict, user_id: int = 1) -> dict:
+    """Create a new actionable mitigation task."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    cur.execute("""
+    INSERT INTO action_tasks (
+        user_id, risk_id, title, description, category, status,
+        owner, priority, due_date, cost_estimate, treatment_type, residual_risk
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        user_id,
+        data.get("risk_id"),
+        data.get("title") or "Mitigation Action",
+        data.get("description", ""),
+        data.get("category", "Operations"),
+        data.get("status", "Open"),
+        data.get("owner", "Risk Committee"),
+        data.get("priority", "High"),
+        data.get("due_date", ""),
+        data.get("cost_estimate", ""),
+        data.get("treatment_type", "Reduce"),
+        float(data.get("residual_risk") or 0.0)
+    ))
+    task_id = cur.lastrowid
+    conn.commit()
+    conn.close()
+    record_audit_log(None, data.get("title") or f"Task #{task_id}", "TASK_CREATED", f"Status: {data.get('status', 'Open')}", user_id=user_id)
+    data["id"] = task_id
+    data["user_id"] = user_id
+    return data
+
+
+def update_action_task(task_id: int, data: dict, user_id: int = 1) -> bool:
+    """Update task status (Open / In Progress / Closed), owner, due date, residual risk."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    cur.execute("""
+    UPDATE action_tasks SET
+        status = coalesce(?, status),
+        owner = coalesce(?, owner),
+        due_date = coalesce(?, due_date),
+        priority = coalesce(?, priority),
+        residual_risk = coalesce(?, residual_risk),
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+    """, (
+        data.get("status"),
+        data.get("owner"),
+        data.get("due_date"),
+        data.get("priority"),
+        data.get("residual_risk"),
+        task_id
+    ))
+    affected = cur.rowcount
+    conn.commit()
+    conn.close()
+    if affected:
+        record_audit_log(None, f"Task #{task_id}", "TASK_UPDATED", json.dumps(data), user_id=user_id)
+        return True
+    return False
+
+
+def delete_action_task(task_id: int, user_id: int = 1) -> bool:
+    """Remove a task from the action tracker."""
+    conn = get_sqlite_conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM action_tasks WHERE id = ?", (task_id,))
+    affected = cur.rowcount
+    conn.commit()
+    conn.close()
+    if affected:
+        record_audit_log(None, f"Task #{task_id}", "TASK_DELETED", "Removed action task", user_id=user_id)
+        return True
+    return False

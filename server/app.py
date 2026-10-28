@@ -14,16 +14,28 @@ import random
 import math
 import html
 import time
+import io
+import csv
 import traceback
 from collections import defaultdict
+from functools import wraps
 from urllib.parse import urlparse
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, Response
 from flask_cors import CORS
 from dotenv import load_dotenv
+SERVER_DIR = os.path.dirname(os.path.abspath(__file__))
+if SERVER_DIR not in sys.path:
+    sys.path.insert(0, SERVER_DIR)
+import numpy as np
 import database
+from services.financial_ratios import calculate_financial_ratios, calculate_altman_z, INDUSTRY_BENCHMARKS
+from services.rule_engine import evaluate_rules
+from services.stress_testing import run_stress_test, PRESET_SCENARIOS
+from services.explainability import explain_health_score
+from services.cyber_engine import calculate_cyber_posture
 
 # Load environment
-load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env'))
+load_dotenv(os.path.join(SERVER_DIR, '..', '.env'))
 
 if sys.platform.startswith('win'):
     try:
@@ -259,7 +271,16 @@ def apply_security_headers(response):
 # ─── Static File Serving with Sandboxed Boundary Validation ───────────────────
 
 @app.route("/")
-def index():
+@app.route("/home")
+@app.route("/home.html")
+def home():
+    """Serve public landing page."""
+    return send_from_directory(CLIENT_DIR, "home.html")
+
+
+@app.route("/dashboard")
+@app.route("/index.html")
+def dashboard():
     """Serve main dashboard client HTML."""
     return send_from_directory(CLIENT_DIR, "index.html")
 
@@ -607,55 +628,72 @@ def generate_ai_mitigation_plan_text(name, category, likelihood, impact, score, 
     )
 
 
-def run_monte_carlo(likelihood_val, impact_val, financial_base, iterations=3000):
-    """Run probabilistic trial simulation on exposure with bounded iterations."""
-    p = likelihood_val / 5.0
-    impact_factor = impact_val / 5.0
+def run_monte_carlo(likelihood_val, impact_val, financial_base, iterations=3000, seed=None):
+    """
+    Vectorized Monte Carlo Value-at-Risk (VaR) simulation using NumPy.
+    Mathematical Assumptions:
+    - Probability Calibration: Annual probability p = Likelihood / 5.0 (20% to 100%)
+    - Severity Distribution: Log-Normal LN(mu, sigma) with mu = ln(Impact/5.0 + 0.1), sigma = 0.35
+    - Trial Independence: Iteration trials are independently drawn from compound distribution.
+    """
+    if seed is not None:
+        np.random.seed(seed)
 
-    losses = []
-    for _ in range(iterations):
-        if random.random() < p:
-            severity = max(0.05, random.lognormvariate(math.log(impact_factor + 0.1), 0.35))
-            loss = financial_base * severity
-        else:
-            loss = 0.0
-        losses.append(round(loss, 2))
+    p = float(likelihood_val) / 5.0
+    impact_factor = float(impact_val) / 5.0
+    mu = float(np.log(impact_factor + 0.1))
+    sigma = 0.35
 
-    losses.sort()
+    events = np.random.rand(iterations) < p
+    severities = np.maximum(0.05, np.random.lognormal(mean=mu, sigma=sigma, size=iterations))
+    losses = np.where(events, float(financial_base) * severities, 0.0)
+    losses = np.sort(losses)
+
+    non_zero = losses[losses > 0]
     n = len(losses)
-    non_zero = [l for l in losses if l > 0]
+    mean_loss = float(np.mean(losses))
+    median_loss = float(np.median(losses))
+    var_95 = float(np.percentile(losses, 95))
+    worst_case = float(np.max(losses))
+    occurrence_rate = float(len(non_zero) / n * 100.0)
 
-    mean_loss = sum(losses) / n
-    var_95 = losses[int(n * 0.95)]
-    worst_case = losses[-1]
+    # 10 Histogram buckets
+    max_val = worst_case if worst_case > 0 else 1000.0
+    bins = np.linspace(0, max_val, 11)
+    counts, _ = np.histogram(losses, bins=bins)
 
-    # Histogram buckets (10 intervals)
-    max_loss = worst_case if worst_case > 0 else 1000
-    bucket_size = max_loss / 10
     histogram = []
     for i in range(10):
-        low_bound = i * bucket_size
-        high_bound = (i + 1) * bucket_size
-        count = sum(1 for l in losses if low_bound <= l < high_bound or (i == 9 and l >= low_bound))
+        low_bound = bins[i]
+        high_bound = bins[i+1]
+        cnt = int(counts[i])
         histogram.append({
             "range": f"${int(low_bound/1000)}k-${int(high_bound/1000)}k",
-            "frequency": count,
-            "percentage": round((count / n) * 100, 1)
+            "frequency": cnt,
+            "percentage": round((cnt / n) * 100, 1)
         })
 
     return {
         "iterations": iterations,
         "meanLoss": round(mean_loss, 2),
-        "medianLoss": round(losses[n // 2], 2),
+        "medianLoss": round(median_loss, 2),
         "valueAtRisk95": round(var_95, 2),
         "worstCase": round(worst_case, 2),
-        "occurrenceRate": round((len(non_zero) / n) * 100, 1),
-        "histogram": histogram
+        "occurrenceRate": round(occurrence_rate, 1),
+        "histogram": histogram,
+        "methodology": {
+            "distribution": "Log-Normal (LN)",
+            "mu_parameter": round(mu, 3),
+            "sigma_parameter": sigma,
+            "trial_probability": round(p, 2),
+            "confidence_level": "95%",
+            "model_type": "Compound Poisson-LogNormal Loss Process"
+        }
     }
 
 
 def generate_trend_forecast(current_score, trend="stable", velocity="Medium"):
-    """Generate 6-month projected risk trajectory with confidence band."""
+    """Generate 6-month projected risk trajectory with upper and lower confidence bands."""
     months = ["Month +1", "Month +2", "Month +3", "Month +4", "Month +5", "Month +6"]
     trend_slope = 0.8 if trend == "increasing" else (-0.7 if trend == "decreasing" else 0.0)
     velocity_mult = 1.3 if velocity == "Fast" else (1.0 if velocity == "Medium" else 0.7)
@@ -671,6 +709,496 @@ def generate_trend_forecast(current_score, trend="stable", velocity="Medium"):
             "lower": round(max(1.0, val - 1.2 - (i * 0.3)), 1)
         })
     return series
+
+
+# ─── Auth Middleware & Decorators ─────────────────────────────────────────────
+
+def get_current_user():
+    """Extract authenticated user from Authorization Bearer header or cookies."""
+    auth_header = request.headers.get("Authorization", "") or request.environ.get("HTTP_AUTHORIZATION", "")
+    token = ""
+    if auth_header.startswith("Bearer "):
+        token = auth_header[7:].strip()
+    elif "rg_token" in request.cookies:
+        token = request.cookies.get("rg_token")
+
+    if not token:
+        return None
+
+    payload = database.decode_jwt_token(token)
+    if payload:
+        try:
+            user_id = int(payload.get("sub"))
+        except (TypeError, ValueError):
+            user_id = payload.get("sub")
+        user = database.get_user_by_id(user_id)
+        if user and not user.get("is_blocked"):
+            return {
+                "id": user["id"],
+                "email": user["email"],
+                "role": user["role"],
+                "firstname": user["firstname"]
+            }
+    return None
+
+
+def require_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({"error": "Unauthorized: Access token is missing or expired.", "code": 401}), 401
+        request.current_user = user
+        return f(*args, **kwargs)
+    return decorated
+
+
+def require_role(required_role):
+    def decorator(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            user = get_current_user()
+            if not user:
+                return jsonify({"error": "Unauthorized: Access token is missing or expired.", "code": 401}), 401
+            if user.get("role") != required_role:
+                return jsonify({"error": f"Forbidden: This action requires '{required_role}' privileges.", "code": 403}), 403
+            request.current_user = user
+            return f(*args, **kwargs)
+        return decorated
+    return decorator
+
+
+# ─── Auth Routes ──────────────────────────────────────────────────────────────
+
+@app.route("/auth")
+@app.route("/auth.html")
+def serve_auth():
+    """Serve the login / signup page."""
+    return send_from_directory(CLIENT_DIR, "auth.html")
+
+
+@app.route("/api/auth/register", methods=["POST"])
+def auth_register():
+    """Register a new user account with secure bcrypt password hashing."""
+    if not check_rate_limit("write"):
+        return jsonify({"success": False, "error": "Too many requests. Please wait before retrying."}), 429
+
+    try:
+        data      = request.get_json(silent=True) or {}
+        firstname = sanitize_text(data.get("firstname", ""), max_length=80).strip()
+        lastname  = sanitize_text(data.get("lastname",  ""), max_length=80).strip()
+        company   = sanitize_text(data.get("company",   ""), max_length=120).strip()
+        email     = sanitize_text(data.get("email",     ""), max_length=200).strip().lower()
+        password  = str(data.get("password", "")).strip()
+
+        if not firstname:
+            return jsonify({"success": False, "error": "First name is required."}), 400
+        if not email or "@" not in email or "." not in email.split("@")[-1]:
+            return jsonify({"success": False, "error": "A valid email address is required."}), 400
+        if len(password) < 8:
+            return jsonify({"success": False, "error": "Password must be at least 8 characters long."}), 400
+        if len(password) > 128:
+            return jsonify({"success": False, "error": "Password is too long."}), 400
+
+        result = database.create_user(firstname, lastname, company, email, password, role="user")
+        status_code = 201 if result["success"] else 409
+        return jsonify(result), status_code
+
+    except Exception as e:
+        return mask_exception(e, "auth_register")
+
+
+@app.route("/api/auth/login", methods=["POST"])
+def auth_login():
+    """Authenticate user credentials and return a signed JWT token."""
+    if not check_rate_limit("write"):
+        return jsonify({"success": False, "error": "Too many requests. Please wait before retrying."}), 429
+
+    try:
+        data     = request.get_json(silent=True) or {}
+        email    = sanitize_text(data.get("email",    ""), max_length=200).strip().lower()
+        password = str(data.get("password", "")).strip()
+
+        if not email or not password:
+            return jsonify({"success": False, "error": "Email and password are required."}), 400
+
+        result = database.verify_user_login(email, password)
+        status_code = 200 if result["success"] else 401
+        return jsonify(result), status_code
+
+    except Exception as e:
+        return mask_exception(e, "auth_login")
+
+
+@app.route("/api/auth/me", methods=["GET"])
+@require_auth
+def auth_me():
+    """Return currently authenticated user profile."""
+    return jsonify({"success": True, "user": request.current_user})
+
+
+# ─── Audit Trail & Integrity Verification ─────────────────────────────────────
+
+@app.route("/api/audit-logs/verify", methods=["GET"])
+def verify_audit():
+    """Verify cryptographic hash chain integrity across all audit log records."""
+    try:
+        report = database.verify_audit_chain()
+        return jsonify(report)
+    except Exception as e:
+        return mask_exception(e, "verify_audit")
+
+
+# ─── Assessment History & Wizard Persistence ──────────────────────────────────
+
+@app.route("/api/assessments", methods=["POST"])
+def submit_assessment():
+    """Save an assessment submission with score, VaR, and step inputs."""
+    try:
+        data = request.get_json(silent=True) or {}
+        user = get_current_user()
+        user_id = user["id"] if user else 1
+
+        company_name = sanitize_text(data.get("company_name"), max_length=120, default="Enterprise Corp")
+        industry = sanitize_text(data.get("industry"), max_length=60, default="General")
+        health_score = sanitize_integer(data.get("health_score"), 0, 100, 75)
+        var_exposure = sanitize_number(data.get("var_exposure"), 0.0, 10_000_000_000.0, 1_000_000.0)
+        step_data = data.get("step_data") or {}
+        ratios_data = data.get("ratios_data") or {}
+
+        saved = database.save_assessment(user_id, company_name, industry, health_score, var_exposure, step_data, ratios_data)
+        return jsonify({"success": True, "assessment": saved}), 201
+    except Exception as e:
+        return mask_exception(e, "submit_assessment")
+
+
+@app.route("/api/assessments", methods=["GET"])
+def list_assessments():
+    """List assessments history for the current user (or all if admin)."""
+    try:
+        user = get_current_user()
+        user_id = user["id"] if user and user.get("role") != "admin" else None
+        assessments = database.get_user_assessments(user_id=user_id)
+        return jsonify(assessments)
+    except Exception as e:
+        return mask_exception(e, "list_assessments")
+
+
+@app.route("/api/assessments/history", methods=["GET"])
+def assessment_history():
+    """Fetch chronological health score and VaR trajectory for trend analysis."""
+    try:
+        user = get_current_user()
+        user_id = user["id"] if user and user.get("role") != "admin" else None
+        trend = database.get_assessment_trend_history(user_id=user_id)
+        return jsonify(trend)
+    except Exception as e:
+        return mask_exception(e, "assessment_history")
+
+
+# ─── Admin Panel Endpoints (Role-Protected) ───────────────────────────────────
+
+@app.route("/api/admin/users", methods=["GET"])
+@require_role("admin")
+def admin_list_users():
+    """List all registered platform users with optional search."""
+    try:
+        search = sanitize_text(request.args.get("search"), max_length=80)
+        users = database.get_all_users_admin(search=search)
+        return jsonify(users)
+    except Exception as e:
+        return mask_exception(e, "admin_list_users")
+
+
+@app.route("/api/admin/users/<int:user_id>/status", methods=["PUT"])
+@require_role("admin")
+def admin_set_user_status(user_id):
+    """Block or unblock a user."""
+    try:
+        data = request.get_json(silent=True) or {}
+        is_blocked = bool(data.get("is_blocked", False))
+        admin_id = request.current_user["id"]
+        success = database.set_user_blocked_status(user_id, is_blocked, admin_id=admin_id)
+        if not success:
+            return jsonify({"error": "User not found"}), 404
+        return jsonify({"success": True, "message": f"User #{user_id} status updated."})
+    except Exception as e:
+        return mask_exception(e, "admin_set_user_status")
+
+
+@app.route("/api/admin/users/<int:user_id>/role", methods=["PUT"])
+@require_role("admin")
+def admin_set_user_role(user_id):
+    """Change a user's role (admin or user)."""
+    try:
+        data = request.get_json(silent=True) or {}
+        role = sanitize_text(data.get("role"), max_length=20, default="user")
+        admin_id = request.current_user["id"]
+        success = database.set_user_role(user_id, role, admin_id=admin_id)
+        if not success:
+            return jsonify({"error": "User not found"}), 404
+        return jsonify({"success": True, "message": f"User #{user_id} role updated to '{role}'."})
+    except Exception as e:
+        return mask_exception(e, "admin_set_user_role")
+
+
+@app.route("/api/admin/assessments/export", methods=["GET"])
+@require_role("admin")
+def admin_export_assessments_csv():
+    """Export all platform submitted assessments as CSV."""
+    try:
+        assessments = database.get_user_assessments(user_id=None, limit=500)
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["Assessment ID", "User ID", "Company Name", "Industry", "Health Score", "VaR Exposure ($)", "Status", "Date Submitted"])
+        for a in assessments:
+            writer.writerow([
+                a.get("id"),
+                a.get("user_id"),
+                a.get("company_name"),
+                a.get("industry"),
+                a.get("health_score"),
+                a.get("var_exposure"),
+                a.get("status"),
+                a.get("created_at")
+            ])
+        output.seek(0)
+        return Response(
+            output.getvalue(),
+            mimetype="text/csv",
+            headers={"Content-Disposition": "attachment; filename=enterprise_risk_assessments.csv"}
+        )
+    except Exception as e:
+        return mask_exception(e, "admin_export_assessments_csv")
+
+
+@app.route("/api/admin/analytics", methods=["GET"])
+@require_role("admin")
+def admin_platform_analytics():
+    """Return platform-wide operational metrics and telemetry."""
+    try:
+        analytics = database.get_platform_analytics()
+        return jsonify(analytics)
+    except Exception as e:
+        return mask_exception(e, "admin_platform_analytics")
+
+
+# ─── B2 & B3: Industry Benchmarks & Financial Ratio Engine ─────────────────────
+
+@app.route("/api/benchmarks", methods=["GET"])
+def get_benchmarks():
+    """Fetch stored industry ratio benchmarks."""
+    try:
+        benchmarks = database.get_all_industry_benchmarks()
+        if not benchmarks:
+            benchmarks = INDUSTRY_BENCHMARKS
+        return jsonify({"success": True, "benchmarks": benchmarks})
+    except Exception as e:
+        return mask_exception(e, "get_benchmarks")
+
+
+@app.route("/api/benchmarks/<string:industry>", methods=["PUT", "POST"])
+@require_role("admin")
+def update_benchmark(industry):
+    """Admin function: update ratio thresholds/benchmarks for an industry without code changes."""
+    try:
+        data = request.get_json() or {}
+        admin_id = getattr(request, "current_user", {}).get("id", 1)
+        success = database.update_industry_benchmark(industry, data, admin_id=admin_id)
+        if not success:
+            return jsonify({"error": "Failed to update industry benchmark"}), 400
+        return jsonify({"success": True, "message": f"Benchmark for industry '{industry}' updated successfully."})
+    except Exception as e:
+        return mask_exception(e, "update_benchmark")
+
+
+@app.route("/api/ratios/calculate", methods=["POST"])
+def api_calculate_ratios():
+    """Calculate institutional financial ratios, Altman Z-Score, flags, and benchmark comparisons."""
+    try:
+        body = request.get_json() or {}
+        data = body.get("data", body)
+        industry = body.get("industry") or data.get("industry") or "General"
+        results = calculate_financial_ratios(data, industry=industry)
+        return jsonify({"success": True, "results": results})
+    except Exception as e:
+        return mask_exception(e, "calculate_ratios")
+
+
+# ─── B4: Rule-Based Solutions Engine ───────────────────────────────────────────
+
+@app.route("/api/solutions/recommend", methods=["POST"])
+def api_solutions_recommend():
+    """Generate ISO 31000 actionable 3-tier treatment recommendations from calculated ratios."""
+    try:
+        body = request.get_json() or {}
+        ratios = body.get("ratios", {})
+        cyber_data = body.get("cyber_data")
+        operational_data = body.get("operational_data")
+        solutions = evaluate_rules(ratios, cyber_data=cyber_data, operational_data=operational_data)
+        return jsonify({"success": True, "solutions": solutions, "count": len(solutions)})
+    except Exception as e:
+        return mask_exception(e, "solutions_recommend")
+
+
+# ─── B5: What-If Analysis & Macroeconomic Stress Testing ────────────────────────
+
+@app.route("/api/stress-test/presets", methods=["GET"])
+def get_stress_presets():
+    """Return standard stress test preset scenario configurations."""
+    return jsonify({"success": True, "presets": PRESET_SCENARIOS})
+
+
+@app.route("/api/stress-test", methods=["POST"])
+def api_stress_test():
+    """Execute dynamic what-if stress simulation across financial & cyber shock sliders."""
+    try:
+        body = request.get_json() or {}
+        base_fin = body.get("base_financials", {})
+        base_score = float(body.get("base_health_score", 78.0))
+        base_var = float(body.get("base_var_exposure", 1450000.0))
+        rev_shock = float(body.get("revenue_shock_pct", 0.0))
+        debt_inc = float(body.get("debt_increase_pct", 0.0))
+        cost_inf = float(body.get("cost_inflation_pct", 0.0))
+        cyber_mult = float(body.get("cyber_multiplier", 1.0))
+        dso_ext = float(body.get("dso_extension_days", 0.0))
+        extra_loss = float(body.get("extra_loss_outlay", 0.0))
+        industry = body.get("industry", "General")
+        iterations = min(10000, max(1000, int(body.get("iterations", 3000))))
+
+        result = run_stress_test(
+            base_financials=base_fin,
+            base_health_score=base_score,
+            base_var_exposure=base_var,
+            revenue_shock_pct=rev_shock,
+            debt_increase_pct=debt_inc,
+            cost_inflation_pct=cost_inf,
+            cyber_multiplier=cyber_mult,
+            dso_extension_days=dso_ext,
+            extra_loss_outlay=extra_loss,
+            industry=industry,
+            iterations=iterations
+        )
+        return jsonify({"success": True, "stress_results": result})
+    except Exception as e:
+        return mask_exception(e, "stress_test")
+
+
+# ─── B6: Explainable Risk Score & Waterfall Breakdown ─────────────────────────
+
+@app.route("/api/score/explain", methods=["POST"])
+def api_explain_score():
+    """Decompose enterprise health score into explainable domain contributions and waterfall steps."""
+    try:
+        body = request.get_json() or {}
+        assessment = body.get("assessment", {})
+        ratios = body.get("ratios")
+        explanation = explain_health_score(assessment, ratios)
+        return jsonify({"success": True, "explanation": explanation})
+    except Exception as e:
+        return mask_exception(e, "explain_score")
+
+
+@app.route("/api/assessments/<int:assessment_id>/explain", methods=["GET"])
+def api_explain_assessment(assessment_id):
+    """Retrieve explainable score waterfall for a saved assessment ID."""
+    try:
+        assessments = database.get_user_assessments(user_id=None, limit=200)
+        found = next((a for a in assessments if a.get("id") == assessment_id), None)
+        if not found:
+            return jsonify({"error": "Assessment not found"}), 404
+        ratios = found.get("ratios_data")
+        explanation = explain_health_score(found, ratios)
+        return jsonify({"success": True, "explanation": explanation})
+    except Exception as e:
+        return mask_exception(e, "explain_assessment")
+
+
+# ─── B7: Risk Register & Action Tracker Tasks ─────────────────────────────────
+
+@app.route("/api/tasks", methods=["GET"])
+def api_get_tasks():
+    """List action mitigation tasks for current user or all tasks for admin."""
+    try:
+        user_id = None
+        # If authenticated, filter by user unless admin
+        token = request.headers.get("Authorization", "").replace("Bearer ", "").strip()
+        if token:
+            user = database.verify_session_token(token)
+            if user and user.get("role") != "admin":
+                user_id = user["id"]
+        status = request.args.get("status")
+        tasks = database.get_action_tasks(user_id=user_id, status=status)
+        return jsonify({"success": True, "tasks": tasks, "count": len(tasks)})
+    except Exception as e:
+        return mask_exception(e, "get_tasks")
+
+
+@app.route("/api/tasks", methods=["POST"])
+def api_create_task():
+    """Create a new mitigation task or convert recommendation into a task."""
+    try:
+        data = request.get_json() or {}
+        user_id = 1
+        token = request.headers.get("Authorization", "").replace("Bearer ", "").strip()
+        if token:
+            user = database.verify_session_token(token)
+            if user:
+                user_id = user["id"]
+        task = database.create_action_task(data, user_id=user_id)
+        return jsonify({"success": True, "task": task}), 201
+    except Exception as e:
+        return mask_exception(e, "create_task")
+
+
+@app.route("/api/tasks/<int:task_id>", methods=["PUT"])
+def api_update_task(task_id):
+    """Update task status (Open / In Progress / Closed), owner, due date, residual risk."""
+    try:
+        data = request.get_json() or {}
+        user_id = 1
+        token = request.headers.get("Authorization", "").replace("Bearer ", "").strip()
+        if token:
+            user = database.verify_session_token(token)
+            if user:
+                user_id = user["id"]
+        success = database.update_action_task(task_id, data, user_id=user_id)
+        if not success:
+            return jsonify({"error": "Task not found or update failed"}), 404
+        return jsonify({"success": True, "message": "Task updated successfully."})
+    except Exception as e:
+        return mask_exception(e, "update_task")
+
+
+@app.route("/api/tasks/<int:task_id>", methods=["DELETE"])
+def api_delete_task(task_id):
+    """Delete a task from the action tracker."""
+    try:
+        user_id = 1
+        token = request.headers.get("Authorization", "").replace("Bearer ", "").strip()
+        if token:
+            user = database.verify_session_token(token)
+            if user:
+                user_id = user["id"]
+        success = database.delete_action_task(task_id, user_id=user_id)
+        if not success:
+            return jsonify({"error": "Task not found"}), 404
+        return jsonify({"success": True, "message": "Task deleted."})
+    except Exception as e:
+        return mask_exception(e, "delete_task")
+
+
+# ─── B9: Cybersecurity Posture Risk Module ─────────────────────────────────────
+
+@app.route("/api/cyber/evaluate", methods=["POST"])
+def api_cyber_evaluate():
+    """Evaluate CVSS-style cyber posture, ALE, SLE, and NIST recommendations."""
+    try:
+        body = request.get_json() or {}
+        posture = calculate_cyber_posture(body)
+        return jsonify({"success": True, "cyber_posture": posture})
+    except Exception as e:
+        return mask_exception(e, "cyber_evaluate")
 
 
 if __name__ == "__main__":
