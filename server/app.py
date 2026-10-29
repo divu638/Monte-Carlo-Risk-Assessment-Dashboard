@@ -33,6 +33,7 @@ from services.rule_engine import evaluate_rules
 from services.stress_testing import run_stress_test, PRESET_SCENARIOS
 from services.explainability import explain_health_score
 from services.cyber_engine import calculate_cyber_posture
+from services.statement_parser import parse_financial_csv, generate_sample_csv
 
 # Load environment
 load_dotenv(os.path.join(SERVER_DIR, '..', '.env'))
@@ -359,9 +360,11 @@ def configure_supabase():
 
 @app.route("/api/stats", methods=["GET"])
 def get_stats():
-    """Retrieve executive KPIs, distribution, and health score."""
+    """Retrieve executive KPIs, distribution, and health score scoped to current user or admin."""
     try:
-        stats = database.get_dashboard_stats()
+        user = get_current_user()
+        user_id = None if (user and user.get("role") == "admin") else (user["id"] if user else 1)
+        stats = database.get_dashboard_stats(user_id=user_id)
         return jsonify(stats)
     except Exception as e:
         return mask_exception(e, "get_stats")
@@ -369,14 +372,17 @@ def get_stats():
 
 @app.route("/api/risks", methods=["GET"])
 def list_risks():
-    """Retrieve risks with sanitized optional filters (category, level, status, search)."""
+    """Retrieve risks with sanitized optional filters (category, level, status, search) and user isolation."""
     try:
+        user = get_current_user()
+        user_id = None if (user and user.get("role") == "admin") else (user["id"] if user else 1)
+
         category = sanitize_text(request.args.get("category"), max_length=50) or None
         level = sanitize_text(request.args.get("level"), max_length=20) or None
         status = sanitize_text(request.args.get("status"), max_length=20) or None
         search = sanitize_text(request.args.get("search"), max_length=80) or None
 
-        risks = database.get_all_risks(category=category, level=level, status=status, search=search)
+        risks = database.get_all_risks(category=category, level=level, status=status, search=search, user_id=user_id)
         return jsonify(risks)
     except Exception as e:
         return mask_exception(e, "list_risks")
@@ -409,8 +415,11 @@ def get_risk(risk_id):
 
 @app.route("/api/risks", methods=["POST"])
 def add_risk():
-    """Create a new risk in database with sanitized inputs and audit log."""
+    """Create a new risk in database with sanitized inputs, audit log, and user ownership."""
     try:
+        user = get_current_user()
+        user_id = user["id"] if user else 1
+
         data = request.get_json(silent=True) or {}
         name = sanitize_text(data.get("name"), max_length=150)
         if not name:
@@ -431,7 +440,7 @@ def add_risk():
             "action_plan": sanitize_text(data.get("action_plan"), max_length=2000)
         }
 
-        new_risk = database.create_risk(sanitized_data)
+        new_risk = database.create_risk(sanitized_data, user_id=user_id)
         return jsonify(new_risk), 201
     except Exception as e:
         return mask_exception(e, "add_risk")
@@ -439,10 +448,14 @@ def add_risk():
 
 @app.route("/api/risks/<int:risk_id>", methods=["PUT"])
 def update_risk(risk_id):
-    """Update risk details and audit trail with sanitized inputs."""
+    """Update risk details and audit trail with sanitized inputs and user ownership validation."""
     try:
         if risk_id < 1 or risk_id > 1000000:
             return jsonify({"error": "Invalid risk identifier"}), 400
+
+        user = get_current_user()
+        user_id = user["id"] if user else 1
+        is_admin = bool(user and user.get("role") == "admin")
 
         data = request.get_json(silent=True) or {}
         if not data:
@@ -474,9 +487,9 @@ def update_risk(risk_id):
         if "action_plan" in data:
             sanitized_data["action_plan"] = sanitize_text(data.get("action_plan"), max_length=2000)
 
-        updated = database.update_risk(risk_id, sanitized_data)
+        updated = database.update_risk(risk_id, sanitized_data, user_id=user_id, is_admin=is_admin)
         if not updated:
-            return jsonify({"error": "Risk not found"}), 404
+            return jsonify({"error": "Risk not found or unauthorized to modify."}), 404
         return jsonify(updated)
     except Exception as e:
         return mask_exception(e, f"update_risk #{risk_id}")
@@ -484,14 +497,18 @@ def update_risk(risk_id):
 
 @app.route("/api/risks/<int:risk_id>", methods=["DELETE"])
 def delete_risk(risk_id):
-    """Remove a risk from database with audit event logging."""
+    """Remove a risk from database with audit event logging and ownership validation."""
     try:
         if risk_id < 1 or risk_id > 1000000:
             return jsonify({"error": "Invalid risk identifier"}), 400
 
-        success = database.delete_risk(risk_id)
+        user = get_current_user()
+        user_id = user["id"] if user else 1
+        is_admin = bool(user and user.get("role") == "admin")
+
+        success = database.delete_risk(risk_id, user_id=user_id, is_admin=is_admin)
         if not success:
-            return jsonify({"error": "Risk not found"}), 404
+            return jsonify({"error": "Risk not found or unauthorized to delete."}), 404
         return jsonify({"success": True, "message": f"Risk #{risk_id} removed successfully."})
     except Exception as e:
         return mask_exception(e, f"delete_risk #{risk_id}")
@@ -499,9 +516,11 @@ def delete_risk(risk_id):
 
 @app.route("/api/matrix", methods=["GET"])
 def get_matrix():
-    """Retrieve 5x5 matrix populated with active risks."""
+    """Retrieve 5x5 matrix populated with active risks scoped to user."""
     try:
-        matrix_data = database.get_matrix_data()
+        user = get_current_user()
+        user_id = None if (user and user.get("role") == "admin") else (user["id"] if user else 1)
+        matrix_data = database.get_matrix_data(user_id=user_id)
         return jsonify(matrix_data)
     except Exception as e:
         return mask_exception(e, "get_matrix")
@@ -509,9 +528,13 @@ def get_matrix():
 
 @app.route("/api/audit-logs", methods=["GET"])
 def get_audit_trail():
-    """Retrieve recent database audit activity trail."""
+    """Retrieve recent database audit activity trail with optional filtering."""
     try:
-        logs = database.get_audit_logs()
+        user_id = request.args.get("user_id", type=int)
+        action = sanitize_text(request.args.get("action"), max_length=40) or None
+        date = sanitize_text(request.args.get("date"), max_length=30) or None
+        limit = sanitize_integer(request.args.get("limit"), 10, 200, 50)
+        logs = database.get_audit_logs(limit=limit, user_id=user_id, action=action, date=date)
         return jsonify(logs)
     except Exception as e:
         return mask_exception(e, "get_audit_trail")
@@ -779,7 +802,7 @@ def serve_auth():
 
 @app.route("/api/auth/register", methods=["POST"])
 def auth_register():
-    """Register a new user account with secure bcrypt password hashing."""
+    """Register a new user account with secure bcrypt password hashing and strength validation."""
     if not check_rate_limit("write"):
         return jsonify({"success": False, "error": "Too many requests. Please wait before retrying."}), 429
 
@@ -795,10 +818,10 @@ def auth_register():
             return jsonify({"success": False, "error": "First name is required."}), 400
         if not email or "@" not in email or "." not in email.split("@")[-1]:
             return jsonify({"success": False, "error": "A valid email address is required."}), 400
-        if len(password) < 8:
-            return jsonify({"success": False, "error": "Password must be at least 8 characters long."}), 400
-        if len(password) > 128:
-            return jsonify({"success": False, "error": "Password is too long."}), 400
+
+        is_strong, err_msg = database.validate_password_strength(password)
+        if not is_strong:
+            return jsonify({"success": False, "error": err_msg}), 400
 
         result = database.create_user(firstname, lastname, company, email, password, role="user")
         status_code = 201 if result["success"] else 409
@@ -810,7 +833,7 @@ def auth_register():
 
 @app.route("/api/auth/login", methods=["POST"])
 def auth_login():
-    """Authenticate user credentials and return a signed JWT token."""
+    """Authenticate user credentials with lockout protection, optional TOTP MFA, and signed JWT."""
     if not check_rate_limit("write"):
         return jsonify({"success": False, "error": "Too many requests. Please wait before retrying."}), 429
 
@@ -818,13 +841,27 @@ def auth_login():
         data     = request.get_json(silent=True) or {}
         email    = sanitize_text(data.get("email",    ""), max_length=200).strip().lower()
         password = str(data.get("password", "")).strip()
+        mfa_code = sanitize_text(data.get("mfa_code", ""), max_length=10).strip() or None
 
         if not email or not password:
             return jsonify({"success": False, "error": "Email and password are required."}), 400
 
-        result = database.verify_user_login(email, password)
-        status_code = 200 if result["success"] else 401
-        return jsonify(result), status_code
+        result = database.verify_user_login(email, password, mfa_code=mfa_code)
+        if not result.get("success"):
+            status_code = 401 if not result.get("mfa_required") else 200
+            return jsonify(result), status_code
+
+        response = jsonify(result)
+        if "token" in result:
+            response.set_cookie(
+                "rg_token",
+                result["token"],
+                httponly=True,
+                samesite="Lax",
+                secure=request.is_secure,
+                max_age=86400 * 7
+            )
+        return response, 200
 
     except Exception as e:
         return mask_exception(e, "auth_login")
@@ -834,7 +871,70 @@ def auth_login():
 @require_auth
 def auth_me():
     """Return currently authenticated user profile."""
-    return jsonify({"success": True, "user": request.current_user})
+    mfa_info = database.get_user_mfa_status(request.current_user["id"])
+    return jsonify({
+        "success": True,
+        "user": {
+            **request.current_user,
+            "mfa_enabled": mfa_info.get("enabled", False)
+        }
+    })
+
+
+@app.route("/api/auth/mfa/setup", methods=["POST"])
+@require_auth
+def auth_mfa_setup():
+    """Generate high-entropy Base32 secret and provisioning URI for TOTP authenticator setup."""
+    try:
+        from services.mfa_service import generate_totp_secret, get_totp_provisioning_uri
+        secret = generate_totp_secret()
+        uri = get_totp_provisioning_uri(secret, request.current_user["email"])
+        return jsonify({
+            "success": True,
+            "secret": secret,
+            "provisioning_uri": uri
+        })
+    except Exception as e:
+        return mask_exception(e, "auth_mfa_setup")
+
+
+@app.route("/api/auth/mfa/enable", methods=["POST"])
+@require_auth
+def auth_mfa_enable():
+    """Verify submitted code and activate TOTP MFA for user."""
+    try:
+        from services.mfa_service import verify_totp_code
+        data = request.get_json(silent=True) or {}
+        secret = sanitize_text(data.get("secret", ""), max_length=64).strip()
+        code = sanitize_text(data.get("code", ""), max_length=10).strip()
+
+        if not secret or not code:
+            return jsonify({"success": False, "error": "Both MFA secret and verification code are required."}), 400
+
+        if not verify_totp_code(secret, code):
+            return jsonify({"success": False, "error": "Invalid TOTP verification code. Please check your authenticator clock."}), 400
+
+        database.set_user_mfa(request.current_user["id"], secret, enabled=True)
+        return jsonify({"success": True, "message": "Two-factor authentication successfully enabled."})
+    except Exception as e:
+        return mask_exception(e, "auth_mfa_enable")
+
+
+@app.route("/api/auth/mfa/disable", methods=["POST"])
+@require_auth
+def auth_mfa_disable():
+    """Disable TOTP MFA after verifying user password."""
+    try:
+        data = request.get_json(silent=True) or {}
+        password = str(data.get("password", "")).strip()
+        user_rec = database.get_user_by_id(request.current_user["id"])
+        if not user_rec or not database._verify_password_hash(password, user_rec["password_hash"], user_rec.get("salt", "")):
+            return jsonify({"success": False, "error": "Invalid password confirmation."}), 401
+
+        database.disable_user_mfa(request.current_user["id"])
+        return jsonify({"success": True, "message": "Two-factor authentication disabled."})
+    except Exception as e:
+        return mask_exception(e, "auth_mfa_disable")
 
 
 # ─── Audit Trail & Integrity Verification ─────────────────────────────────────
@@ -1199,6 +1299,59 @@ def api_cyber_evaluate():
         return jsonify({"success": True, "cyber_posture": posture})
     except Exception as e:
         return mask_exception(e, "cyber_evaluate")
+
+
+# ─── B10: Financial Statement CSV Upload & Parser ─────────────────────────────
+
+@app.route("/api/statements/template", methods=["GET"])
+def api_download_statement_template():
+    """Download standard CSV template for corporate financial statement upload."""
+    try:
+        csv_content = generate_sample_csv()
+        return Response(
+            csv_content,
+            mimetype="text/csv",
+            headers={"Content-Disposition": "attachment; filename=riskguard_financial_statement_template.csv"}
+        )
+    except Exception as e:
+        return mask_exception(e, "download_statement_template")
+
+
+@app.route("/api/statements/upload", methods=["POST"])
+def api_upload_statement():
+    """Parse uploaded corporate financial CSV and compute ratio analytics."""
+    try:
+        content = ""
+        if "file" in request.files:
+            file_obj = request.files["file"]
+            content = file_obj.read().decode("utf-8", errors="replace")
+        elif request.is_json:
+            body = request.get_json() or {}
+            content = body.get("content", "")
+        else:
+            content = request.get_data(as_text=True)
+
+        if not content or not content.strip():
+            return jsonify({"success": False, "error": "No CSV content provided"}), 400
+
+        metrics, warnings = parse_financial_csv(content)
+        if not metrics:
+            return jsonify({"success": False, "error": "Could not extract valid financial metrics from CSV", "warnings": warnings}), 400
+
+        industry = sanitize_text(request.args.get("industry") or "General", max_length=50)
+        ratios = calculate_financial_ratios(metrics, industry=industry)
+        altman = ratios.get("altman_z", {})
+
+        return jsonify({
+            "success": True,
+            "metrics": metrics,
+            "ratios": ratios,
+            "altman_z": altman,
+            "warnings": warnings,
+            "metrics_count": len(metrics)
+        })
+    except Exception as e:
+        return mask_exception(e, "upload_statement")
 
 
 if __name__ == "__main__":

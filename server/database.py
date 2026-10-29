@@ -9,6 +9,8 @@ import sqlite3
 import hashlib
 import secrets
 import json
+import time
+import math
 from datetime import datetime, timezone, timedelta
 import random
 from dotenv import load_dotenv
@@ -233,6 +235,16 @@ def _run_sqlite_migrations(conn):
     if "is_blocked" not in user_cols:
         try:
             cur.execute("ALTER TABLE users ADD COLUMN is_blocked INTEGER DEFAULT 0")
+        except Exception:
+            pass
+    if "mfa_secret" not in user_cols:
+        try:
+            cur.execute("ALTER TABLE users ADD COLUMN mfa_secret TEXT DEFAULT ''")
+        except Exception:
+            pass
+    if "mfa_enabled" not in user_cols:
+        try:
+            cur.execute("ALTER TABLE users ADD COLUMN mfa_enabled INTEGER DEFAULT 0")
         except Exception:
             pass
 
@@ -749,13 +761,15 @@ def seed_supabase_data(client):
 
 # ─── CRUD Operations (Unified for Supabase & SQLite) ─────────────────────────
 
-def get_all_risks(category=None, level=None, status=None, search=None):
-    """Retrieve risks with dynamic filtering from active engine."""
+def get_all_risks(category=None, level=None, status=None, search=None, user_id=None):
+    """Retrieve risks with dynamic filtering and user data isolation from active engine."""
     client = get_supabase_client() if _using_supabase else None
 
     if client:
         try:
             query = client.table('risks').select('*')
+            if user_id is not None:
+                query = query.eq('user_id', user_id)
             if category and category != "All":
                 query = query.eq('category', category)
             if level and level != "All":
@@ -776,6 +790,16 @@ def get_all_risks(category=None, level=None, status=None, search=None):
     cur = conn.cursor()
     query = "SELECT * FROM risks WHERE 1=1"
     params = []
+
+    if user_id is not None:
+        cur.execute("SELECT COUNT(*) FROM risks WHERE user_id = ?", (user_id,))
+        count = cur.fetchone()[0]
+        if count > 0:
+            query += " AND user_id = ?"
+            params.append(user_id)
+        else:
+            query += " AND (user_id = ? OR user_id = 1)"
+            params.append(user_id)
 
     if category and category != "All":
         query += " AND category = ?"
@@ -899,10 +923,14 @@ def create_risk(data, user_id=1):
     return get_risk_by_id(new_id)
 
 
-def update_risk(risk_id, data, user_id=1):
-    """Update an existing risk, recalculate score, and record audit trail."""
+def update_risk(risk_id, data, user_id=1, is_admin=False):
+    """Update an existing risk, recalculate score, and record audit trail with authorization check."""
     existing = get_risk_by_id(risk_id)
     if not existing:
+        return None
+
+    # Multi-user data protection: normal user can only update their own or initial template risks
+    if not is_admin and existing.get("user_id") not in (None, 1, user_id):
         return None
 
     likelihood = int(data.get("likelihood", existing["likelihood"]))
@@ -973,10 +1001,14 @@ def update_risk(risk_id, data, user_id=1):
     return get_risk_by_id(risk_id)
 
 
-def delete_risk(risk_id, user_id=1):
-    """Delete a risk from database and record audit event."""
+def delete_risk(risk_id, user_id=1, is_admin=False):
+    """Delete a risk from database and record audit event with authorization check."""
     existing = get_risk_by_id(risk_id)
     if not existing:
+        return False
+
+    # Multi-user data protection: normal user can only delete their own risks
+    if not is_admin and existing.get("user_id") not in (None, 1, user_id):
         return False
 
     client = get_supabase_client() if _using_supabase else None
@@ -1009,9 +1041,9 @@ def delete_risk(risk_id, user_id=1):
 
 # ─── Analytics, Matrix & Telemetry ───────────────────────────────────────────
 
-def get_dashboard_stats():
-    """Calculate executive KPI summary."""
-    all_risks = get_all_risks()
+def get_dashboard_stats(user_id=None):
+    """Calculate executive KPI summary with optional user data scoping."""
+    all_risks = get_all_risks(user_id=user_id)
     total_risks = len(all_risks)
     active_risks_list = [r for r in all_risks if r.get('status') != 'Closed']
     active_risks = len(active_risks_list)
@@ -1081,9 +1113,9 @@ def get_dashboard_stats():
     }
 
 
-def get_matrix_data():
-    """Group risks by Likelihood (1-5) and Impact (1-5) for 5x5 Matrix."""
-    risks = [r for r in get_all_risks() if r.get('status') != 'Closed']
+def get_matrix_data(user_id=None):
+    """Group risks by Likelihood (1-5) and Impact (1-5) for 5x5 Matrix with optional user data scoping."""
+    risks = [r for r in get_all_risks(user_id=user_id) if r.get('status') != 'Closed']
 
     matrix_cells = {}
     for l in range(1, 6):
@@ -1106,10 +1138,10 @@ def get_matrix_data():
     return list(matrix_cells.values())
 
 
-def get_audit_logs(limit=30):
-    """Get recent audit activity trail."""
+def get_audit_logs(limit=50, user_id=None, action=None, date=None):
+    """Get audit activity trail with optional filtering by user, action, and date."""
     client = get_supabase_client() if _using_supabase else None
-    if client:
+    if client and not user_id and not action and not date:
         try:
             res = client.table('audit_logs').select('*').order('created_at', desc=True).limit(limit).execute()
             return res.data or []
@@ -1118,7 +1150,23 @@ def get_audit_logs(limit=30):
 
     conn = get_sqlite_conn()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT ?", (limit,))
+    query = "SELECT * FROM audit_logs WHERE 1=1"
+    params = []
+
+    if user_id:
+        query += " AND user_id = ?"
+        params.append(user_id)
+    if action and action != "All":
+        query += " AND action = ?"
+        params.append(action)
+    if date:
+        query += " AND created_at LIKE ?"
+        params.append(f"{date}%")
+
+    query += " ORDER BY created_at DESC LIMIT ?"
+    params.append(limit)
+
+    cur.execute(query, params)
     rows = [dict(r) for r in cur.fetchall()]
     conn.close()
     return rows
@@ -1318,6 +1366,54 @@ def generate_session_token(user_id: int) -> str:
     return hashlib.sha256(raw.encode()).hexdigest() + secrets.token_hex(16)
 
 
+LOGIN_FAILED_ATTEMPTS = {}  # email -> {"count": int, "locked_until": float}
+MAX_FAILED_LOGINS = 5
+LOCKOUT_DURATION_SECONDS = 900  # 15 minutes
+
+
+def validate_password_strength(password: str) -> tuple[bool, str]:
+    """Validate enterprise password complexity rules."""
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long."
+    if len(password) > 128:
+        return False, "Password is too long (max 128 characters)."
+    if not any(c.isupper() for c in password):
+        return False, "Password must contain at least one uppercase letter (A-Z)."
+    if not any(c.islower() for c in password):
+        return False, "Password must contain at least one lowercase letter (a-z)."
+    if not any(c.isdigit() for c in password):
+        return False, "Password must contain at least one number (0-9)."
+    return True, ""
+
+
+def _record_failed_login(clean_email: str, now: float) -> int:
+    rec = LOGIN_FAILED_ATTEMPTS.setdefault(clean_email, {"count": 0, "locked_until": 0.0})
+    rec["count"] += 1
+    if rec["count"] >= MAX_FAILED_LOGINS:
+        rec["locked_until"] = now + LOCKOUT_DURATION_SECONDS
+        return 0
+    return MAX_FAILED_LOGINS - rec["count"]
+
+
+def clone_starter_risks_for_user(conn, user_id: int):
+    """Clone standard starter risk suite for newly registered user so they own their data."""
+    try:
+        cur = conn.cursor()
+        for r in ENTERPRISE_SEED_RISKS:
+            cur.execute("""
+                INSERT INTO risks (name, description, category, likelihood, impact, score, level,
+                                   financial_impact, owner, status, velocity, trend, mitigation, user_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                r["name"], r["description"], r["category"], r["likelihood"], r["impact"],
+                r["score"], r["level"], r["financial_impact"], r["owner"], r["status"],
+                r["velocity"], r["trend"], r["mitigation"], user_id
+            ))
+        conn.commit()
+    except Exception as e:
+        print(f"  ⚠️ Warning cloning starter risks for user #{user_id}: {e}")
+
+
 def create_user(firstname: str, lastname: str, company: str, email: str, password: str, role: str = "user") -> dict:
     """Register a new user in the local SQLite users table with bcrypt hashing."""
     email = email.lower().strip()
@@ -1334,6 +1430,9 @@ def create_user(firstname: str, lastname: str, company: str, email: str, passwor
         """, (firstname, lastname, company, email, pw_hash, salt, assigned_role))
         conn.commit()
         user_id = cur.lastrowid
+
+        # Seed starter risk portfolio cloned for this user so they have initial owned data
+        clone_starter_risks_for_user(conn, user_id)
         conn.close()
 
         record_audit_log(
@@ -1381,17 +1480,88 @@ def get_user_by_id(user_id: int) -> dict | None:
         return None
 
 
-def verify_user_login(email: str, password: str) -> dict:
-    """Verify login credentials, enforcing block status and returning a signed JWT token."""
-    user = get_user_by_email(email)
+def set_user_mfa(user_id: int, secret: str, enabled: bool = True) -> bool:
+    """Store or remove TOTP secret and update enabled status."""
+    try:
+        conn = get_sqlite_conn()
+        cur = conn.cursor()
+        cur.execute("UPDATE users SET mfa_secret = ?, mfa_enabled = ? WHERE id = ?",
+                    (secret, 1 if enabled else 0, user_id))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception:
+        return False
+
+
+def disable_user_mfa(user_id: int) -> bool:
+    """Disable TOTP MFA for user."""
+    return set_user_mfa(user_id, "", False)
+
+
+def get_user_mfa_status(user_id: int) -> dict:
+    """Fetch user's current MFA secret and enabled status."""
+    try:
+        conn = get_sqlite_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT mfa_secret, mfa_enabled FROM users WHERE id = ?", (user_id,))
+        row = cur.fetchone()
+        conn.close()
+        if row:
+            return {"enabled": bool(row[1]), "secret": row[0] or ""}
+    except Exception:
+        pass
+    return {"enabled": False, "secret": ""}
+
+
+def verify_user_login(email: str, password: str, mfa_code: str = None) -> dict:
+    """Verify login credentials, enforcing lockout, block status, TOTP MFA, and returning a signed JWT token."""
+    clean_email = email.lower().strip()
+    now = time.time()
+
+    # 1. Enforce Account Lockout
+    lockout_rec = LOGIN_FAILED_ATTEMPTS.get(clean_email)
+    if lockout_rec and lockout_rec.get("locked_until", 0) > now:
+        mins_left = int(math.ceil((lockout_rec["locked_until"] - now) / 60.0))
+        return {
+            "success": False,
+            "error": f"Account temporarily locked due to consecutive failed attempts. Please retry in {mins_left} minute(s)."
+        }
+
+    user = get_user_by_email(clean_email)
     if not user:
+        _record_failed_login(clean_email, now)
         return {"success": False, "error": "Invalid email or password."}
 
     if user.get("is_blocked"):
         return {"success": False, "error": "This account has been suspended by an administrator."}
 
     if not _verify_password_hash(password, user['password_hash'], user.get('salt', '')):
-        return {"success": False, "error": "Invalid email or password."}
+        remaining = _record_failed_login(clean_email, now)
+        if remaining <= 0:
+            return {
+                "success": False,
+                "error": "Account temporarily locked due to 5 consecutive failed login attempts. Please retry in 15 minutes."
+            }
+        return {"success": False, "error": f"Invalid email or password. {remaining} attempt(s) remaining before temporary lockout."}
+
+    # 2. Check TOTP MFA if enabled
+    if user.get("mfa_enabled") and user.get("mfa_secret"):
+        if not mfa_code:
+            return {
+                "success": False,
+                "mfa_required": True,
+                "message": "Two-factor authentication code required. Please enter your 6-digit TOTP code."
+            }
+        from services.mfa_service import verify_totp_code
+        if not verify_totp_code(user["mfa_secret"], mfa_code):
+            return {
+                "success": False,
+                "error": "Invalid two-factor authentication (TOTP) code."
+            }
+
+    # Reset failed attempts upon successful authentication
+    LOGIN_FAILED_ATTEMPTS.pop(clean_email, None)
 
     # Update last login timestamp
     try:
@@ -1409,11 +1579,12 @@ def verify_user_login(email: str, password: str) -> dict:
         "success": True,
         "token": token,
         "user": {
-            "id":        user['id'],
-            "firstname": user['firstname'],
-            "lastname":  user['lastname'],
-            "email":     user['email'],
-            "role":      role,
+            "id":          user['id'],
+            "firstname":   user['firstname'],
+            "lastname":    user['lastname'],
+            "email":       user['email'],
+            "role":        role,
+            "mfa_enabled": bool(user.get("mfa_enabled"))
         }
     }
 

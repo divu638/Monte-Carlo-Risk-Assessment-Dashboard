@@ -190,3 +190,26 @@ def test_api_cyber_evaluate(client):
     assert 0 <= posture["cvss_composite_score"] <= 10
     assert posture["annualized_loss_expectancy"] > 0
     assert "monte_carlo_feed" in posture
+
+
+def test_api_statement_template(client):
+    """Verify statement template download endpoint returns CSV."""
+    resp = client.get("/api/statements/template")
+    assert resp.status_code == 200
+    assert "text/csv" in resp.content_type
+    assert b"Financial Metric" in resp.data
+
+
+def test_api_statement_upload(client):
+    """Verify CSV statement upload and instant ratio + Altman Z computation."""
+    csv_payload = {
+        "content": "Financial Metric,Value\nRevenue,3200\nCurrent Assets,950\nCurrent Liabilities,450\nTotal Debt,600\nTotal Equity,1200\nTotal Assets,2200"
+    }
+    resp = client.post("/api/statements/upload", json=csv_payload)
+    assert resp.status_code == 200
+    data = json.loads(resp.data)
+    assert data["success"] is True
+    assert "ratios" in data
+    assert "altman_z" in data
+    assert data["ratios"]["liquidity"]["current_ratio"] > 1.5
+

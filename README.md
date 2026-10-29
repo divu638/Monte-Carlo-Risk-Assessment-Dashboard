@@ -4,7 +4,7 @@
 > Built with Python/Flask, Supabase Cloud PostgreSQL (with local SQLite auto-fallback), NumPy, Three.js, Chart.js, and Vanilla CSS Glassmorphism.
 
 [![Live Production](https://img.shields.io/badge/Production-Render%20Live-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://monte-carlo-risk-assessment-dashboard.onrender.com/)
-[![Tests](https://img.shields.io/badge/pytest-50%2F50%20passing-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)](#test-suite)
+[![Tests](https://img.shields.io/badge/pytest-52%2F52%20passing-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)](#test-suite)
 [![Security](https://img.shields.io/badge/OWASP-A%2B%20Hardened-blue?style=for-the-badge&logo=security&logoColor=white)](#security-hardening)
 [![ISO 31000](https://img.shields.io/badge/Standard-ISO%2031000%3A2018-emerald?style=for-the-badge)](#iso-31000-framework)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -139,21 +139,24 @@ Open **[http://localhost:5000](http://localhost:5000)** in your browser.
 
 ## 📡 Complete REST API Endpoints Specification
 
-### 1. Authentication & Session Management
+### 1. Authentication, MFA & Session Management
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/api/auth/register` | Public | Create new analyst account with bcrypt hashing and validation |
-| `POST` | `/api/auth/login` | Public | Authenticate user, apply rate limit check, and issue 24h JWT token |
+| `POST` | `/api/auth/login` | Public | Authenticate user, apply rate limit check, verify TOTP MFA if enabled, issue JWT |
 | `GET` | `/api/auth/me` | Authenticated | Validate active session token and retrieve current user persona |
+| `POST` | `/api/auth/mfa/setup` | Authenticated | Generate RFC 6238 TOTP MFA secret and otpauth URI for authenticator apps |
+| `POST` | `/api/auth/mfa/enable` | Authenticated | Confirm 6-digit TOTP code and activate MFA requirement |
+| `POST` | `/api/auth/mfa/disable` | Authenticated | Deactivate MFA after password re-verification |
 
 ### 2. Risk Registry & 5×5 Matrix
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/risks` | Authenticated | Retrieve registered risks with optional domain/severity filtering |
+| `GET` | `/api/risks` | Authenticated | Retrieve registered risks with user isolation (admins view all) |
 | `GET` | `/api/risks/<int:id>` | Authenticated | Retrieve single risk vector by ID |
 | `POST` | `/api/risks` | Authenticated | Create and register new risk vector (logged to cryptographic audit trail) |
-| `PUT` | `/api/risks/<int:id>` | Authenticated | Update existing risk status, likelihood, impact, or mitigation |
-| `DELETE` | `/api/risks/<int:id>` | Authenticated | Remove risk from registry (immutable audit entry created) |
+| `PUT` | `/api/risks/<int:id>` | Authenticated | Update existing risk status, likelihood, impact, or mitigation (user scoped) |
+| `DELETE` | `/api/risks/<int:id>` | Authenticated | Remove risk from registry (immutable audit entry created, user scoped) |
 | `GET` | `/api/matrix` | Authenticated | Retrieve pre-computed 5×5 probability × impact coordinate clusters |
 
 ### 3. Quantitative Monte Carlo & Stress Testing
@@ -163,10 +166,12 @@ Open **[http://localhost:5000](http://localhost:5000)** in your browser.
 | `POST` | `/api/stress-test` | Public / Auth | Execute dynamic what-if simulation with financial/cyber shocks |
 | `GET` | `/api/stress-test/presets` | Public / Auth | Fetch predefined macroeconomic stress test configurations |
 
-### 4. Financial Ratios, Solvency & Solutions
+### 4. Financial Ratios, Solvency, Statements & Solutions
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/api/ratios/calculate` | Public / Auth | Compute full 14-ratio suite, Altman Z-Score, and benchmark deltas |
+| `GET` | `/api/statements/template` | Public | Download standard CSV statement template |
+| `POST` | `/api/statements/upload` | Public / Auth | Ingest CSV financial statements, parse metrics and compute ratios |
 | `GET` | `/api/benchmarks` | Public / Auth | Fetch sectoral benchmark standards stored in database |
 | `PUT` | `/api/benchmarks/<string:ind>` | Admin Only | Update sectoral ratio benchmarks in database without code changes |
 | `POST` | `/api/solutions/recommend` | Public / Auth | Generate 3-tier ISO 31000 mitigation plan based on ratio flags |
@@ -352,7 +357,7 @@ $$Z = 1.2 X_1 + 1.4 X_2 + 3.3 X_3 + 0.6 X_4 + 0.999 X_5$$
 
 ## 🧪 Automated Test Suite
 
-The platform includes 50 automated tests covering all critical components:
+The platform includes 52 automated tests covering all critical components:
 
 ```bash
 pytest -v
@@ -360,20 +365,20 @@ pytest -v
 
 ```
 ============================= test session starts =============================
-collected 50 items
+collected 52 items
 
-tests/test_api_endpoints.py ........                                     [ 16%]
-tests/test_audit_chain.py ...                                            [ 22%]
-tests/test_auth.py ......                                                [ 34%]
-tests/test_engines.py .....                                              [ 44%]
-tests/test_financial_ratios.py ........                                  [ 60%]
-tests/test_monte_carlo.py ...                                            [ 66%]
+tests/test_api_endpoints.py ..........                                   [ 19%]
+tests/test_audit_chain.py ...                                            [ 25%]
+tests/test_auth.py ......                                                [ 36%]
+tests/test_engines.py .....                                              [ 46%]
+tests/test_financial_ratios.py ........                                  [ 61%]
+tests/test_monte_carlo.py ...                                            [ 67%]
 tests/test_security.py .................                                 [100%]
 
-======================= 50 passed, 2 warnings in 3.55s ========================
+======================= 52 passed, 2 warnings in 2.46s ========================
 ```
 
-* **`test_api_endpoints.py` (8 tests)**: Validates REST contract for benchmarks, ratios, stress testing, solutions, explainable scores, action tasks, and cyber posture.
+* **`test_api_endpoints.py` (10 tests)**: Validates REST contract for benchmarks, ratios, stress testing, solutions, explainable scores, action tasks, cyber posture, and statement upload/template.
 * **`test_audit_chain.py` (3 tests)**: Confirms SHA-256 chain integrity, append-only mechanics, and simulated tampering detection.
 * **`test_auth.py` (6 tests)**: Tests user registration, password strength, bcrypt hashing, JWT issuance, and RBAC admin route protection.
 * **`test_engines.py` (5 tests)**: Verifies ISO 31000 rule engine priorities, macroeconomic stress test shocks, waterfall math, and CVSS cyber scoring.
