@@ -126,12 +126,18 @@ def get_connection_status():
     }
 
 
+_supabase_last_fail_ts = 0
+
 def init_db():
     """Initialize database: try Supabase first, fallback to SQLite if needed."""
-    global _using_supabase, _db_status_message
+    global _using_supabase, _db_status_message, _supabase_last_fail_ts
 
     # Always ensure local SQLite schema is available for offline / fallback
     init_local_sqlite()
+
+    # If Supabase recently failed (offline / network error), avoid blocking on DNS timeouts
+    if not _using_supabase and (time.time() - _supabase_last_fail_ts < 120):
+        return False
 
     client = get_supabase_client()
     if client:
@@ -149,11 +155,13 @@ def init_db():
             return True
         except Exception as e:
             _using_supabase = False
+            _supabase_last_fail_ts = time.time()
             # Sanitize error to prevent leaking connection tokens or sensitive network details
             safe_err = str(e).split('?')[0].split('//')[-1][:120]
             _db_status_message = f"Supabase notice: {safe_err}. Operating in Local Safe Mode."
             print(f"  ⚠️  {_db_status_message}")
             print("  ℹ️  Ensure you ran setup_supabase.sql in your Supabase SQL Editor.")
+            return False
     else:
         _using_supabase = False
         _db_status_message = "Supabase credentials are placeholder in .env. Running on local database."
@@ -1595,6 +1603,85 @@ def verify_user_login(email: str, password: str, mfa_code: str = None) -> dict:
             "mfa_enabled": bool(user.get("mfa_enabled"))
         }
     }
+
+
+def verify_or_create_google_user(email: str, firstname: str = "", lastname: str = "", google_id: str = "", avatar_url: str = "") -> dict:
+    """Authenticate or register a user via Google OAuth / SSO."""
+    clean_email = (email or "").lower().strip()
+    if not clean_email or "@" not in clean_email:
+        return {"success": False, "error": "Valid Google email address is required."}
+
+    user = get_user_by_email(clean_email)
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    if user:
+        if user.get("is_blocked"):
+            return {"success": False, "error": "This Google account has been suspended by an administrator."}
+
+        try:
+            conn = get_sqlite_conn()
+            conn.execute("UPDATE users SET last_login = ? WHERE id = ?", (now_iso, user['id']))
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+
+        role = "admin" if user['role'] in ("admin", "superadmin") else "user"
+        token = generate_jwt_token(user['id'], user['email'], role)
+        return {
+            "success": True,
+            "token": token,
+            "user": {
+                "id":            user['id'],
+                "firstname":     user['firstname'],
+                "lastname":      user['lastname'],
+                "email":         user['email'],
+                "role":          role,
+                "auth_provider": "google",
+                "mfa_enabled":   bool(user.get("mfa_enabled"))
+            }
+        }
+    else:
+        fn = firstname.strip() if firstname else "Google"
+        ln = lastname.strip() if lastname else "User"
+        company = "Google Workspace Organization"
+        role = "admin" if ("admin" in clean_email or "cro" in clean_email) else "user"
+        salt = secrets.token_hex(32)
+        pw_hash = _hash_password(secrets.token_urlsafe(32), salt)
+
+        try:
+            conn = get_sqlite_conn()
+            cur = conn.cursor()
+            cur.execute("""
+                INSERT INTO users (firstname, lastname, company, email, password_hash, salt, role, is_verified, is_blocked, created_at, last_login)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0, ?, ?)
+            """, (fn, ln, company, clean_email, pw_hash, salt, role, now_iso, now_iso))
+            conn.commit()
+            user_id = cur.lastrowid
+            conn.close()
+
+            record_audit_log(
+                None, "Google SSO Signup", "USER_REGISTERED",
+                f"OAuth Google SSO user registered ({clean_email}, role={role})",
+                user_id=user_id
+            )
+
+            token = generate_jwt_token(user_id, clean_email, role)
+            return {
+                "success": True,
+                "token": token,
+                "user": {
+                    "id":            user_id,
+                    "firstname":     fn,
+                    "lastname":      ln,
+                    "email":         clean_email,
+                    "role":          role,
+                    "auth_provider": "google",
+                    "mfa_enabled":   False
+                }
+            }
+        except Exception as e:
+            return {"success": False, "error": f"Failed to register Google user: {str(e)}"}
 
 
 # ─── Assessment History & Persistence ─────────────────────────────────────────

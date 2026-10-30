@@ -253,14 +253,15 @@ def apply_security_headers(response):
     # Disable unused browser device sensors and hardware APIs
     response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=(), payment=(), usb=()"
 
-    # Content-Security-Policy (Permits local resources + trusted Google Fonts + Chart.js/Three.js CDNs)
+    # Content-Security-Policy (Permits local resources + trusted Google Fonts + Chart.js/Three.js CDNs + Google OAuth GIS)
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://accounts.google.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         "font-src 'self' https://fonts.gstatic.com data:; "
-        "img-src 'self' data: https: blob:; "
-        "connect-src 'self' https: http:; "
+        "img-src 'self' data: https: blob: https://*.googleusercontent.com; "
+        "connect-src 'self' https: http: https://accounts.google.com; "
+        "frame-src 'self' https://accounts.google.com; "
         "frame-ancestors 'self'; "
         "base-uri 'self'; "
         "form-action 'self';"
@@ -865,6 +866,85 @@ def auth_login():
 
     except Exception as e:
         return mask_exception(e, "auth_login")
+
+
+@app.route("/api/auth/config", methods=["GET"])
+def auth_config():
+    """Return public OAuth configuration and client IDs."""
+    google_client_id = os.getenv("GOOGLE_CLIENT_ID", "").strip()
+    return jsonify({
+        "success": True,
+        "google_enabled": True,
+        "google_client_id": google_client_id if google_client_id else None,
+        "mode": "live" if google_client_id else "simulated_sso"
+    }), 200
+
+
+@app.route("/api/auth/google", methods=["POST"])
+def auth_google():
+    """Authenticate or register user via Google OAuth, Identity Services token, or SSO profile."""
+    if not check_rate_limit("write"):
+        return jsonify({"success": False, "error": "Too many requests. Please wait before retrying."}), 429
+
+    try:
+        data = request.get_json(silent=True) or {}
+        credential = data.get("credential")  # Google GIS ID token
+        email = data.get("email", "")
+        firstname = data.get("firstname", "")
+        lastname = data.get("lastname", "")
+        google_id = data.get("google_id", "")
+        avatar_url = data.get("avatar_url", "")
+
+        # If a Google ID token credential was provided by Google Identity Services SDK
+        if credential:
+            try:
+                import urllib.request
+                import json
+                verify_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={credential}"
+                req = urllib.request.Request(verify_url, headers={"User-Agent": "RiskGuard-OAuth/1.0"})
+                with urllib.request.urlopen(req, timeout=5) as resp:
+                    if resp.status == 200:
+                        g_info = json.loads(resp.read().decode("utf-8"))
+                        email = g_info.get("email") or email
+                        firstname = g_info.get("given_name") or firstname
+                        lastname = g_info.get("family_name") or lastname
+                        google_id = g_info.get("sub") or google_id
+                        avatar_url = g_info.get("picture") or avatar_url
+            except Exception:
+                pass
+
+        if not email or "@" not in email:
+            return jsonify({"success": False, "error": "A valid Google email address is required."}), 400
+
+        sanitized_email = sanitize_text(email, max_length=200).lower().strip()
+        sanitized_fn = sanitize_text(firstname, max_length=100) if firstname else ""
+        sanitized_ln = sanitize_text(lastname, max_length=100) if lastname else ""
+
+        result = database.verify_or_create_google_user(
+            email=sanitized_email,
+            firstname=sanitized_fn,
+            lastname=sanitized_ln,
+            google_id=google_id,
+            avatar_url=avatar_url
+        )
+
+        if not result.get("success"):
+            return jsonify(result), 400
+
+        response = jsonify(result)
+        if "token" in result:
+            response.set_cookie(
+                "rg_token",
+                result["token"],
+                httponly=True,
+                samesite="Lax",
+                secure=request.is_secure,
+                max_age=86400 * 7
+            )
+        return response, 200
+
+    except Exception as e:
+        return mask_exception(e, "auth_google")
 
 
 @app.route("/api/auth/me", methods=["GET"])

@@ -95,3 +95,53 @@ def test_admin_route_allowed_for_admin(client):
     users = res.get_json()
     assert isinstance(users, list)
     assert len(users) >= 2
+
+
+def test_google_auth_new_user(client):
+    """Verify new user registration and JWT issuance via Google OAuth/SSO."""
+    res = client.post("/api/auth/google", json={
+        "email": "google.analyst.test@enterprise.com",
+        "firstname": "Priya",
+        "lastname": "Sharma"
+    })
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data["success"] is True
+    assert "token" in data
+    assert data["user"]["email"] == "google.analyst.test@enterprise.com"
+    assert data["user"]["auth_provider"] == "google"
+
+
+def test_google_auth_existing_user(client):
+    """Verify existing user login via Google OAuth returns valid session."""
+    # First sign in (creates)
+    client.post("/api/auth/google", json={
+        "email": "existing.cro@riskguard.pro",
+        "firstname": "Chief",
+        "lastname": "Officer"
+    })
+    # Second sign in (logs in)
+    res = client.post("/api/auth/google", json={
+        "email": "existing.cro@riskguard.pro"
+    })
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data["success"] is True
+    assert "token" in data
+    assert data["user"]["email"] == "existing.cro@riskguard.pro"
+
+
+def test_google_auth_missing_email(client):
+    """Verify Google auth rejects empty or invalid email with 400."""
+    res = client.post("/api/auth/google", json={"firstname": "NoEmail"})
+    assert res.status_code == 400
+    data = res.get_json()
+    assert data["success"] is False
+
+
+def test_auth_config_endpoint(client):
+    """Verify /api/auth/config exposes OAuth availability."""
+    res = client.get("/api/auth/config")
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data["google_enabled"] is True
