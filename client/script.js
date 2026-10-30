@@ -16151,7 +16151,7 @@ function evaluateRatioDiagnostic(id, val, metrics) {
 
         case 'return_on_equity':
             if (isNA) return {
-                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders' Equity) × 100',
+                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders Equity) × 100',
                 valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
                 interpretation: 'Equity return unavailable.',
                 impacts: ['Shareholder wealth creation unverified.'],
@@ -16159,7 +16159,7 @@ function evaluateRatioDiagnostic(id, val, metrics) {
                 taskTitle: 'Verify Shareholders Equity Inputs', taskTreatment: 'Mitigate'
             };
             if (num >= 14.0) return {
-                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders' Equity) × 100',
+                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders Equity) × 100',
                 valStr: num.toFixed(1) + '%', level: 'risk-low', badge: 'Low Risk',
                 interpretation: 'Shareholders are receiving healthy returns; capital is deployed efficiently.',
                 impacts: ['High investor confidence, favorable equity valuation, and access to new equity capital.'],
@@ -16167,7 +16167,7 @@ function evaluateRatioDiagnostic(id, val, metrics) {
                 taskTitle: 'Maintain Long-Term ROE Discipline', taskTreatment: 'Accept'
             };
             if (num >= 6.0) return {
-                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders' Equity) × 100',
+                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders Equity) × 100',
                 valStr: num.toFixed(1) + '%', level: 'risk-moderate', badge: 'Moderate Risk',
                 interpretation: 'Returns to shareholders are moderate or declining.',
                 impacts: ['Potential investor dissatisfaction or difficulty attracting equity expansion funding.'],
@@ -16175,7 +16175,7 @@ function evaluateRatioDiagnostic(id, val, metrics) {
                 taskTitle: 'Formulate Capital Efficiency & Margin Expansion Strategy', taskTreatment: 'Reduce'
             };
             return {
-                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders' Equity) × 100',
+                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders Equity) × 100',
                 valStr: num.toFixed(1) + '%', level: 'risk-high', badge: 'High Risk',
                 interpretation: 'Very poor or negative returns to shareholders; net losses are eroding owner net worth.',
                 impacts: ['Severe investor flight risk and potential distress valuation.'],
@@ -16186,7 +16186,7 @@ function evaluateRatioDiagnostic(id, val, metrics) {
         // ── 3. SOLVENCY PILLAR ───────────────────────────────────────────────
         case 'debt_to_equity':
             if (isNA) return {
-                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders' Equity',
+                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders Equity',
                 valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
                 interpretation: 'Debt or equity figures unavailable.',
                 impacts: ['Long-term gearing and solvency unknown.'],
@@ -16194,7 +16194,7 @@ function evaluateRatioDiagnostic(id, val, metrics) {
                 taskTitle: 'Reconcile Total Debt and Equity', taskTreatment: 'Mitigate'
             };
             if (num <= 0.8) return {
-                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders' Equity',
+                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders Equity',
                 valStr: num.toFixed(2) + 'x', level: 'risk-low', badge: 'Low Risk',
                 interpretation: 'Lower dependence on borrowed funds; strong equity cushion protects against creditor pressure.',
                 impacts: ['Exceptional borrowing capacity and immunity to debt covenant crises.'],
@@ -16202,7 +16202,7 @@ function evaluateRatioDiagnostic(id, val, metrics) {
                 taskTitle: 'Maintain Prudent Solvency Leverage Limit', taskTreatment: 'Accept'
             };
             if (num <= 1.8) return {
-                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders' Equity',
+                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders Equity',
                 valStr: num.toFixed(2) + 'x', level: 'risk-moderate', badge: 'Moderate Risk',
                 interpretation: 'Considerable debt obligations compared with equity; leverage is increasing repayment burden.',
                 impacts: ['Higher interest expenses reduce free cash flow flexibility during economic slowdowns.'],
@@ -16210,7 +16210,7 @@ function evaluateRatioDiagnostic(id, val, metrics) {
                 taskTitle: 'Cap Long-Term Debt Drawdowns & Build Sinking Fund', taskTreatment: 'Reduce'
             };
             return {
-                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders' Equity',
+                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders Equity',
                 valStr: num.toFixed(2) + 'x', level: 'risk-high', badge: 'High Risk',
                 interpretation: 'Excessive debt compared with equity; financial gearing is dangerously elevated.',
                 impacts: ['High risk of debt default, potential ratings downgrade, and creditor asset foreclosure.'],
