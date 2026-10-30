@@ -2375,7 +2375,11 @@
                                     <h3>Direct Financial Statements (P&amp;L &amp; Balance Sheet)</h3>
                                     <p class="card-subtitle">Attach company financial statements directly via document upload or select an audited sector statement — automated extraction eliminates manual data entry.</p>
                                 </div>
-                                <div style="display: flex; gap: 8px;">
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <a href="/api/statements/template?format=excel" class="btn btn-sm btn-outline" download="financial_statement_template.xlsx" title="Download Excel statement template to fill in your company numbers">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                        <span>Download Template (.xlsx)</span>
+                                    </a>
                                     <button type="button" class="btn btn-sm btn-emerald" onclick="document.getElementById('wiz-stmt-file-input').click();">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                                         <span>Upload File</span>
@@ -2400,6 +2404,7 @@
                                                     <span class="stmt-fmt-badge">📄 Balance Sheet (PDF / Excel)</span>
                                                     <span class="stmt-fmt-badge">📊 Income Statement / P&amp;L (.xlsx, .csv)</span>
                                                     <span class="stmt-fmt-badge">📑 Audited Annual Statements</span>
+                                                    <a href="/api/statements/template?format=excel" download="financial_statement_template.xlsx" class="stmt-fmt-badge" style="color:#34D399;border-color:rgba(52,211,153,0.4);text-decoration:none;cursor:pointer;" title="Download sample template">📥 Excel Template</a>
                                                     <span class="stmt-fmt-badge" style="color:#34D399;border-color:rgba(52,211,153,0.3);">⚡ Instant Auto-Extraction</span>
                                                 </div>
                                             </div>

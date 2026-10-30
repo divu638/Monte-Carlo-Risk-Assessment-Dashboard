@@ -11630,86 +11630,98 @@ function clientParseStatementText(text) {
 async function processUploadedStatement(file) {
     if (!file) return;
     const fileName = file.name;
+    const fileSizeKB = (file.size / 1024).toFixed(1);
+
     document.querySelectorAll('.stmt-preset-card').forEach(card => card.classList.remove('active'));
 
-    showToast(`Reading and parsing "${fileName}"...`, 'info');
+    showToast(`Analyzing & extracting financial figures from "${fileName}" (${fileSizeKB} KB)...`, 'info', 4000);
 
-    const reader = new FileReader();
-    reader.onload = async function(event) {
-        const fileContent = event.target.result;
+    const titleEl = document.getElementById('stmt-active-doc-title');
+    const descEl = document.getElementById('stmt-active-doc-desc');
+    if (titleEl) titleEl.textContent = `Analyzing "${fileName}"...`;
+    if (descEl) descEl.textContent = `Scanning balance sheet & profit & loss line items...`;
+
+    try {
+        let extractedData = null;
+
+        // 1. Send file directly via multipart FormData (handles PDF, Excel .xlsx, and CSV)
         try {
-            let extractedData = null;
+            const formData = new FormData();
+            formData.append('file', file);
 
-            // 1. Try sending to backend parser API for full precision & validation
-            try {
-                const response = await fetch('/api/statements/upload', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: fileContent })
-                });
-                if (response.ok) {
-                    const resJson = await response.json();
-                    if (resJson.success && resJson.metrics) {
-                        const m = resJson.metrics;
-                        extractedData = {
-                            currentAssets: m.current_assets || 0,
-                            inventory: m.inventory || 0,
-                            currentLiabilities: m.current_liabilities || 0,
-                            totalDebt: m.total_debt || 0,
-                            equity: m.total_equity || 0,
-                            revenue: m.revenue || 0,
-                            cogs: m.cogs || 0,
-                            operatingProfit: m.ebit || 0,
-                            netProfit: m.net_profit || 0,
-                            interest: m.interest_expense || 0,
-                            prepaidExpenses: m.prepaid_expenses || 0,
-                            avgInventory: m.avg_inventory || m.inventory || 0,
-                            avgReceivables: m.avg_receivables || m.accounts_receivable || 0,
-                            creditSales: m.credit_sales || m.revenue || 0,
-                            totalAssets: m.total_assets || 0,
-                            cash: m.cash_and_equivalents || 0,
-                            stInvestments: m.short_term_investments || 0,
-                            accountsPayable: m.accounts_payable || 0,
-                            operatingExpenses: m.operating_expenses || 0,
-                            ebitda: m.ebitda || (m.ebit || 0)
-                        };
-                    }
-                }
-            } catch (apiErr) {
-                console.warn('Backend statement upload API unreachable, using client-side parser:', apiErr);
-            }
+            const response = await fetch('/api/statements/upload', {
+                method: 'POST',
+                body: formData
+            });
 
-            // 2. Client-side fallback parser if backend not responding or returned empty
-            if (!extractedData || (extractedData.revenue === 0 && extractedData.currentAssets === 0)) {
-                extractedData = clientParseStatementText(fileContent);
-            }
+            const resJson = await response.json();
 
-            if (!extractedData || (extractedData.revenue === 0 && extractedData.currentAssets === 0)) {
-                showToast(`Could not detect recognizable financial figures in "${fileName}". Please check file format or enter details below.`, 'warning');
+            if (response.ok && resJson.success && resJson.metrics) {
+                const m = resJson.metrics;
+                extractedData = {
+                    currentAssets: m.current_assets || 0,
+                    inventory: m.inventory || 0,
+                    currentLiabilities: m.current_liabilities || 0,
+                    totalDebt: m.total_debt || 0,
+                    equity: m.total_equity || 0,
+                    revenue: m.revenue || 0,
+                    cogs: m.cogs || 0,
+                    operatingProfit: m.ebit || 0,
+                    netProfit: m.net_profit || 0,
+                    interest: m.interest_expense || 0,
+                    prepaidExpenses: m.prepaid_expenses || 0,
+                    avgInventory: m.avg_inventory || m.inventory || 0,
+                    avgReceivables: m.avg_receivables || m.accounts_receivable || 0,
+                    creditSales: m.credit_sales || m.revenue || 0,
+                    totalAssets: m.total_assets || 0,
+                    cash: m.cash_and_equivalents || 0,
+                    stInvestments: m.short_term_investments || 0,
+                    accountsPayable: m.accounts_payable || 0,
+                    operatingExpenses: m.operating_expenses || 0,
+                    ebitda: m.ebitda || (m.ebit || 0)
+                };
+            } else if (!response.ok) {
+                console.warn('Statement upload API notice:', resJson);
+                const notice = resJson.details || resJson.error || `No recognizable financial figures found in "${fileName}".`;
+                showToast(notice, 'warning', 8000);
+                if (titleEl) titleEl.textContent = 'Audited Financial Statements (Upload or Select Preset)';
+                if (descEl) descEl.textContent = 'Upload corporate balance sheet or P&L statement (PDF, Excel, or CSV) to calculate ratios.';
                 return;
             }
-
-            // Update UI with ACTUAL parsed values from the user file!
-            updateFinancialStatementUI(
-                extractedData,
-                `Uploaded Statement: ${fileName} (${(file.size / 1024).toFixed(1)} KB)`,
-                `Successfully extracted genuine audited statement figures · Calculated 8 core ratios and full telemetry`
-            );
-
-            showToast(`Statement Verified: ${fileName} parsed successfully with exact calculated ratios!`, 'success');
-
-        } catch (err) {
-            console.error('Error processing uploaded financial statement:', err);
-            showToast(`Failed to parse file "${fileName}". Please upload a standard CSV or text statement.`, 'error');
+        } catch (apiErr) {
+            console.warn('Backend statement upload API unreachable, attempting client-side fallback:', apiErr);
+            // Fallback for CSV/JSON/Text files if offline
+            if (fileName.endsWith('.csv') || fileName.endsWith('.txt') || fileName.endsWith('.json')) {
+                const text = await file.text();
+                extractedData = clientParseStatementText(text);
+            }
         }
-    };
 
-    reader.onerror = function() {
-        showToast(`Failed to read file "${fileName}".`, 'error');
-    };
+        if (!extractedData || (extractedData.revenue === 0 && extractedData.currentAssets === 0 && extractedData.totalAssets === 0)) {
+            showToast(`Could not detect recognizable financial figures in "${fileName}". Please upload a corporate Balance Sheet or P&L statement (PDF, Excel, or CSV), or download our template below.`, 'warning', 8000);
+            if (titleEl) titleEl.textContent = 'Audited Financial Statements (Upload or Select Preset)';
+            if (descEl) descEl.textContent = 'Upload corporate balance sheet or P&L statement (PDF, Excel, or CSV) to calculate ratios.';
+            return;
+        }
 
-    reader.readAsText(file);
+        // Update UI with ACTUAL parsed values from the user file!
+        updateFinancialStatementUI(
+            extractedData,
+            `Uploaded Statement: ${fileName} (${fileSizeKB} KB)`,
+            `Successfully extracted genuine audited figures · All 8 Essential Ratios and Full Telemetry Recalculated Live`
+        );
+
+        showToast(`✓ Statement Verified: "${fileName}" parsed successfully! 8 Core Ratios computed from your data.`, 'success', 5000);
+
+    } catch (err) {
+        console.error('Error processing uploaded financial statement:', err);
+        showToast(`Failed to parse file "${fileName}". Please upload a standard Balance Sheet or P&L statement (PDF, Excel, or CSV).`, 'error', 6000);
+    } finally {
+        const fileInput = document.getElementById('wiz-stmt-file-input');
+        if (fileInput) fileInput.value = '';
+    }
 }
+
 
 
 /* ==========================================================================

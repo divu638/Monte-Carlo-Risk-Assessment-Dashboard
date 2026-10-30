@@ -9,6 +9,7 @@ Verifies:
 
 import os
 import sys
+import tempfile
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "server")))
@@ -16,10 +17,27 @@ from app import app
 import database
 
 
-@pytest.fixture
-def client():
+@pytest.fixture(scope="module")
+def isolated_db():
     app.config["TESTING"] = True
+    test_db = os.path.join(tempfile.gettempdir(), f"riskguard_test_auth_{os.getpid()}.db")
+    orig_db = database.LOCAL_DB_FILE
+    database.LOCAL_DB_FILE = test_db
     database.init_db()
+    yield test_db
+    database.LOCAL_DB_FILE = orig_db
+    for suffix in ("", "-wal", "-shm"):
+        fpath = test_db + suffix
+        if os.path.exists(fpath):
+            try:
+                os.remove(fpath)
+            except Exception:
+                pass
+
+
+@pytest.fixture
+def client(isolated_db):
+    app.config["TESTING"] = True
     with app.test_client() as client:
         yield client
 

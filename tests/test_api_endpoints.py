@@ -10,6 +10,7 @@ Integration Tests for RiskGuard Pro REST API Endpoints:
 
 import os
 import sys
+import io
 import json
 import pytest
 
@@ -212,4 +213,25 @@ def test_api_statement_upload(client):
     assert "ratios" in data
     assert "altman_z" in data
     assert data["ratios"]["liquidity"]["current_ratio"] > 1.5
+
+
+def test_api_statement_excel_template_and_upload(client):
+    """Verify Excel template generation, download, and multipart upload parsing."""
+    resp = client.get("/api/statements/template?format=excel")
+    assert resp.status_code == 200
+    assert "spreadsheetml" in resp.content_type
+    excel_bytes = resp.data
+    assert len(excel_bytes) > 1000
+
+    # Test uploading this Excel file via multipart/form-data
+    upload_resp = client.post(
+        "/api/statements/upload",
+        data={"file": (io.BytesIO(excel_bytes), "sample_statements.xlsx")},
+        content_type="multipart/form-data"
+    )
+    assert upload_resp.status_code == 200
+    upload_data = json.loads(upload_resp.data)
+    assert upload_data["success"] is True
+    assert upload_data["metrics"]["revenue"] == 2400.0
+    assert upload_data["ratios"]["liquidity"]["current_ratio"] > 1.0
 

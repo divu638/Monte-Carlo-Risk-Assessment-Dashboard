@@ -173,10 +173,12 @@ def init_db():
 # ─── SQLite Local Fallback Engine ─────────────────────────────────────────────
 
 def get_sqlite_conn(timeout: float = 30.0):
-    """Get connection to local SQLite database with Row dictionary factory and 30s busy timeout."""
+    """Get connection to local SQLite database with Row dictionary factory, WAL mode, and 30s busy timeout."""
     conn = sqlite3.connect(LOCAL_DB_FILE, timeout=timeout)
     try:
+        conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA busy_timeout=30000;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
     except Exception:
         pass
     conn.row_factory = sqlite3.Row
@@ -1643,8 +1645,8 @@ def reset_user_password(email: str, new_password: str) -> dict:
             # Clear lockout if any
             LOGIN_FAILED_ATTEMPTS.pop(clean_email, None)
             return {"success": True, "message": "Password updated successfully. You can now log in with your new password."}
-        except Exception:
-            return {"success": False, "error": "Failed to update password. Please try again."}
+        except Exception as e:
+            return {"success": False, "error": f"Failed to update password: {e}"}
     else:
         # User not found in DB - register them directly!
         fn = clean_email.split("@")[0].capitalize()

@@ -33,7 +33,13 @@ from services.rule_engine import evaluate_rules
 from services.stress_testing import run_stress_test, PRESET_SCENARIOS
 from services.explainability import explain_health_score
 from services.cyber_engine import calculate_cyber_posture
-from services.statement_parser import parse_financial_csv, generate_sample_csv
+from services.statement_parser import (
+    parse_financial_csv,
+    parse_financial_pdf,
+    parse_financial_excel,
+    generate_sample_csv,
+    generate_sample_excel
+)
 
 # Load environment
 load_dotenv(os.path.join(SERVER_DIR, '..', '.env'))
@@ -1403,42 +1409,79 @@ def api_cyber_evaluate():
         return mask_exception(e, "cyber_evaluate")
 
 
-# ─── B10: Financial Statement CSV Upload & Parser ─────────────────────────────
+# ─── B10: Financial Statement Multi-Format Upload & Parser ─────────────────────
 
 @app.route("/api/statements/template", methods=["GET"])
 def api_download_statement_template():
-    """Download standard CSV template for corporate financial statement upload."""
+    """Download standard audited financial statement template in Excel (.xlsx) or CSV format."""
     try:
-        csv_content = generate_sample_csv()
-        return Response(
-            csv_content,
-            mimetype="text/csv",
-            headers={"Content-Disposition": "attachment; filename=riskguard_financial_statement_template.csv"}
-        )
+        fmt = request.args.get("format", "csv").lower()
+        if fmt in ("excel", "xlsx"):
+            excel_bytes = generate_sample_excel()
+            resp = Response(
+                excel_bytes,
+                mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+            resp.headers["Content-Disposition"] = "attachment; filename=financial_statement_template.xlsx"
+            return resp
+        else:
+            csv_str = generate_sample_csv()
+            resp = Response(csv_str, mimetype="text/csv; charset=utf-8")
+            resp.headers["Content-Disposition"] = "attachment; filename=riskguard_financial_statement_template.csv"
+            return resp
     except Exception as e:
         return mask_exception(e, "download_statement_template")
 
 
 @app.route("/api/statements/upload", methods=["POST"])
 def api_upload_statement():
-    """Parse uploaded corporate financial CSV and compute ratio analytics."""
+    """Parse uploaded corporate financial statements (PDF, Excel, CSV, JSON) and compute ratio analytics."""
     try:
-        content = ""
+        metrics = {}
+        warnings = []
+        filename = "statement"
+
         if "file" in request.files:
             file_obj = request.files["file"]
-            content = file_obj.read().decode("utf-8", errors="replace")
+            filename = file_obj.filename or "statement"
+            fn_lower = filename.lower()
+            file_bytes = file_obj.read()
+
+            if not file_bytes:
+                return jsonify({
+                    "success": False,
+                    "error": "The uploaded file is empty.",
+                    "filename": filename
+                }), 400
+
+            if fn_lower.endswith(".pdf"):
+                metrics, warnings = parse_financial_pdf(file_bytes)
+            elif fn_lower.endswith(".xlsx") or fn_lower.endswith(".xls"):
+                metrics, warnings = parse_financial_excel(file_bytes)
+            else:
+                # CSV, TSV, TXT, or JSON
+                content = file_bytes.decode("utf-8", errors="replace")
+                metrics, warnings = parse_financial_csv(content)
         elif request.is_json:
             body = request.get_json() or {}
             content = body.get("content", "")
+            if not content or not content.strip():
+                return jsonify({"success": False, "error": "No statement content provided"}), 400
+            metrics, warnings = parse_financial_csv(content)
         else:
             content = request.get_data(as_text=True)
+            if not content or not content.strip():
+                return jsonify({"success": False, "error": "No statement content provided"}), 400
+            metrics, warnings = parse_financial_csv(content)
 
-        if not content or not content.strip():
-            return jsonify({"success": False, "error": "No CSV content provided"}), 400
-
-        metrics, warnings = parse_financial_csv(content)
-        if not metrics:
-            return jsonify({"success": False, "error": "Could not extract valid financial metrics from CSV", "warnings": warnings}), 400
+        if not metrics or (metrics.get("revenue", 0) == 0 and metrics.get("current_assets", 0) == 0 and metrics.get("total_assets", 0) == 0):
+            return jsonify({
+                "success": False,
+                "error": f"No recognizable financial line items detected in '{filename}'.",
+                "filename": filename,
+                "details": "We scanned this document for audited financial lines (such as Revenue, Operating Profit, Current Assets, Inventory, Liabilities, or Equity), but none were found. Please ensure you upload a corporate Balance Sheet or Profit & Loss Statement (PDF, Excel .xlsx, or CSV), or choose from our audited presets below.",
+                "warnings": warnings
+            }), 400
 
         industry = sanitize_text(request.args.get("industry") or "General", max_length=50)
         ratios = calculate_financial_ratios(metrics, industry=industry)
@@ -1446,6 +1489,7 @@ def api_upload_statement():
 
         return jsonify({
             "success": True,
+            "filename": filename,
             "metrics": metrics,
             "ratios": ratios,
             "altman_z": altman,

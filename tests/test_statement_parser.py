@@ -65,3 +65,50 @@ def test_parse_json_statement():
     assert data["gross_profit"] == 2000000.0
     assert data["ebit"] == 1200000.0  # 2000000 - 800000
 
+
+def test_match_field_no_collisions():
+    from server.services.statement_parser import _match_field
+    assert _match_field("Total Debt / Borrowings") == "total_debt"
+    assert _match_field("Total Debt") == "total_debt"
+    assert _match_field("Profit Before Tax") == "profit_before_tax"
+    assert _match_field("EBT") == "profit_before_tax"
+    assert _match_field("Revenue from Operations") == "revenue"
+    assert _match_field("Current Assets") == "current_assets"
+    assert _match_field("Current Liabilities") == "current_liabilities"
+
+
+def test_pick_best_figure():
+    from server.services.statement_parser import _pick_best_figure
+    # Table with note number 24 followed by amounts
+    assert _pick_best_figure(["24", "3,500.00", "3,100.00"]) == "3,500.00"
+    # Single figure
+    assert _pick_best_figure(["1,700.00"]) == "1,700.00"
+    # Currency with scale
+    assert _pick_best_figure(["₹550.00 Cr"]) == "₹550.00 Cr"
+
+
+def test_parse_financial_excel():
+    from server.services.statement_parser import generate_sample_excel, parse_financial_excel
+    excel_bytes = generate_sample_excel()
+    data, warnings = parse_financial_excel(excel_bytes)
+    assert not warnings
+    assert data["revenue"] == 2400.0
+    assert data["cogs"] == 1680.0
+    assert data["gross_profit"] == 720.0
+    assert data["ebit"] == 360.0
+    assert data["net_profit"] == 240.0
+    assert data["current_assets"] == 650.0
+    assert data["inventory"] == 210.0
+    assert data["current_liabilities"] == 420.0
+    assert data["total_debt"] == 550.0
+    assert data["total_equity"] == 850.0
+    assert data["total_assets"] == 1820.0
+
+
+def test_parse_non_financial_pdf():
+    from server.services.statement_parser import parse_financial_pdf
+    # Empty bytes
+    data, warnings = parse_financial_pdf(b"")
+    assert not data
+    assert len(warnings) > 0
+
