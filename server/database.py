@@ -164,9 +164,13 @@ def init_db():
 
 # ─── SQLite Local Fallback Engine ─────────────────────────────────────────────
 
-def get_sqlite_conn():
-    """Get connection to local SQLite database with Row dictionary factory."""
-    conn = sqlite3.connect(LOCAL_DB_FILE)
+def get_sqlite_conn(timeout: float = 30.0):
+    """Get connection to local SQLite database with Row dictionary factory and 30s busy timeout."""
+    conn = sqlite3.connect(LOCAL_DB_FILE, timeout=timeout)
+    try:
+        conn.execute("PRAGMA busy_timeout=30000;")
+    except Exception:
+        pass
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -305,6 +309,10 @@ def _run_sqlite_migrations(conn):
 def init_local_sqlite():
     """Create local SQLite tables if they do not exist and seed if empty."""
     conn = get_sqlite_conn()
+    try:
+        conn.execute("PRAGMA journal_mode=WAL;")
+    except Exception:
+        pass
     cur = conn.cursor()
 
     cur.execute("""
