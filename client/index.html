@@ -2412,19 +2412,19 @@
                                     </div>
 
                                     <!-- 2. Attached Statement Status Badge -->
-                                    <div id="stmt-attached-banner" class="stmt-attached-card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; margin: 14px 0; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(52, 211, 153, 0.3); border-radius: 12px;">
+                                    <div id="stmt-attached-banner" class="stmt-attached-card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; margin: 14px 0; background: rgba(148, 163, 184, 0.04); border: 1px dashed rgba(148, 163, 184, 0.25); border-radius: 12px;">
                                         <div style="display: flex; align-items: center; gap: 12px;">
-                                            <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; color: #34D399; font-size: 1.1rem; font-weight: 700;">
-                                                ✓
+                                            <div id="stmt-status-icon-box" style="width: 34px; height: 34px; border-radius: 8px; background: rgba(148, 163, 184, 0.15); display: flex; align-items: center; justify-content: center; color: #94A3B8; font-size: 1.1rem; font-weight: 700;">
+                                                📑
                                             </div>
                                             <div>
-                                                <div style="font-weight: 700; color: #fff; font-size: 0.88rem;" id="stmt-active-doc-title">Audited Financial Statements (FY 2024-25)</div>
-                                                <div style="font-size: 0.74rem; color: #94A3B8;" id="stmt-active-doc-desc">Direct Balance Sheet &amp; P&amp;L statements attached · Zero manual typing required</div>
+                                                <div style="font-weight: 700; color: #fff; font-size: 0.88rem;" id="stmt-active-doc-title">No Financial Statement Uploaded</div>
+                                                <div style="font-size: 0.74rem; color: #94A3B8;" id="stmt-active-doc-desc">Drop your Balance Sheet &amp; P&amp;L file (.xlsx, .csv, .pdf) above or pick a sector preset below to calculate live ratios.</div>
                                             </div>
                                         </div>
                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span class="badge-emerald" id="stmt-status-pill">Active Statement</span>
-                                            <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('wiz-stmt-file-input').click();">Replace File</button>
+                                            <span class="badge-slate" id="stmt-status-pill" style="background: rgba(148, 163, 184, 0.15); color: #94A3B8; border: 1px solid rgba(148, 163, 184, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">Awaiting Upload</span>
+                                            <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('wiz-stmt-file-input').click();">Upload Statement</button>
                                         </div>
                                     </div>
 
@@ -2435,7 +2435,7 @@
                                             <span style="font-size: 0.72rem; color: #94A3B8;">1-Click Instant Sector Statement</span>
                                         </div>
                                         <div class="stmt-presets-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-                                            <div class="stmt-preset-card active" id="preset-manufacturing" onclick="applyFinancialPreset('manufacturing')" role="button" tabindex="0">
+                                            <div class="stmt-preset-card" id="preset-manufacturing" onclick="applyFinancialPreset('manufacturing')" role="button" tabindex="0">
                                                 <div class="preset-icon">🏭</div>
                                                 <div class="preset-info">
                                                     <div class="preset-title">Manufacturing Plant</div>
@@ -2482,7 +2482,7 @@
                                     <div class="stmt-table-card">
                                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                             <h4 style="font-size: 0.95rem; font-weight: 700; color: #F8FAFC; margin: 0;">Extracted Financial Statements Telemetry</h4>
-                                            <span style="font-size: 0.72rem; color: #34D399; font-weight: 600;">Direct Statement Analysis Active</span>
+                                            <span id="stmt-analysis-status" style="font-size: 0.72rem; color: #94A3B8; font-weight: 600;">Awaiting Statement Upload</span>
                                         </div>
 
                                         <div class="stmt-grid-tables">
@@ -2492,12 +2492,12 @@
                                                 <table class="stmt-table">
                                                     <thead><tr><th>Line Item</th><th style="text-align:right;">Amount (₹)</th></tr></thead>
                                                     <tbody>
-                                                        <tr><td>Revenue from Operations</td><td class="val-col" id="disp-revenue">₹1,25,00,000</td></tr>
-                                                        <tr><td>Cost of Goods Sold (COGS)</td><td class="val-col" id="disp-cogs">₹75,00,000</td></tr>
-                                                        <tr class="highlight-row"><td>Gross Profit</td><td class="val-col" id="disp-gross-profit">₹50,00,000 (40.0%)</td></tr>
-                                                        <tr><td>Operating Profit (EBIT)</td><td class="val-col" id="disp-ebit">₹14,00,000</td></tr>
-                                                        <tr><td>Interest Expenses</td><td class="val-col" id="disp-interest">₹2,50,000</td></tr>
-                                                        <tr class="highlight-row"><td>Net Profit (PAT)</td><td class="val-col" id="disp-net-profit">₹8,50,000 (6.8%)</td></tr>
+                                                        <tr><td>Revenue from Operations</td><td class="val-col" id="disp-revenue">—</td></tr>
+                                                        <tr><td>Cost of Goods Sold (COGS)</td><td class="val-col" id="disp-cogs">—</td></tr>
+                                                        <tr class="highlight-row"><td>Gross Profit</td><td class="val-col" id="disp-gross-profit">—</td></tr>
+                                                        <tr><td>Operating Profit (EBIT)</td><td class="val-col" id="disp-ebit">—</td></tr>
+                                                        <tr><td>Interest Expenses</td><td class="val-col" id="disp-interest">—</td></tr>
+                                                        <tr class="highlight-row"><td>Net Profit (PAT)</td><td class="val-col" id="disp-net-profit">—</td></tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -2508,12 +2508,12 @@
                                                 <table class="stmt-table">
                                                     <thead><tr><th>Line Item</th><th style="text-align:right;">Amount (₹)</th></tr></thead>
                                                     <tbody>
-                                                        <tr><td>Current Assets (Cash &amp; Receivables)</td><td class="val-col" id="disp-current-assets">₹4,50,00,000</td></tr>
-                                                        <tr><td>Inventory &amp; Finished Stock</td><td class="val-col" id="disp-inventory">₹1,80,00,000</td></tr>
-                                                        <tr><td>Current Liabilities (Short-Term)</td><td class="val-col" id="disp-current-liab">₹2,80,00,000</td></tr>
-                                                        <tr><td>Total Debt &amp; Borrowings</td><td class="val-col" id="disp-total-debt">₹3,20,00,000</td></tr>
-                                                        <tr class="highlight-row"><td>Shareholders' Equity</td><td class="val-col" id="disp-equity">₹4,80,00,000</td></tr>
-                                                        <tr><td>Annual Credit Sales</td><td class="val-col" id="disp-credit-sales">₹9,50,00,000</td></tr>
+                                                        <tr><td>Current Assets (Cash &amp; Receivables)</td><td class="val-col" id="disp-current-assets">—</td></tr>
+                                                        <tr><td>Inventory &amp; Finished Stock</td><td class="val-col" id="disp-inventory">—</td></tr>
+                                                        <tr><td>Current Liabilities (Short-Term)</td><td class="val-col" id="disp-current-liab">—</td></tr>
+                                                        <tr><td>Total Debt &amp; Borrowings</td><td class="val-col" id="disp-total-debt">—</td></tr>
+                                                        <tr class="highlight-row"><td>Shareholders' Equity</td><td class="val-col" id="disp-equity">—</td></tr>
+                                                        <tr><td>Annual Credit Sales</td><td class="val-col" id="disp-credit-sales">—</td></tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -2532,49 +2532,49 @@
                                                 <div class="stmt-kpi-item">
                                                     <span style="display:block; font-size:0.62rem; color:#60A5FA; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Liquidity</span>
                                                     <div class="stmt-kpi-label">Current Ratio</div>
-                                                    <div class="stmt-kpi-val" id="disp-kpi-cr">1.61x</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-cr">—</div>
                                                     <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">CA ÷ CL</div>
                                                 </div>
                                                 <div class="stmt-kpi-item">
                                                     <span style="display:block; font-size:0.62rem; color:#60A5FA; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Liquidity</span>
                                                     <div class="stmt-kpi-label">Quick Ratio</div>
-                                                    <div class="stmt-kpi-val" id="disp-kpi-qr">0.96x</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-qr">—</div>
                                                     <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">(CA − Inv) ÷ CL</div>
                                                 </div>
                                                 <div class="stmt-kpi-item">
                                                     <span style="display:block; font-size:0.62rem; color:#A78BFA; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Solvency</span>
                                                     <div class="stmt-kpi-label">Debt-to-Equity</div>
-                                                    <div class="stmt-kpi-val" id="disp-kpi-de">0.67x</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-de">—</div>
                                                     <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">Debt ÷ Equity</div>
                                                 </div>
                                                 <div class="stmt-kpi-item">
                                                     <span style="display:block; font-size:0.62rem; color:#34D399; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Profitability</span>
                                                     <div class="stmt-kpi-label">Net Profit Margin</div>
-                                                    <div class="stmt-kpi-val" id="disp-kpi-npm">6.8%</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-npm">—</div>
                                                     <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">PAT ÷ Rev × 100</div>
                                                 </div>
                                                 <div class="stmt-kpi-item">
                                                     <span style="display:block; font-size:0.62rem; color:#34D399; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Profitability</span>
                                                     <div class="stmt-kpi-label">Operating Margin</div>
-                                                    <div class="stmt-kpi-val" id="disp-kpi-opm">11.2%</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-opm">—</div>
                                                     <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">EBIT ÷ Rev × 100</div>
                                                 </div>
                                                 <div class="stmt-kpi-item">
                                                     <span style="display:block; font-size:0.62rem; color:#F59E0B; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Debt Servicing</span>
                                                     <div class="stmt-kpi-label">Interest Coverage</div>
-                                                    <div class="stmt-kpi-val" id="disp-kpi-icr">5.6x</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-icr">—</div>
                                                     <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">EBIT ÷ Interest</div>
                                                 </div>
                                                 <div class="stmt-kpi-item">
                                                     <span style="display:block; font-size:0.62rem; color:#F472B6; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Efficiency</span>
                                                     <div class="stmt-kpi-label">Inventory Turnover</div>
-                                                    <div class="stmt-kpi-val" id="disp-kpi-it">4.3x</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-it">—</div>
                                                     <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">COGS ÷ Avg Inv</div>
                                                 </div>
                                                 <div class="stmt-kpi-item">
                                                     <span style="display:block; font-size:0.62rem; color:#F472B6; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Efficiency</span>
                                                     <div class="stmt-kpi-label">Receivable Days</div>
-                                                    <div class="stmt-kpi-val" id="disp-kpi-dso">46 days</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-dso">—</div>
                                                     <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">Rec ÷ Sales × 365</div>
                                                 </div>
                                             </div>
@@ -2590,37 +2590,37 @@
                                                 <!-- Liquidity Supporting -->
                                                 <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px;">
                                                     <div style="font-size: 0.75rem; font-weight: 700; color: #60A5FA; margin-bottom: 6px;">💧 Liquidity Supporting</div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Cash Ratio:</span><strong id="disp-sup-cash-ratio" style="color: #F8FAFC;">0.43x</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Working Capital:</span><strong id="disp-sup-wc" style="color: #34D399;">₹1.70 Cr</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>WC to Total Assets:</span><strong id="disp-sup-wc-assets" style="color: #F8FAFC;">21.25%</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Cash Ratio:</span><strong id="disp-sup-cash-ratio" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Working Capital:</span><strong id="disp-sup-wc" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>WC to Total Assets:</span><strong id="disp-sup-wc-assets" style="color: #94A3B8;">—</strong></div>
                                                 </div>
                                                 <!-- Solvency Supporting -->
                                                 <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px;">
                                                     <div style="font-size: 0.75rem; font-weight: 700; color: #A78BFA; margin-bottom: 6px;">🏛️ Solvency Supporting</div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Debt-to-Assets:</span><strong id="disp-sup-debt-assets" style="color: #F8FAFC;">40.0%</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Equity Ratio:</span><strong id="disp-sup-equity-ratio" style="color: #F8FAFC;">60.0%</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Debt-to-EBITDA:</span><strong id="disp-sup-debt-ebitda" style="color: #F8FAFC;">2.29x</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>DSCR:</span><strong id="disp-sup-dscr" style="color: #34D399;">3.2x</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Debt-to-Assets:</span><strong id="disp-sup-debt-assets" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Equity Ratio:</span><strong id="disp-sup-equity-ratio" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Debt-to-EBITDA:</span><strong id="disp-sup-debt-ebitda" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>DSCR:</span><strong id="disp-sup-dscr" style="color: #94A3B8;">—</strong></div>
                                                 </div>
                                                 <!-- Profitability Supporting -->
                                                 <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px;">
                                                     <div style="font-size: 0.75rem; font-weight: 700; color: #34D399; margin-bottom: 6px;">📈 Profitability Supporting</div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Gross Profit Margin:</span><strong id="disp-sup-gross-margin" style="color: #F8FAFC;">40.0%</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>ROA (Return on Assets):</span><strong id="disp-sup-roa" style="color: #F8FAFC;">10.6%</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>ROE (Return on Equity):</span><strong id="disp-sup-roe" style="color: #F8FAFC;">17.7%</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>ROCE (Capital Employed):</span><strong id="disp-sup-roce" style="color: #34D399;">26.9%</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>EBITDA Margin:</span><strong id="disp-sup-ebitda-margin" style="color: #F8FAFC;">14.4%</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Expense Ratio:</span><strong id="disp-sup-expense-ratio" style="color: #F8FAFC;">28.8%</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Gross Profit Margin:</span><strong id="disp-sup-gross-margin" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>ROA (Return on Assets):</span><strong id="disp-sup-roa" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>ROE (Return on Equity):</span><strong id="disp-sup-roe" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>ROCE (Capital Employed):</span><strong id="disp-sup-roce" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>EBITDA Margin:</span><strong id="disp-sup-ebitda-margin" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Expense Ratio:</span><strong id="disp-sup-expense-ratio" style="color: #94A3B8;">—</strong></div>
                                                 </div>
                                                 <!-- Efficiency Supporting -->
                                                 <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px;">
                                                     <div style="font-size: 0.75rem; font-weight: 700; color: #F472B6; margin-bottom: 6px;">⚡ Efficiency Supporting</div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Total Asset Turnover:</span><strong id="disp-sup-asset-turnover" style="color: #F8FAFC;">1.56x</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Receivables Turnover:</span><strong id="disp-sup-rec-turnover" style="color: #F8FAFC;">7.9x</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Payables Turnover:</span><strong id="disp-sup-pay-turnover" style="color: #F8FAFC;">6.2x</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Payable Days:</span><strong id="disp-sup-pay-days" style="color: #F8FAFC;">59 days</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Inventory Days:</span><strong id="disp-sup-inv-days" style="color: #F8FAFC;">85 days</strong></div>
-                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Cash Conversion Cycle:</span><strong id="disp-sup-ccc" style="color: #34D399;">72 days</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Total Asset Turnover:</span><strong id="disp-sup-asset-turnover" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Receivables Turnover:</span><strong id="disp-sup-rec-turnover" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Payables Turnover:</span><strong id="disp-sup-pay-turnover" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Payable Days:</span><strong id="disp-sup-pay-days" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Inventory Days:</span><strong id="disp-sup-inv-days" style="color: #94A3B8;">—</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Cash Conversion Cycle:</span><strong id="disp-sup-ccc" style="color: #94A3B8;">—</strong></div>
                                                 </div>
                                             </div>
                                         </details>
@@ -2635,55 +2635,55 @@
                                             <div class="wiz-form-grid">
                                                 <div class="form-group">
                                                     <label for="wiz-current-assets">Current Assets (₹)</label>
-                                                    <input type="number" id="wiz-current-assets" class="form-control" value="45000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-current-assets" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-inventory">Inventory / Stock (₹)</label>
-                                                    <input type="number" id="wiz-inventory" class="form-control" value="18000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-inventory" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-current-liabilities">Current Liabilities (₹)</label>
-                                                    <input type="number" id="wiz-current-liabilities" class="form-control" value="28000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-current-liabilities" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-total-debt">Total Debt / Borrowings (₹)</label>
-                                                    <input type="number" id="wiz-total-debt" class="form-control" value="32000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-total-debt" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-equity">Shareholders' Equity (₹)</label>
-                                                    <input type="number" id="wiz-equity" class="form-control" value="48000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-equity" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-revenue">Total Revenue / Sales (₹)</label>
-                                                    <input type="number" id="wiz-revenue" class="form-control" value="125000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-revenue" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-cogs">Cost of Goods Sold (COGS) (₹)</label>
-                                                    <input type="number" id="wiz-cogs" class="form-control" value="75000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-cogs" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-operating-profit">Operating Profit (EBIT) (₹)</label>
-                                                    <input type="number" id="wiz-operating-profit" class="form-control" value="14000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-operating-profit" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-net-profit">Net Profit (PAT) (₹)</label>
-                                                    <input type="number" id="wiz-net-profit" class="form-control" value="8500000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-net-profit" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-interest">Interest Expense (₹)</label>
-                                                    <input type="number" id="wiz-interest" class="form-control" value="2500000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-interest" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-avg-inventory">Average Inventory (₹)</label>
-                                                    <input type="number" id="wiz-avg-inventory" class="form-control" value="17500000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-avg-inventory" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-avg-receivables">Average Receivables (₹)</label>
-                                                    <input type="number" id="wiz-avg-receivables" class="form-control" value="12000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-avg-receivables" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="wiz-credit-sales">Annual Credit Sales (₹)</label>
-                                                    <input type="number" id="wiz-credit-sales" class="form-control" value="95000000" min="0" step="any" oninput="syncManualFinancials()" required>
+                                                    <input type="number" id="wiz-credit-sales" class="form-control" value="0" min="0" step="any" oninput="syncManualFinancials()" required>
                                                 </div>
                                             </div>
                                         </div>

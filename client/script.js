@@ -11341,6 +11341,32 @@ function updateFinancialStatementUI(data, docTitle, docDesc) {
     if (titleEl && docTitle) titleEl.textContent = docTitle;
     if (descEl && docDesc) descEl.textContent = docDesc;
 
+    // Set Active styling on status banner
+    const pillEl = document.getElementById('stmt-status-pill');
+    if (pillEl) {
+        pillEl.textContent = 'Active Statement';
+        pillEl.className = 'badge-emerald';
+        pillEl.style.background = '';
+        pillEl.style.color = '';
+        pillEl.style.border = '';
+    }
+    const iconBox = document.getElementById('stmt-status-icon-box');
+    if (iconBox) {
+        iconBox.innerHTML = '✓';
+        iconBox.style.background = 'rgba(16, 185, 129, 0.2)';
+        iconBox.style.color = '#34D399';
+    }
+    const bannerEl = document.getElementById('stmt-attached-banner');
+    if (bannerEl) {
+        bannerEl.style.background = 'rgba(16, 185, 129, 0.08)';
+        bannerEl.style.border = '1px solid rgba(52, 211, 153, 0.3)';
+    }
+    const statusEl = document.getElementById('stmt-analysis-status');
+    if (statusEl) {
+        statusEl.textContent = 'Direct Statement Analysis Active';
+        statusEl.style.color = '#34D399';
+    }
+
     // Derived figures
     const rev = Math.abs(Number(data.revenue) || 0);
     const cogs = Math.abs(Number(data.cogs) || 0);
@@ -11471,6 +11497,70 @@ function updateFinancialStatementUI(data, docTitle, docDesc) {
 
     const errBox = document.getElementById('wiz-step3-error-banner');
     if (errBox) errBox.style.display = 'none';
+}
+
+function resetFinancialStatementUI() {
+    const titleEl = document.getElementById('stmt-active-doc-title');
+    const descEl = document.getElementById('stmt-active-doc-desc');
+    const pillEl = document.getElementById('stmt-status-pill');
+    const iconBox = document.getElementById('stmt-status-icon-box');
+    const bannerEl = document.getElementById('stmt-attached-banner');
+    const statusEl = document.getElementById('stmt-analysis-status');
+
+    if (titleEl) titleEl.textContent = 'No Financial Statement Uploaded';
+    if (descEl) descEl.textContent = 'Drop your Balance Sheet & P&L (.xlsx, .csv, .pdf) above or pick a sector preset below to calculate live ratios.';
+    if (pillEl) {
+        pillEl.textContent = 'Awaiting Upload';
+        pillEl.className = 'badge-slate';
+        pillEl.style.background = 'rgba(148, 163, 184, 0.15)';
+        pillEl.style.color = '#94A3B8';
+        pillEl.style.border = '1px solid rgba(148, 163, 184, 0.3)';
+    }
+    if (iconBox) {
+        iconBox.innerHTML = '📑';
+        iconBox.style.background = 'rgba(148, 163, 184, 0.15)';
+        iconBox.style.color = '#94A3B8';
+    }
+    if (bannerEl) {
+        bannerEl.style.background = 'rgba(148, 163, 184, 0.04)';
+        bannerEl.style.border = '1px dashed rgba(148, 163, 184, 0.25)';
+    }
+    if (statusEl) {
+        statusEl.textContent = 'Awaiting Statement Upload';
+        statusEl.style.color = '#94A3B8';
+    }
+
+    document.querySelectorAll('.stmt-preset-card').forEach(card => card.classList.remove('active'));
+
+    const setTxt = (id, txt) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = txt;
+    };
+
+    // Telemetry items -> '—'
+    ['disp-revenue', 'disp-cogs', 'disp-gross-profit', 'disp-ebit', 'disp-interest', 'disp-net-profit',
+     'disp-current-assets', 'disp-inventory', 'disp-current-liab', 'disp-total-debt', 'disp-equity', 'disp-credit-sales'
+    ].forEach(id => setTxt(id, '—'));
+
+    // 8 Essential KPIs -> '—'
+    ['disp-kpi-cr', 'disp-kpi-qr', 'disp-kpi-de', 'disp-kpi-npm', 'disp-kpi-opm', 'disp-kpi-icr', 'disp-kpi-it', 'disp-kpi-dso'
+    ].forEach(id => setTxt(id, '—'));
+
+    // Supporting KPIs -> '—'
+    ['disp-sup-cash-ratio', 'disp-sup-wc', 'disp-sup-wc-assets', 'disp-sup-debt-assets', 'disp-sup-equity-ratio',
+     'disp-sup-debt-ebitda', 'disp-sup-dscr', 'disp-sup-gross-margin', 'disp-sup-roa', 'disp-sup-roe', 'disp-sup-roce',
+     'disp-sup-ebitda-margin', 'disp-sup-expense-ratio', 'disp-sup-asset-turnover', 'disp-sup-rec-turnover',
+     'disp-sup-pay-turnover', 'disp-sup-pay-days', 'disp-sup-inv-days', 'disp-sup-ccc'
+    ].forEach(id => setTxt(id, '—'));
+
+    const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+    };
+    ['wiz-current-assets', 'wiz-inventory', 'wiz-current-liabilities', 'wiz-total-debt', 'wiz-equity',
+     'wiz-revenue', 'wiz-cogs', 'wiz-operating-profit', 'wiz-net-profit', 'wiz-interest',
+     'wiz-avg-inventory', 'wiz-avg-receivables', 'wiz-credit-sales'
+    ].forEach(id => setVal(id, 0));
 }
 
 function applyFinancialPreset(sector) {
@@ -11842,6 +11932,16 @@ const assessmentWizard = {
 
 
     validateStep3() {
+        const revVal = parseFloat(document.getElementById('wiz-revenue')?.value) || 0;
+        if (revVal <= 0) {
+            const errBox = document.getElementById('wiz-step3-error-banner');
+            if (errBox) {
+                errBox.style.display = 'block';
+                errBox.innerHTML = '<strong>⚠️ No Financial Statement Attached:</strong> Please drop your corporate Balance Sheet &amp; P&amp;L file (Excel/PDF/CSV) or click one of the sector presets to proceed.';
+            }
+            showToast('⚠️ Please upload a financial statement or select a preset to proceed.', 'warning');
+            return false;
+        }
 
         const reqFields = [
 
