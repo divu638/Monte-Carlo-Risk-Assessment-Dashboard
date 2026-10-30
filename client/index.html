@@ -2514,29 +2514,111 @@
                                             </div>
                                         </div>
 
-                                        <!-- KPI Telemetry Bar -->
-                                        <div class="stmt-kpi-bar">
-                                            <div class="stmt-kpi-item">
-                                                <div class="stmt-kpi-label">Current Ratio</div>
-                                                <div class="stmt-kpi-val" id="disp-kpi-cr">1.61x</div>
+                                        <!-- 8 Main Essential Financial Ratios -->
+                                        <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                                                <h5 style="font-size: 0.84rem; font-weight: 700; color: #34D399; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+                                                    <span>⭐</span> 8 Main Essential Financial Ratios
+                                                </h5>
+                                                <span style="font-size: 0.72rem; color: #94A3B8;">Calculated Live from Statement</span>
                                             </div>
-                                            <div class="stmt-kpi-item">
-                                                <div class="stmt-kpi-label">Quick Ratio</div>
-                                                <div class="stmt-kpi-val" id="disp-kpi-qr">0.96x</div>
-                                            </div>
-                                            <div class="stmt-kpi-item">
-                                                <div class="stmt-kpi-label">Debt-to-Equity</div>
-                                                <div class="stmt-kpi-val" id="disp-kpi-de">0.67x</div>
-                                            </div>
-                                            <div class="stmt-kpi-item">
-                                                <div class="stmt-kpi-label">Net Profit Margin</div>
-                                                <div class="stmt-kpi-val" id="disp-kpi-npm">6.8%</div>
-                                            </div>
-                                            <div class="stmt-kpi-item">
-                                                <div class="stmt-kpi-label">Interest Coverage</div>
-                                                <div class="stmt-kpi-val" id="disp-kpi-icr">5.6x</div>
+
+                                            <div class="stmt-kpi-bar" style="grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); margin-top: 0; padding-top: 0; border-top: none;">
+                                                <div class="stmt-kpi-item">
+                                                    <span style="display:block; font-size:0.62rem; color:#60A5FA; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Liquidity</span>
+                                                    <div class="stmt-kpi-label">Current Ratio</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-cr">1.61x</div>
+                                                    <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">CA ÷ CL</div>
+                                                </div>
+                                                <div class="stmt-kpi-item">
+                                                    <span style="display:block; font-size:0.62rem; color:#60A5FA; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Liquidity</span>
+                                                    <div class="stmt-kpi-label">Quick Ratio</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-qr">0.96x</div>
+                                                    <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">(CA − Inv) ÷ CL</div>
+                                                </div>
+                                                <div class="stmt-kpi-item">
+                                                    <span style="display:block; font-size:0.62rem; color:#A78BFA; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Solvency</span>
+                                                    <div class="stmt-kpi-label">Debt-to-Equity</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-de">0.67x</div>
+                                                    <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">Debt ÷ Equity</div>
+                                                </div>
+                                                <div class="stmt-kpi-item">
+                                                    <span style="display:block; font-size:0.62rem; color:#34D399; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Profitability</span>
+                                                    <div class="stmt-kpi-label">Net Profit Margin</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-npm">6.8%</div>
+                                                    <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">PAT ÷ Rev × 100</div>
+                                                </div>
+                                                <div class="stmt-kpi-item">
+                                                    <span style="display:block; font-size:0.62rem; color:#34D399; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Profitability</span>
+                                                    <div class="stmt-kpi-label">Operating Margin</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-opm">11.2%</div>
+                                                    <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">EBIT ÷ Rev × 100</div>
+                                                </div>
+                                                <div class="stmt-kpi-item">
+                                                    <span style="display:block; font-size:0.62rem; color:#F59E0B; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Debt Servicing</span>
+                                                    <div class="stmt-kpi-label">Interest Coverage</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-icr">5.6x</div>
+                                                    <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">EBIT ÷ Interest</div>
+                                                </div>
+                                                <div class="stmt-kpi-item">
+                                                    <span style="display:block; font-size:0.62rem; color:#F472B6; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Efficiency</span>
+                                                    <div class="stmt-kpi-label">Inventory Turnover</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-it">4.3x</div>
+                                                    <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">COGS ÷ Avg Inv</div>
+                                                </div>
+                                                <div class="stmt-kpi-item">
+                                                    <span style="display:block; font-size:0.62rem; color:#F472B6; text-transform:uppercase; font-weight:700; margin-bottom:2px;">Efficiency</span>
+                                                    <div class="stmt-kpi-label">Receivable Days</div>
+                                                    <div class="stmt-kpi-val" id="disp-kpi-dso">46 days</div>
+                                                    <div style="font-size: 0.60rem; color: #64748B; margin-top: 2px;">Rec ÷ Sales × 365</div>
+                                                </div>
                                             </div>
                                         </div>
+
+                                        <!-- Supporting Financial Ratios (Collapsible Accordion) -->
+                                        <details style="margin-top: 14px; background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 10px 14px;">
+                                            <summary style="font-size: 0.8rem; font-weight: 700; color: #38BDF8; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: space-between;">
+                                                <span>📊 View Supporting Ratios (Liquidity · Solvency · Profitability · Efficiency)</span>
+                                                <span style="font-size: 0.72rem; color: #94A3B8; font-weight: 400;">Full Financial Suite</span>
+                                            </summary>
+                                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
+                                                <!-- Liquidity Supporting -->
+                                                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px;">
+                                                    <div style="font-size: 0.75rem; font-weight: 700; color: #60A5FA; margin-bottom: 6px;">💧 Liquidity Supporting</div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Cash Ratio:</span><strong id="disp-sup-cash-ratio" style="color: #F8FAFC;">0.43x</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Working Capital:</span><strong id="disp-sup-wc" style="color: #34D399;">₹1.70 Cr</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>WC to Total Assets:</span><strong id="disp-sup-wc-assets" style="color: #F8FAFC;">21.25%</strong></div>
+                                                </div>
+                                                <!-- Solvency Supporting -->
+                                                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px;">
+                                                    <div style="font-size: 0.75rem; font-weight: 700; color: #A78BFA; margin-bottom: 6px;">🏛️ Solvency Supporting</div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Debt-to-Assets:</span><strong id="disp-sup-debt-assets" style="color: #F8FAFC;">40.0%</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Equity Ratio:</span><strong id="disp-sup-equity-ratio" style="color: #F8FAFC;">60.0%</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Debt-to-EBITDA:</span><strong id="disp-sup-debt-ebitda" style="color: #F8FAFC;">2.29x</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>DSCR:</span><strong id="disp-sup-dscr" style="color: #34D399;">3.2x</strong></div>
+                                                </div>
+                                                <!-- Profitability Supporting -->
+                                                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px;">
+                                                    <div style="font-size: 0.75rem; font-weight: 700; color: #34D399; margin-bottom: 6px;">📈 Profitability Supporting</div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Gross Profit Margin:</span><strong id="disp-sup-gross-margin" style="color: #F8FAFC;">40.0%</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>ROA (Return on Assets):</span><strong id="disp-sup-roa" style="color: #F8FAFC;">10.6%</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>ROE (Return on Equity):</span><strong id="disp-sup-roe" style="color: #F8FAFC;">17.7%</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>ROCE (Capital Employed):</span><strong id="disp-sup-roce" style="color: #34D399;">26.9%</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>EBITDA Margin:</span><strong id="disp-sup-ebitda-margin" style="color: #F8FAFC;">14.4%</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Expense Ratio:</span><strong id="disp-sup-expense-ratio" style="color: #F8FAFC;">28.8%</strong></div>
+                                                </div>
+                                                <!-- Efficiency Supporting -->
+                                                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px;">
+                                                    <div style="font-size: 0.75rem; font-weight: 700; color: #F472B6; margin-bottom: 6px;">⚡ Efficiency Supporting</div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Total Asset Turnover:</span><strong id="disp-sup-asset-turnover" style="color: #F8FAFC;">1.56x</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Receivables Turnover:</span><strong id="disp-sup-rec-turnover" style="color: #F8FAFC;">7.9x</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Payables Turnover:</span><strong id="disp-sup-pay-turnover" style="color: #F8FAFC;">6.2x</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Payable Days:</span><strong id="disp-sup-pay-days" style="color: #F8FAFC;">59 days</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Inventory Days:</span><strong id="disp-sup-inv-days" style="color: #F8FAFC;">85 days</strong></div>
+                                                    <div style="display: flex; justify-content: space-between; font-size: 0.73rem; padding: 3px 0; color: #CBD5E1;"><span>Cash Conversion Cycle:</span><strong id="disp-sup-ccc" style="color: #34D399;">72 days</strong></div>
+                                                </div>
+                                            </div>
+                                        </details>
                                     </div>
 
                                     <!-- 5. Collapsible Optional Adjustment Form (Hidden by default, keeps existing models 100% compatible) -->

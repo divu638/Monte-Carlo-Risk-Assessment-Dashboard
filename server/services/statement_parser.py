@@ -1,106 +1,390 @@
 """
-Financial Statement CSV/Excel Parser — RiskGuard Pro
+Financial Statement CSV/Excel/Text Parser — RiskGuard Pro
 
-Parses uploaded corporate financial statements in CSV format,
+Parses uploaded corporate financial statements in CSV/TSV/JSON format,
 maps flexible column/row names to standard financial parameters,
 and validates quantitative inputs for downstream ratio computation.
+Supports both key-value exports and columnar formats, currency symbols (₹, $, €, £),
+lakhs/crores notation, and accounting identities.
 """
 
 import io
 import csv
+import re
+import json
 from typing import Dict, Any, Tuple
 
 
-# Flexible mapping for header aliases
+# Comprehensive mapping for financial field aliases across Indian & Global reporting standards
 FIELD_ALIASES = {
-    "current_assets": ["current assets", "current_assets", "ca", "currentassets"],
-    "current_liabilities": ["current liabilities", "current_liabilities", "cl", "currentliabilities"],
-    "cash_and_equivalents": ["cash", "cash and equivalents", "cash & cash equivalents", "cash_and_equivalents"],
-    "inventory": ["inventory", "inventories", "stock", "stock in trade"],
-    "total_assets": ["total assets", "total_assets", "assets"],
-    "total_debt": ["total debt", "total_debt", "debt", "borrowings", "short and long term debt"],
-    "total_equity": ["total equity", "equity", "shareholder equity", "net worth", "owners equity"],
-    "revenue": ["revenue", "sales", "turnover", "total revenue", "gross sales"],
-    "gross_profit": ["gross profit", "gross_profit", "gross margin amount"],
-    "net_profit": ["net profit", "net income", "profit after tax", "pat", "net_profit"],
-    "ebit": ["ebit", "operating profit", "operating income"],
-    "ebitda": ["ebitda", "operating profit before depreciation"],
-    "interest_expense": ["interest", "interest expense", "finance costs"],
-    "accounts_receivable": ["accounts receivable", "receivables", "debtors", "trade receivables"],
-    "retained_earnings": ["retained earnings", "reserves and surplus"]
+    "revenue": [
+        "revenue", "revenue from operations", "sales", "turnover", "total revenue",
+        "gross sales", "net revenue", "net sales", "operating revenue", "topline",
+        "income from operations"
+    ],
+    "cogs": [
+        "cost of goods sold", "cogs", "cost of sales", "direct expenses", "cost of materials consumed",
+        "production costs", "direct costs", "cost of revenue", "purchase of stock in trade"
+    ],
+    "gross_profit": [
+        "gross profit", "gross_profit", "gp", "gross margin amount", "gross income"
+    ],
+    "ebit": [
+        "ebit", "operating profit", "operating income", "pbit", "profit before interest and tax",
+        "operating profit (ebit)", "earnings before interest and tax"
+    ],
+    "operating_expenses": [
+        "operating expenses", "operating expense", "opex", "sga", "selling general and administrative",
+        "administrative expenses", "employee benefits", "indirect expenses", "other expenses"
+    ],
+    "depreciation_amortization": [
+        "depreciation", "depreciation and amortisation", "depreciation & amortisation", "depreciation and amortization",
+        "amortisation", "amortization", "dna", "depreciation expense"
+    ],
+    "ebitda": [
+        "ebitda", "operating profit before depreciation", "operating profit before dna",
+        "earnings before interest taxes depreciation"
+    ],
+    "interest_expense": [
+        "interest", "interest expense", "interest expenses", "finance costs", "borrowing costs",
+        "finance charges", "interest paid"
+    ],
+    "profit_before_tax": [
+        "profit before tax", "pbt", "ebt", "earnings before tax", "profit before taxation"
+    ],
+    "tax_expense": [
+        "tax", "income tax", "taxes", "tax expense", "current tax", "provision for tax", "income tax expense"
+    ],
+    "net_profit": [
+        "net profit", "net income", "profit after tax", "pat", "net_profit", "profit for the period",
+        "bottom line", "net profit after tax", "profit after taxation"
+    ],
+    "current_assets": [
+        "current assets", "current_assets", "ca", "currentassets", "total current assets"
+    ],
+    "cash_and_equivalents": [
+        "cash", "cash and equivalents", "cash & cash equivalents", "cash & bank", "cash and bank",
+        "cash and bank balances", "cash in hand", "bank balance", "cash equivalents"
+    ],
+    "short_term_investments": [
+        "short term investments", "short-term investments", "marketable securities",
+        "current investments", "st investments"
+    ],
+    "accounts_receivable": [
+        "accounts receivable", "receivables", "debtors", "trade receivables", "sundry debtors",
+        "bills receivable"
+    ],
+    "inventory": [
+        "inventory", "inventories", "stock", "stock in trade", "finished goods",
+        "raw materials", "work-in-progress", "work in progress", "wip", "closing stock", "closing inventory"
+    ],
+    "prepaid_expenses": [
+        "prepaid expenses", "prepaid expense", "prepayments", "expenses paid in advance",
+        "advance tax", "prepaid"
+    ],
+    "other_current_assets": [
+        "other current assets", "short term advances", "recoverable taxes", "other ca"
+    ],
+    "current_liabilities": [
+        "current liabilities", "current_liabilities", "cl", "currentliabilities",
+        "total current liabilities"
+    ],
+    "accounts_payable": [
+        "accounts payable", "trade payables", "payables", "creditors", "sundry creditors",
+        "bills payable"
+    ],
+    "short_term_borrowings": [
+        "short term borrowings", "short-term borrowings", "short term debt", "short term loans",
+        "bank overdraft", "cash credit", "current borrowings", "st debt"
+    ],
+    "outstanding_expenses": [
+        "outstanding expenses", "accrued expenses", "expenses payable", "accrued liabilities"
+    ],
+    "taxes_payable": [
+        "taxes payable", "tax payable", "provision for taxation", "income tax payable"
+    ],
+    "current_portion_debt": [
+        "current portion of long-term debt", "current maturities of long term debt", "current portion of debt"
+    ],
+    "total_debt": [
+        "total debt", "total_debt", "debt", "borrowings", "short and long term debt",
+        "total borrowings", "secured loans", "loan liabilities"
+    ],
+    "long_term_borrowings": [
+        "long term borrowings", "long-term borrowings", "long term debt", "term loans",
+        "non-current liabilities", "debentures", "bonds"
+    ],
+    "total_equity": [
+        "total equity", "equity", "shareholder equity", "shareholders equity", "shareholders' equity",
+        "net worth", "owners equity", "total net worth", "share capital"
+    ],
+    "share_capital": [
+        "share capital", "equity share capital", "paid up capital", "capital"
+    ],
+    "retained_earnings": [
+        "retained earnings", "reserves and surplus", "reserves & surplus", "accumulated profits",
+        "general reserve", "reserves"
+    ],
+    "non_current_assets": [
+        "non current assets", "non-current assets", "fixed assets", "net fixed assets",
+        "property plant and equipment", "ppe", "gross block", "net block", "capital work in progress"
+    ],
+    "total_assets": [
+        "total assets", "total_assets", "assets", "balance sheet total"
+    ],
+    "total_liabilities": [
+        "total liabilities", "total_liabilities", "liabilities"
+    ],
+    "credit_sales": [
+        "credit sales", "net credit sales", "annual credit sales"
+    ],
+    "credit_purchases": [
+        "credit purchases", "net credit purchases", "purchases", "annual credit purchases"
+    ],
+    "avg_inventory": [
+        "average inventory", "avg inventory", "avg_inventory"
+    ],
+    "avg_receivables": [
+        "average receivables", "avg receivables", "avg_receivables", "average trade receivables"
+    ],
+    "avg_payables": [
+        "average payables", "avg payables", "avg_payables", "average trade payables"
+    ],
+    "operating_cash_flow": [
+        "operating cash flow", "cash flow from operations", "cash flow available for debt service", "cfads"
+    ],
+    "total_debt_service": [
+        "total debt service", "debt service", "debt servicing", "principal and interest", "total debt repayments"
+    ]
 }
+
+
+def _clean_numeric_value(val_str: str) -> float:
+    """Parse number supporting commas, currencies (₹, $, €, £), parentheses for negative, and scale suffixes."""
+    if not val_str:
+        raise ValueError("Empty string")
+    
+    val_str = str(val_str).strip()
+    # Check for negative in parentheses e.g. (50,000)
+    is_neg = False
+    if val_str.startswith('(') and val_str.endswith(')'):
+        is_neg = True
+        val_str = val_str[1:-1].strip()
+    elif val_str.startswith('-'):
+        is_neg = True
+        val_str = val_str[1:].strip()
+
+    # Strip currency signs & common whitespace
+    for char in ['₹', '$', '€', '£', ',', ' ']:
+        val_str = val_str.replace(char, '')
+
+    # Check for multiplier units like Cr, Lakh, k, M
+    multiplier = 1.0
+    val_lower = val_str.lower()
+    if 'cr' in val_lower or 'crore' in val_lower:
+        multiplier = 10_000_000.0
+        val_str = re.sub(r'(cr|crores?|crore)', '', val_str, flags=re.I).strip()
+    elif 'lakh' in val_lower or 'lac' in val_lower or val_lower.endswith('l'):
+        multiplier = 100_000.0
+        val_str = re.sub(r'(lakhs?|lacs?|lac|l)', '', val_str, flags=re.I).strip()
+    elif 'm' in val_lower or 'million' in val_lower:
+        multiplier = 1_000_000.0
+        val_str = re.sub(r'(millions?|million|m)', '', val_str, flags=re.I).strip()
+    elif 'k' in val_lower:
+        multiplier = 1_000.0
+        val_str = re.sub(r'(k)', '', val_str, flags=re.I).strip()
+
+    num = float(val_str) * multiplier
+    return -num if is_neg else num
+
+
+def _match_field(key_str: str) -> str:
+    """Match a cleaned raw key against known FIELD_ALIASES."""
+    clean = key_str.lower().strip()
+    clean = re.sub(r'[\(\[\{].*?[\)\]\}]', '', clean)  # remove parenthesized hints like (₹) or (INR)
+    clean = re.sub(r'[^a-z0-9\s&_]', '', clean).strip()
+    
+    # Exact match first
+    for field, aliases in FIELD_ALIASES.items():
+        if clean == field or clean in aliases:
+            return field
+            
+    # Substring match with boundary check
+    for field, aliases in FIELD_ALIASES.items():
+        for alias in aliases:
+            if alias in clean or clean in alias:
+                return field
+                
+    return None
 
 
 def parse_financial_csv(content_str: str) -> Tuple[Dict[str, float], list]:
     """
-    Parse CSV content supporting both Key-Value rows and Columnar Header rows.
+    Parse CSV / TSV / JSON content supporting both Key-Value rows and Columnar Header rows.
     Returns (parsed_data_dict, list_of_warnings).
     """
     warnings = []
     data = {}
     
+    if not content_str or not content_str.strip():
+        return data, ["The uploaded statement content is empty."]
+
+    # Try JSON format first
+    content_str_trimmed = content_str.strip()
+    if content_str_trimmed.startswith('{') and content_str_trimmed.endswith('}'):
+        try:
+            parsed_json = json.loads(content_str_trimmed)
+            for k, v in parsed_json.items():
+                matched = _match_field(str(k))
+                if matched:
+                    try:
+                        data[matched] = _clean_numeric_value(str(v))
+                    except ValueError:
+                        warnings.append(f"Could not parse numeric value for '{k}': {v}")
+            if data:
+                _derive_accounting_identities(data)
+                return data, warnings
+        except Exception:
+            pass  # Fallback to CSV reader
+
     # Normalize line endings
     content_str = content_str.replace('\r\n', '\n').replace('\r', '\n')
-    reader = csv.reader(io.StringIO(content_str))
-    rows = [row for row in reader if row and any(cell.strip() for cell in row)]
+    
+    # Detect delimiter: comma, tab, or semicolon
+    sample = content_str[:2048]
+    delimiter = ','
+    if '\t' in sample and sample.count('\t') > sample.count(','):
+        delimiter = '\t'
+    elif ';' in sample and sample.count(';') > sample.count(','):
+        delimiter = ';'
+
+    reader = csv.reader(io.StringIO(content_str), delimiter=delimiter)
+    rows = [[c.strip() for c in row] for row in reader if row and any(cell.strip() for cell in row)]
     
     if not rows:
-        return data, ["The uploaded CSV file is empty."]
+        return data, ["The uploaded CSV file is empty or could not be parsed."]
 
-    # Check format:
-    # Format A: Key-Value pairs (e.g. Column 1 = Metric Name, Column 2 = Value)
-    # Format B: Tabular Header with single data row
-    is_key_value = len(rows) > 3 and len(rows[0]) <= 3
+    # Detect format:
+    # Key-Value format: Column 0 is metric name, Column 1 (or last col) is value
+    # Columnar format: Row 0 is headers, subsequent row is values
+    is_key_value = len(rows) >= 2 and len(rows[0]) <= 4 and any(
+        _match_field(r[0]) is not None for r in rows[:min(5, len(rows))]
+    )
 
     if is_key_value:
         for row in rows:
             if len(row) < 2:
                 continue
-            raw_key = row[0].strip().lower()
-            raw_val = row[1].strip().replace(',', '').replace('₹', '').replace('$', '')
-            
-            # Match against aliases
-            matched_field = None
-            for field, aliases in FIELD_ALIASES.items():
-                if raw_key == field or raw_key in aliases or any(a in raw_key for a in aliases):
-                    matched_field = field
-                    break
-            
-            if matched_field:
-                try:
-                    val = float(raw_val)
-                    data[matched_field] = val
-                except ValueError:
-                    warnings.append(f"Could not parse numeric value for '{row[0]}': {raw_val}")
-    else:
-        # Tabular format (Row 0 = headers, Row 1 = values)
-        headers = [h.strip().lower() for h in rows[0]]
-        val_row = rows[1] if len(rows) > 1 else []
-        for i, h in enumerate(headers):
-            if i >= len(val_row):
-                break
-            raw_val = val_row[i].strip().replace(',', '').replace('₹', '').replace('$', '')
-            for field, aliases in FIELD_ALIASES.items():
-                if h == field or h in aliases:
+            raw_key = row[0]
+            matched_field = _match_field(raw_key)
+            if not matched_field:
+                continue
+                
+            val_found = False
+            # 1. Try joined remainder first (handles unquoted comma numbers like ₹10,00,00,000)
+            joined_remainder = "".join(row[1:]).strip()
+            try:
+                data[matched_field] = _clean_numeric_value(joined_remainder)
+                val_found = True
+            except ValueError:
+                # 2. Try individual cells
+                for cell in row[1:]:
+                    if not cell:
+                        continue
                     try:
-                        data[field] = float(raw_val)
+                        data[matched_field] = _clean_numeric_value(cell)
+                        val_found = True
+                        break
                     except ValueError:
-                        warnings.append(f"Could not parse numeric value for '{h}': {raw_val}")
-                    break
+                        continue
+            if not val_found and row[1]:
+                warnings.append(f"Could not parse numeric value for '{raw_key}': {row[1]}")
+    else:
+        # Tabular format: Headers in row 0
+        headers = [_match_field(h) for h in rows[0]]
+        val_row = rows[1] if len(rows) > 1 else []
+        for i, matched_field in enumerate(headers):
+            if not matched_field or i >= len(val_row):
+                continue
+            try:
+                data[matched_field] = _clean_numeric_value(val_row[i])
+            except ValueError:
+                warnings.append(f"Could not parse numeric value for '{rows[0][i]}': {val_row[i]}")
 
-    # Impute logical dependencies if not explicitly provided
-    if "gross_profit" not in data and "revenue" in data:
-        data["gross_profit"] = round(data["revenue"] * 0.35, 2)
-    if "ebit" not in data and "net_profit" in data:
-        data["ebit"] = round(data["net_profit"] * 1.35, 2)
-    if "total_assets" not in data and "current_assets" in data:
-        data["total_assets"] = round(data["current_assets"] * 1.8, 2)
+    # Derive missing components strictly from standard accounting identities
+    _derive_accounting_identities(data)
 
     return data, warnings
 
 
+def _derive_accounting_identities(data: Dict[str, float]):
+    """Derive missing financial items using exact accounting formulas."""
+    # 1. Gross Profit = Revenue - COGS
+    if "gross_profit" not in data and "revenue" in data and "cogs" in data:
+        data["gross_profit"] = round(data["revenue"] - data["cogs"], 2)
+    elif "cogs" not in data and "revenue" in data and "gross_profit" in data:
+        data["cogs"] = round(data["revenue"] - data["gross_profit"], 2)
+
+    # 2. EBIT = Gross Profit - Operating Expenses (or Revenue - COGS - Operating Expenses)
+    if "ebit" not in data:
+        if "gross_profit" in data and "operating_expenses" in data:
+            data["ebit"] = round(data["gross_profit"] - data["operating_expenses"], 2)
+        elif "revenue" in data and "cogs" in data and "operating_expenses" in data:
+            data["ebit"] = round(data["revenue"] - data["cogs"] - data["operating_expenses"], 2)
+        elif "net_profit" in data and "interest_expense" in data:
+            tax = data.get("tax_expense", 0.0)
+            data["ebit"] = round(data["net_profit"] + data["interest_expense"] + tax, 2)
+
+    # 3. EBITDA = EBIT + Depreciation & Amortisation
+    if "ebitda" not in data and "ebit" in data:
+        dna = data.get("depreciation_amortization", 0.0)
+        data["ebitda"] = round(data["ebit"] + dna, 2)
+
+    # 4. Net Profit = Profit Before Tax - Tax Expense
+    if "net_profit" not in data and "profit_before_tax" in data:
+        tax = data.get("tax_expense", 0.0)
+        data["net_profit"] = round(data["profit_before_tax"] - tax, 2)
+
+    # 5. Current Assets aggregation
+    ca_components = ["cash_and_equivalents", "accounts_receivable", "inventory", "short_term_investments", "prepaid_expenses", "other_current_assets"]
+    if "current_assets" not in data and any(k in data for k in ca_components):
+        data["current_assets"] = sum(data.get(k, 0.0) for k in ca_components)
+
+    # 6. Current Liabilities aggregation
+    cl_components = ["accounts_payable", "short_term_borrowings", "outstanding_expenses", "taxes_payable", "current_portion_debt"]
+    if "current_liabilities" not in data and any(k in data for k in cl_components):
+        data["current_liabilities"] = sum(data.get(k, 0.0) for k in cl_components)
+
+    # 7. Total Debt = Short-Term Borrowings + Long-Term Borrowings
+    if "total_debt" not in data:
+        if "short_term_borrowings" in data or "long_term_borrowings" in data:
+            data["total_debt"] = round(data.get("short_term_borrowings", 0.0) + data.get("long_term_borrowings", 0.0), 2)
+
+    # 8. Shareholders' Equity = Share Capital + Reserves and Surplus
+    if "total_equity" not in data:
+        if "share_capital" in data or "retained_earnings" in data:
+            data["total_equity"] = round(data.get("share_capital", 0.0) + data.get("retained_earnings", 0.0), 2)
+
+    # 9. Total Assets = Current Assets + Non-Current Assets
+    if "total_assets" not in data and "current_assets" in data and "non_current_assets" in data:
+        data["total_assets"] = round(data["current_assets"] + data["non_current_assets"], 2)
+    elif "total_assets" not in data and "total_debt" in data and "total_equity" in data:
+        # Balance sheet identity: Assets = Total Liabilities/Debt + Equity
+        data["total_assets"] = round(data["total_debt"] + data["total_equity"], 2)
+
+    # 10. Averages defaults
+    if "avg_inventory" not in data and "inventory" in data:
+        data["avg_inventory"] = data["inventory"]
+    if "avg_receivables" not in data and "accounts_receivable" in data:
+        data["avg_receivables"] = data["accounts_receivable"]
+    if "avg_payables" not in data and "accounts_payable" in data:
+        data["avg_payables"] = data["accounts_payable"]
+    if "credit_sales" not in data and "revenue" in data:
+        data["credit_sales"] = data["revenue"]
+
+
 def generate_sample_csv() -> str:
-    """Generate sample CSV template formatted as Metric, Value."""
+    """Generate sample CSV template formatted as Metric, Value according to RiskGuard standard."""
     sample_rows = [
         ["Financial Metric", "Value (₹ Lakhs)"],
         ["Revenue / Annual Turnover", "2400.00"],
@@ -113,7 +397,9 @@ def generate_sample_csv() -> str:
         ["Cash & Equivalents", "120.00"],
         ["Inventory", "210.00"],
         ["Accounts Receivable", "180.00"],
+        ["Prepaid Expenses", "15.00"],
         ["Current Liabilities", "420.00"],
+        ["Accounts Payable", "160.00"],
         ["Total Debt / Borrowings", "550.00"],
         ["Total Equity / Net Worth", "850.00"],
         ["Total Assets", "1820.00"],
