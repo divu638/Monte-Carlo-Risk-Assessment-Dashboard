@@ -4,13 +4,13 @@
 > Built with Python/Flask, Supabase Cloud PostgreSQL (with local SQLite auto-fallback), NumPy, Three.js, Chart.js, and Vanilla CSS Glassmorphism.
 
 [![Live Production](https://img.shields.io/badge/Production-Render%20Live-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://monte-carlo-risk-assessment-dashboard.onrender.com/)
-[![Tests](https://img.shields.io/badge/pytest-52%2F52%20passing-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)](#test-suite)
+[![Tests](https://img.shields.io/badge/pytest-56%2F56%20passing-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)](#test-suite)
 [![Security](https://img.shields.io/badge/OWASP-A%2B%20Hardened-blue?style=for-the-badge&logo=security&logoColor=white)](#security-hardening)
 [![ISO 31000](https://img.shields.io/badge/Standard-ISO%2031000%3A2018-emerald?style=for-the-badge)](#iso-31000-framework)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 🌐 **Live Application URL**: [https://monte-carlo-risk-assessment-dashboard.onrender.com](https://monte-carlo-risk-assessment-dashboard.onrender.com)  
-📦 **Repository**: [https://github.com/divu638/Monte-Carlo-Risk-Assessment-Dashboard](https://github.com/divu638/Monte-Carlo-Risk-Assessment-Dashboard)
+📦 **Repository**: [https://github.com/divu638/bussiness-Risk-Assessment-Dashboard](https://github.com/divu638/bussiness-Risk-Assessment-Dashboard)
 
 ---
 
@@ -23,7 +23,7 @@
 6. [Monte Carlo VaR Engine Methodology & Assumptions](#-monte-carlo-var-engine-methodology--assumptions)
 7. [Financial Ratio Engine & Altman Z-Score](#-financial-ratio-engine--altman-z-score)
 8. [Security Hardening & Cryptographic Audit Ledger](#-security-hardening--cryptographic-audit-ledger)
-9. [Automated Test Suite (50 Passing Tests)](#-automated-test-suite)
+9. [Automated Test Suite (56 Passing Tests)](#-automated-test-suite)
 10. [5-Minute Examiner / Viva Demonstration Script](#-5-minute-examiner--viva-demonstration-script)
 11. [10 Likely Viva Questions with In-Depth Answers](#-10-likely-viva-questions-with-in-depth-answers)
 
@@ -56,7 +56,7 @@
                                   ┌──────────────────────────────────────────────┐
                                   │      Dual-Engine Resilient Data Layer        │
                                   │  PRIMARY: Supabase PostgreSQL (Cloud)       │
-                                  │  FALLBACK: SQLite with SHA-256 Hash Chain    │
+                                  │  FALLBACK: SQLite WAL with SHA-256 Hash Chain│
                                   └──────────────────────────────────────────────┘
 ```
 
@@ -65,18 +65,21 @@
 ## 🔑 Demo Credentials & Quick Start
 
 ### Seeded Persona Accounts (Zero Setup Required)
-Run `python seed_demo.py` to auto-provision all test credentials and sample data:
+For live evaluation or viva presentation, use these pre-seeded credentials:
 
 | Persona | Role | Email | Password | Scope & Privileges |
 | :--- | :--- | :--- | :--- | :--- |
-| **Super Admin (CRO)** | `admin` | `admin@riskguard.internal` | `Admin@RiskGuard2026!` | Full Admin Console, User Governance, Benchmark Calibrations, CSV Export, DB Seed |
-| **Lead Risk Analyst** | `user` | `analyst@riskguard.internal` | `Analyst@RiskGuard2026!` | Executive Overview, 3D Mesh, 8-Step Wizard, What-If Stress Testing, Action Tracker |
+| **Super Admin (CRO)** | `admin` | `admin@riskguard.pro` | `password123` *(or `AdminPassword123!`)* | Full Admin Console, User Governance, Benchmark Calibrations, CSV Export, DB Seed |
+| **Lead Risk Analyst** | `user` | `analyst@riskguard.pro` | `password123` *(or `AnalystPass123!`)* | Executive Overview, 3D Mesh, 8-Step Wizard, What-If Stress Testing, Action Tracker |
+| **Google Single Sign-On** | `admin` / `user` | *Any Google Email* | *Google OAuth 2.0* | One-click instant login via Google Identity Services & Enterprise SSO |
+
+> **Pro-Tip for Demo**: On the login page ([/auth.html](https://monte-carlo-risk-assessment-dashboard.onrender.com/auth.html)), click **`👑 Admin Demo Fill`** to automatically load credentials in 1 click!
 
 ### Local Setup (One Command)
 ```bash
 # 1. Clone repository
-git clone https://github.com/divu638/Monte-Carlo-Risk-Assessment-Dashboard.git
-cd Monte-Carlo-Risk-Assessment-Dashboard
+git clone https://github.com/divu638/bussiness-Risk-Assessment-Dashboard.git
+cd bussiness-Risk-Assessment-Dashboard
 
 # 2. Install dependencies (pinned in requirements.txt)
 pip install -r requirements.txt
@@ -144,6 +147,8 @@ Open **[http://localhost:5000](http://localhost:5000)** in your browser.
 | :--- | :--- | :--- | :--- |
 | `POST` | `/api/auth/register` | Public | Create new analyst account with bcrypt hashing and validation |
 | `POST` | `/api/auth/login` | Public | Authenticate user, apply rate limit check, verify TOTP MFA if enabled, issue JWT |
+| `POST` | `/api/auth/google` | Public | Google OAuth 2.0 / GIS token exchange and auto-provisioning |
+| `GET` | `/api/auth/config` | Public | Retrieve public auth configuration (Google Client ID, environment) |
 | `GET` | `/api/auth/me` | Authenticated | Validate active session token and retrieve current user persona |
 | `POST` | `/api/auth/mfa/setup` | Authenticated | Generate RFC 6238 TOTP MFA secret and otpauth URI for authenticator apps |
 | `POST` | `/api/auth/mfa/enable` | Authenticated | Confirm 6-digit TOTP code and activate MFA requirement |
@@ -357,7 +362,7 @@ $$Z = 1.2 X_1 + 1.4 X_2 + 3.3 X_3 + 0.6 X_4 + 0.999 X_5$$
 
 ## 🧪 Automated Test Suite
 
-The platform includes 52 automated tests covering all critical components:
+The platform includes 56 automated tests covering all critical components:
 
 ```bash
 pytest -v
@@ -365,22 +370,22 @@ pytest -v
 
 ```
 ============================= test session starts =============================
-collected 52 items
+collected 56 items
 
-tests/test_api_endpoints.py ..........                                   [ 19%]
-tests/test_audit_chain.py ...                                            [ 25%]
-tests/test_auth.py ......                                                [ 36%]
-tests/test_engines.py .....                                              [ 46%]
-tests/test_financial_ratios.py ........                                  [ 61%]
-tests/test_monte_carlo.py ...                                            [ 67%]
+tests/test_api_endpoints.py ..........                                   [ 17%]
+tests/test_audit_chain.py ...                                            [ 23%]
+tests/test_auth.py ..........                                            [ 41%]
+tests/test_engines.py .....                                              [ 50%]
+tests/test_financial_ratios.py ........                                  [ 64%]
+tests/test_monte_carlo.py ...                                            [ 69%]
 tests/test_security.py .................                                 [100%]
 
-======================= 52 passed, 2 warnings in 2.46s ========================
+======================= 56 passed, 2 warnings in 2.80s ========================
 ```
 
 * **`test_api_endpoints.py` (10 tests)**: Validates REST contract for benchmarks, ratios, stress testing, solutions, explainable scores, action tasks, cyber posture, and statement upload/template.
 * **`test_audit_chain.py` (3 tests)**: Confirms SHA-256 chain integrity, append-only mechanics, and simulated tampering detection.
-* **`test_auth.py` (6 tests)**: Tests user registration, password strength, bcrypt hashing, JWT issuance, and RBAC admin route protection.
+* **`test_auth.py` (10 tests)**: Tests user registration, password strength, bcrypt hashing, JWT issuance, RBAC admin route protection, and Google OAuth 2.0 / SSO flows.
 * **`test_engines.py` (5 tests)**: Verifies ISO 31000 rule engine priorities, macroeconomic stress test shocks, waterfall math, and CVSS cyber scoring.
 * **`test_financial_ratios.py` (8 tests)**: Validates 14 financial ratios, Altman Z-score in each zone, zero-division guards, and sector comparisons.
 * **`test_monte_carlo.py` (3 tests)**: Verifies statistical monotonicity ($\bar{L} \le \text{VaR}_{0.95} \le \text{Worst Case}$) and reproducible random seeds.
