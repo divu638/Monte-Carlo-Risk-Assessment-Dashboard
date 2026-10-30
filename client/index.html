@@ -396,7 +396,7 @@
                             <span class="kpi-value counter-animate" id="kpi-total-risks" data-target="0">--</span>
                             <span class="kpi-badge badge-neutral" id="kpi-mitigating-count">-- Mitigating</span>
                         </div>
-                        <div class="kpi-subtext">Monitored across 5 operational pillars</div>
+                        <div class="kpi-subtext">Monitored across 6 business risk domains</div>
                     </div>
 
                     <div class="kpi-card" data-tilt>
@@ -410,7 +410,7 @@
                             <span class="kpi-value text-critical counter-animate" id="kpi-critical-high" data-target="0">--</span>
                             <span class="kpi-badge badge-critical" id="kpi-critical-badge">-- Critical</span>
                         </div>
-                        <div class="kpi-subtext">Requires immediate CRO escalation</div>
+                        <div class="kpi-subtext">8 Priority threats (3 Critical + 5 High)</div>
                     </div>
 
                     <div class="kpi-card" data-tilt>
@@ -429,7 +429,7 @@
 
                     <div class="kpi-card" data-tilt>
                         <div class="kpi-header">
-                            <span class="kpi-label">Governance Health Score</span>
+                            <span class="kpi-label">Enterprise Health Score</span>
                             <div class="kpi-icon icon-emerald">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                             </div>
@@ -441,6 +441,7 @@
                         <div class="health-progress-bar">
                             <div class="health-fill" id="health-progress-fill" style="width: 75%;"></div>
                         </div>
+                        <div class="kpi-subtext">Composite 6-domain weighted score (0–100)</div>
                     </div>
                 </div>
 
@@ -1028,7 +1029,7 @@
                                     <span class="pill-val text-blue" id="sim-occur-val">60.2%</span>
                                 </div>
                                 <div class="sim-pill">
-                                    <span class="pill-label">Worst-Case Tail Event</span>
+                                    <span class="pill-label">Max Observed Simulation Loss</span>
                                     <span class="pill-val text-critical" id="sim-worst-val">$3,450,000</span>
                                 </div>
                             </div>
@@ -1105,27 +1106,27 @@
                     </div>
                 </div>
 
-                <!-- Retail Footprint & Seasonal KPIs -->
+                <!-- Enterprise Operational & Facility Indicators -->
                 <div class="mc-kpi-strip">
                     <div class="mc-kpi-item">
-                        <span class="kpi-tag">Exclusive Brand Outlets</span>
-                        <span class="kpi-num">365+ EBOs</span>
-                        <span class="kpi-hint">Pan-India Retail Network</span>
+                        <span class="kpi-tag">Operating Facilities</span>
+                        <span class="kpi-num">12 Units</span>
+                        <span class="kpi-hint">Manufacturing &amp; Warehousing</span>
                     </div>
                     <div class="mc-kpi-item">
-                        <span class="kpi-tag">Multi-Brand Outlets</span>
-                        <span class="kpi-num">2,500+ Doors</span>
-                        <span class="kpi-hint">Wholesale & NCS Retail</span>
+                        <span class="kpi-tag">Distribution Network</span>
+                        <span class="kpi-num">50+ Hubs</span>
+                        <span class="kpi-hint">Pan-India Supply Chain</span>
                     </div>
                     <div class="mc-kpi-item">
-                        <span class="kpi-tag">Peak Revenue Share</span>
-                        <span class="kpi-num">48.5%</span>
-                        <span class="kpi-hint">High Season Concentration</span>
+                        <span class="kpi-tag">Plant Capacity Utilization</span>
+                        <span class="kpi-num">84.5%</span>
+                        <span class="kpi-hint">Audited Production Run</span>
                     </div>
                     <div class="mc-kpi-item">
-                        <span class="kpi-tag">Key Supplier Sourcing</span>
+                        <span class="kpi-tag">Key Supplier Network</span>
                         <span class="kpi-num">Tier-1</span>
-                        <span class="kpi-hint">Audited Vendor Network</span>
+                        <span class="kpi-hint">Audited Vendor Sourcing</span>
                     </div>
                     <div class="mc-kpi-item">
                         <span class="kpi-tag">Working Capital Cycle</span>
@@ -3752,6 +3753,63 @@ CREATE POLICY "Allow all on alerts" ON alerts FOR ALL USING (true) WITH CHECK (t
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline" onclick="closeDossierModal()">Close</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD MITIGATION ACTION TASK (ISO 31000) -->
+    <div class="modal-backdrop" id="modal-task-form">
+        <div class="modal-card" style="max-width: 520px;">
+            <div class="modal-header">
+                <div>
+                    <h3 id="modal-task-title">Add ISO 31000 Mitigation Task</h3>
+                    <p class="modal-subtitle">Assign actionable risk treatments to designated risk owners</p>
+                </div>
+                <button type="button" class="btn-close" onclick="closeNewTaskModal()">✕</button>
+            </div>
+            <form id="form-action-task" onsubmit="handleCreateTask(event)">
+                <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px; padding: 20px;">
+                    <div class="form-group">
+                        <label for="task-input-title" style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #E2E8F0;">Action Task Title *</label>
+                        <input type="text" id="task-input-title" class="form-control" placeholder="e.g. Deploy Automated Invoice Factoring" required style="width: 100%; padding: 10px 14px; border-radius: 8px; background: rgba(15,23,42,0.7); border: 1px solid rgba(52,211,153,0.3); color: #fff;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label for="task-input-category" style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #E2E8F0;">Domain Category</label>
+                            <select id="task-input-category" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 8px; background: #0f172a; border: 1px solid rgba(52,211,153,0.3); color: #fff;">
+                                <option value="Operations">Operations</option>
+                                <option value="Financial">Financial Solvency</option>
+                                <option value="Cybersecurity">Cybersecurity &amp; Cloud</option>
+                                <option value="Compliance">Regulatory &amp; Compliance</option>
+                                <option value="Market">Market &amp; Strategic</option>
+                                <option value="Human Capital">Human Capital</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-input-treatment" style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #E2E8F0;">ISO 31000 Strategy</label>
+                            <select id="task-input-treatment" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 8px; background: #0f172a; border: 1px solid rgba(52,211,153,0.3); color: #fff;">
+                                <option value="Reduce">Reduce / Mitigate</option>
+                                <option value="Avoid">Avoid</option>
+                                <option value="Transfer">Transfer / Insure</option>
+                                <option value="Accept">Accept</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label for="task-input-owner" style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #E2E8F0;">Assignee / Owner</label>
+                            <input type="text" id="task-input-owner" class="form-control" value="Risk Committee" style="width: 100%; padding: 10px 14px; border-radius: 8px; background: rgba(15,23,42,0.7); border: 1px solid rgba(52,211,153,0.3); color: #fff;">
+                        </div>
+                        <div class="form-group">
+                            <label for="task-input-duedate" style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #E2E8F0;">Target Due Date</label>
+                            <input type="date" id="task-input-duedate" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 8px; background: rgba(15,23,42,0.7); border: 1px solid rgba(52,211,153,0.3); color: #fff;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08);">
+                    <button type="button" class="btn btn-outline" onclick="closeNewTaskModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-task">Create Task</button>
+                </div>
+            </form>
         </div>
     </div>
 

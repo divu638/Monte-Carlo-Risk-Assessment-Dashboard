@@ -7287,15 +7287,22 @@ function exportRegistryToCSV() {
 
 
 function formatCurrency(val) {
+    if (!val && val !== 0) return '₹0 ($0)';
+    const n = Number(val);
+    if (isNaN(n) || n === 0) return '₹0 ($0)';
+    const inrVal = n * 83; // Standard conversion: $1 = ₹83
 
-    if (!val && val !== 0) return '$0';
-
-    if (val >= 1000000) return `$${(val / 1000000).toFixed(2)}M`;
-
-    if (val >= 1000) return `$${(val / 1000).toFixed(0)}k`;
-
-    return `$${val.toLocaleString()}`;
-
+    if (n >= 1000000) {
+        const inrCr = (inrVal / 10000000).toFixed(2);
+        const usdM = (n / 1000000).toFixed(2);
+        return `₹${inrCr} Cr ($${usdM}M)`;
+    }
+    if (n >= 1000) {
+        const inrL = (inrVal / 100000).toFixed(1);
+        const usdK = (n / 1000).toFixed(0);
+        return `₹${inrL} L ($${usdK}k)`;
+    }
+    return `₹${Math.round(inrVal).toLocaleString('en-IN')} ($${n.toLocaleString()})`;
 }
 
 
@@ -15261,73 +15268,66 @@ window.deleteTask = deleteTask;
 
 
 
-async function openNewTaskModal() {
+function openNewTaskModal() {
+    const modal = document.getElementById('modal-task-form');
+    if (modal) {
+        const titleEl = document.getElementById('task-input-title');
+        const ownerEl = document.getElementById('task-input-owner');
+        const dateEl = document.getElementById('task-input-duedate');
+        if (titleEl) titleEl.value = '';
+        if (ownerEl) ownerEl.value = 'Risk Committee';
+        if (dateEl) dateEl.value = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+        modal.classList.add('active');
+        if (titleEl) setTimeout(() => titleEl.focus(), 100);
+    }
+}
 
-    const title = prompt('Enter Action Task Title (e.g., Deploy Automated Invoice Factoring):');
+function closeNewTaskModal() {
+    const modal = document.getElementById('modal-task-form');
+    if (modal) modal.classList.remove('active');
+}
 
+async function handleCreateTask(e) {
+    if (e) e.preventDefault();
+    const title = (document.getElementById('task-input-title')?.value || '').trim();
     if (!title) return;
-
-    const category = prompt('Category (Financial / Cybersecurity / Operations / Compliance / Strategic):', 'Operations') || 'Operations';
-
-    const owner = prompt('Assignee / Owner:', 'Risk Committee') || 'Risk Committee';
-
-    const dueDate = prompt('Target Completion Date (YYYY-MM-DD):', new Date(Date.now() + 30*86400000).toISOString().split('T')[0]) || '';
-
-
+    const category = document.getElementById('task-input-category')?.value || 'Operations';
+    const treatment = document.getElementById('task-input-treatment')?.value || 'Reduce';
+    const owner = (document.getElementById('task-input-owner')?.value || 'Risk Committee').trim();
+    const dueDate = document.getElementById('task-input-duedate')?.value || '';
 
     try {
-
         const token = localStorage.getItem('rg_token') || sessionStorage.getItem('rg_token');
-
         const res = await fetch('/api/tasks', {
-
             method: 'POST',
-
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-
             body: JSON.stringify({
-
                 title,
-
                 category,
-
                 owner,
-
                 due_date: dueDate,
-
                 status: 'Open',
-
                 priority: 'High',
-
-                treatment_type: 'Reduce'
-
+                treatment_type: treatment
             })
-
         });
-
         const d = await res.json();
-
         if (d.success) {
-
-            showNotification('New mitigation task created!', 'success');
-
+            showToast('New mitigation task created!', 'success');
+            closeNewTaskModal();
             loadActionTasks();
-
         } else {
-
-            showNotification(d.error || 'Failed to create task', 'error');
-
+            showToast(d.error || 'Failed to create task', 'error');
         }
-
-    } catch(e) {
-
-        showNotification(e.message, 'error');
-
+    } catch (err) {
+        showToast(err.message || 'Error creating task', 'error');
     }
-
 }
 
 window.openNewTaskModal = openNewTaskModal;
+window.closeNewTaskModal = closeNewTaskModal;
+window.handleCreateTask = handleCreateTask;
+window.showNotification = (msg, type) => showToast(msg, type);
 
 
 

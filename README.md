@@ -4,7 +4,7 @@
 > Built with Python/Flask, Supabase Cloud PostgreSQL (with local SQLite auto-fallback), NumPy, Three.js, Chart.js, and Vanilla CSS Glassmorphism.
 
 [![Live Production](https://img.shields.io/badge/Production-Render%20Live-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://monte-carlo-risk-assessment-dashboard.onrender.com/)
-[![Tests](https://img.shields.io/badge/pytest-56%2F56%20passing-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)](#test-suite)
+[![Tests](https://img.shields.io/badge/pytest-66%2F66%20passing-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)](#test-suite)
 [![Security](https://img.shields.io/badge/OWASP-A%2B%20Hardened-blue?style=for-the-badge&logo=security&logoColor=white)](#security-hardening)
 [![ISO 31000](https://img.shields.io/badge/Standard-ISO%2031000%3A2018-emerald?style=for-the-badge)](#iso-31000-framework)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -23,7 +23,7 @@
 6. [Monte Carlo VaR Engine Methodology & Assumptions](#-monte-carlo-var-engine-methodology--assumptions)
 7. [Financial Ratio Engine & Altman Z-Score](#-financial-ratio-engine--altman-z-score)
 8. [Security Hardening & Cryptographic Audit Ledger](#-security-hardening--cryptographic-audit-ledger)
-9. [Automated Test Suite (56 Passing Tests)](#-automated-test-suite)
+9. [Automated Test Suite (66 Passing Tests)](#-automated-test-suite)
 10. [5-Minute Examiner / Viva Demonstration Script](#-5-minute-examiner--viva-demonstration-script)
 11. [10 Likely Viva Questions with In-Depth Answers](#-10-likely-viva-questions-with-in-depth-answers)
 
@@ -362,7 +362,7 @@ $$Z = 1.2 X_1 + 1.4 X_2 + 3.3 X_3 + 0.6 X_4 + 0.999 X_5$$
 
 ## 🧪 Automated Test Suite
 
-The platform includes 56 automated tests covering all critical components:
+The platform includes 66 automated tests covering all critical components:
 
 ```bash
 pytest -v
@@ -370,26 +370,28 @@ pytest -v
 
 ```
 ============================= test session starts =============================
-collected 56 items
+collected 66 items
 
-tests/test_api_endpoints.py ..........                                   [ 17%]
-tests/test_audit_chain.py ...                                            [ 23%]
-tests/test_auth.py ..........                                            [ 41%]
-tests/test_engines.py .....                                              [ 50%]
-tests/test_financial_ratios.py ........                                  [ 64%]
-tests/test_monte_carlo.py ...                                            [ 69%]
-tests/test_security.py .................                                 [100%]
+tests/test_api_endpoints.py ...........                                  [ 16%]
+tests/test_audit_chain.py ...                                            [ 21%]
+tests/test_auth.py ............                                          [ 39%]
+tests/test_engines.py .....                                              [ 46%]
+tests/test_financial_ratios.py ........                                  [ 59%]
+tests/test_monte_carlo.py ...                                            [ 63%]
+tests/test_security.py .................                                 [ 89%]
+tests/test_statement_parser.py .......                                   [100%]
 
-======================= 56 passed, 2 warnings in 2.80s ========================
+============================= 66 passed in 7.55s ==============================
 ```
 
-* **`test_api_endpoints.py` (10 tests)**: Validates REST contract for benchmarks, ratios, stress testing, solutions, explainable scores, action tasks, cyber posture, and statement upload/template.
+* **`test_api_endpoints.py` (11 tests)**: Validates REST contract for benchmarks, ratios, stress testing, solutions, explainable scores, action tasks, cyber posture, and statement upload/template.
 * **`test_audit_chain.py` (3 tests)**: Confirms SHA-256 chain integrity, append-only mechanics, and simulated tampering detection.
-* **`test_auth.py` (10 tests)**: Tests user registration, password strength, bcrypt hashing, JWT issuance, RBAC admin route protection, and Google OAuth 2.0 / SSO flows.
+* **`test_auth.py` (12 tests)**: Tests user registration, password strength, bcrypt hashing, JWT issuance, RBAC admin route protection, and Google OAuth 2.0 / SSO flows.
 * **`test_engines.py` (5 tests)**: Verifies ISO 31000 rule engine priorities, macroeconomic stress test shocks, waterfall math, and CVSS cyber scoring.
 * **`test_financial_ratios.py` (8 tests)**: Validates 14 financial ratios, Altman Z-score in each zone, zero-division guards, and sector comparisons.
 * **`test_monte_carlo.py` (3 tests)**: Verifies statistical monotonicity ($\bar{L} \le \text{VaR}_{0.95} \le \text{Worst Case}$) and reproducible random seeds.
 * **`test_security.py` (17 tests)**: Verifies OWASP security headers, path traversal blocks, rate limiting, and server masking.
+* **`test_statement_parser.py` (7 tests)**: Validates multi-sheet Excel, CSV, TSV, JSON, and PDF statement parsing, key aliases, and accounting identities.
 
 ---
 
@@ -417,7 +419,7 @@ Use this exact chronological script to ace your presentation:
   * Go to **Risk Registry / Action Tracker**: Show tasks created from suggestions (`Open` / `In Progress` / `Closed`) with assignees and due dates.
 * **4:30 - 5:00 | Security, Cryptographic Audit Ledger & Conclusion**:
   * Open `/api/audit-logs/verify` or the Audit Tab: Show the **cryptographic SHA-256 hash chain** confirming tamper-evident logging.
-  * Show terminal running `pytest`: "All 50 unit and security integration tests pass." Conclude the presentation.
+  * Show terminal running `pytest`: "All 66 unit and security integration tests pass." Conclude the presentation.
 
 ---
 
