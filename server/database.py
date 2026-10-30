@@ -1560,6 +1560,13 @@ def verify_user_login(email: str, password: str, mfa_code: str = None) -> dict:
             pw_matches = True
 
     if not pw_matches:
+        # Check if this user was created via Google Sign-In
+        if user.get("company") == "Google Workspace Organization":
+            return {
+                "success": False,
+                "is_google_account": True,
+                "error": "This account was registered using Google. Please click 'Continue with Google' above, or reset your password to set a direct login password."
+            }
         remaining = _record_failed_login(clean_email, now)
         if remaining <= 0:
             return {
@@ -1610,6 +1617,42 @@ def verify_user_login(email: str, password: str, mfa_code: str = None) -> dict:
             "mfa_enabled": bool(user.get("mfa_enabled"))
         }
     }
+
+
+def reset_user_password(email: str, new_password: str) -> dict:
+    """Reset or set a new password for an existing or Google-created user."""
+    clean_email = email.lower().strip()
+    if not clean_email or "@" not in clean_email:
+        return {"success": False, "error": "A valid email address is required."}
+    if len(new_password) < 6:
+        return {"success": False, "error": "Password must be at least 6 characters long."}
+
+    user = get_user_by_email(clean_email)
+    salt = secrets.token_hex(32)
+    pw_hash = _hash_password(new_password, salt)
+
+    if user:
+        try:
+            conn = get_sqlite_conn()
+            conn.execute(
+                "UPDATE users SET password_hash = ?, salt = ?, is_verified = 1 WHERE id = ?",
+                (pw_hash, salt, user["id"])
+            )
+            conn.commit()
+            conn.close()
+            # Clear lockout if any
+            LOGIN_FAILED_ATTEMPTS.pop(clean_email, None)
+            return {"success": True, "message": "Password updated successfully. You can now log in with your new password."}
+        except Exception:
+            return {"success": False, "error": "Failed to update password. Please try again."}
+    else:
+        # User not found in DB - register them directly!
+        fn = clean_email.split("@")[0].capitalize()
+        res = create_user(fn, "User", "Enterprise Corp", clean_email, new_password, role="user")
+        if res.get("success"):
+            LOGIN_FAILED_ATTEMPTS.pop(clean_email, None)
+            return {"success": True, "message": "Account created and password set. You can now log in."}
+        return res
 
 
 def verify_or_create_google_user(email: str, firstname: str = "", lastname: str = "", google_id: str = "", avatar_url: str = "") -> dict:

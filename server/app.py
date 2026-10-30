@@ -868,6 +868,28 @@ def auth_login():
         return mask_exception(e, "auth_login")
 
 
+@app.route("/api/auth/reset-password", methods=["POST"])
+def auth_reset_password():
+    """Reset or set a password for an existing or Google-created account."""
+    if not check_rate_limit("write"):
+        return jsonify({"success": False, "error": "Too many requests. Please wait before retrying."}), 429
+    try:
+        data = request.get_json(silent=True) or {}
+        email = sanitize_text(data.get("email", ""), max_length=200).strip().lower()
+        password = str(data.get("password", "")).strip()
+
+        if not email or "@" not in email:
+            return jsonify({"success": False, "error": "A valid email address is required."}), 400
+        if len(password) < 6:
+            return jsonify({"success": False, "error": "Password must be at least 6 characters long."}), 400
+
+        result = database.reset_user_password(email, password)
+        status_code = 200 if result.get("success") else 400
+        return jsonify(result), status_code
+    except Exception as e:
+        return mask_exception(e, "auth_reset_password")
+
+
 @app.route("/api/auth/config", methods=["GET"])
 def auth_config():
     """Return public OAuth configuration and client IDs."""

@@ -64,3 +64,4 @@ def test_parse_json_statement():
     assert data["cogs"] == 3000000.0
     assert data["gross_profit"] == 2000000.0
     assert data["ebit"] == 1200000.0  # 2000000 - 800000
+

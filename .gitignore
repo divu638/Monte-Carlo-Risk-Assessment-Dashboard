@@ -17,6 +17,7 @@ ENV/
 *.db-wal
 *.db-shm
 *.sqlite3-journal
+!server/riskguard.db
 
 # Environment secrets & credentials
 .env

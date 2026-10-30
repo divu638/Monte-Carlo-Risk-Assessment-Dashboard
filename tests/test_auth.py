@@ -145,3 +145,55 @@ def test_auth_config_endpoint(client):
     assert res.status_code == 200
     data = res.get_json()
     assert data["google_enabled"] is True
+
+
+def test_auth_relogin_flow(client):
+    """Verify newly registered user can log in multiple consecutive times without issue."""
+    email = "consecutive_login_test@riskguard.pro"
+    pw = "StrongPass123!"
+    
+    # 1. Register
+    reg = client.post("/api/auth/register", json={
+        "firstname": "Consecutive",
+        "lastname": "Tester",
+        "company": "Test Org",
+        "email": email,
+        "password": pw
+    })
+    assert reg.status_code in (201, 409)
+    
+    # 2. First login
+    l1 = client.post("/api/auth/login", json={"email": email, "password": pw})
+    assert l1.status_code == 200
+    d1 = l1.get_json()
+    assert d1["success"] is True
+    assert "token" in d1
+    
+    # 3. Second login (re-login)
+    l2 = client.post("/api/auth/login", json={"email": email, "password": pw})
+    assert l2.status_code == 200
+    d2 = l2.get_json()
+    assert d2["success"] is True
+    assert "token" in d2
+
+
+def test_auth_reset_password_and_login(client):
+    """Verify password reset endpoint allows setting a new password and logging in with it."""
+    email = "reset_login_test@riskguard.pro"
+    new_pw = "NewSecretPassword123!"
+    
+    res = client.post("/api/auth/reset-password", json={
+        "email": email,
+        "password": new_pw
+    })
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data["success"] is True
+    
+    # Verify login with the new password
+    login_res = client.post("/api/auth/login", json={
+        "email": email,
+        "password": new_pw
+    })
+    assert login_res.status_code == 200
+    assert login_res.get_json()["success"] is True
