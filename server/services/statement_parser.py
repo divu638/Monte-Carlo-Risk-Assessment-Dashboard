@@ -18,65 +18,63 @@ from typing import Dict, Any, Tuple
 # Comprehensive mapping for financial field aliases across Indian & Global reporting standards
 FIELD_ALIASES = {
     "revenue": [
-        "revenue", "revenue from operations", "sales", "turnover", "total revenue",
-        "gross sales", "net revenue", "net sales", "operating revenue", "topline",
-        "income from operations"
+        "net sales", "net revenue", "revenue from operations", "sales revenue", "revenue", "turnover", "total revenue",
+        "gross sales", "operating revenue", "topline", "income from operations", "sales"
     ],
     "cogs": [
-        "cost of goods sold", "cogs", "cost of sales", "direct expenses", "cost of materials consumed",
-        "production costs", "direct costs", "cost of revenue", "purchase of stock in trade"
+        "cost of goods sold", "cogs", "cost of sales", "cost of materials consumed", "purchase of stock in trade",
+        "production costs", "cost of revenue"
     ],
     "gross_profit": [
-        "gross profit", "gross_profit", "gp", "gross margin amount", "gross income"
+        "gross profit", "gross_profit", "gp", "gross margin amount", "gross income", "gross margin"
     ],
     "ebit": [
-        "ebit", "operating profit", "operating income", "pbit", "profit before interest and tax",
-        "operating profit (ebit)", "earnings before interest and tax"
+        "operating profit (ebit)", "operating profit", "ebit", "operating income", "pbit", "profit before interest and tax",
+        "earnings before interest and tax"
     ],
     "operating_expenses": [
-        "operating expenses", "operating expense", "opex", "sga", "selling general and administrative",
+        "total operating expenses", "operating expenses", "operating expense", "opex", "sga", "selling general and administrative",
         "administrative expenses", "employee benefits", "indirect expenses", "other expenses"
     ],
     "depreciation_amortization": [
-        "depreciation", "depreciation and amortisation", "depreciation & amortisation", "depreciation and amortization",
-        "amortisation", "amortization", "dna", "depreciation expense"
+        "depreciation and amortisation", "depreciation and amortization", "accumulated depreciation",
+        "depreciation", "amortisation", "amortization", "dna", "depreciation expense"
     ],
     "ebitda": [
         "ebitda", "operating profit before depreciation", "operating profit before dna",
         "earnings before interest taxes depreciation"
     ],
     "interest_expense": [
-        "interest", "interest expense", "interest expenses", "finance costs", "borrowing costs",
-        "finance charges", "interest paid"
+        "interest on bank loan", "bank loan interest", "interest expense", "interest expenses", "finance costs", "borrowing costs",
+        "finance charges", "interest paid", "interest"
     ],
     "profit_before_tax": [
         "profit before tax", "pbt", "ebt", "earnings before tax", "profit before taxation"
     ],
     "tax_expense": [
-        "tax", "income tax", "taxes", "tax expense", "current tax", "provision for tax", "income tax expense"
+        "income tax", "tax", "taxes", "tax expense", "current tax", "provision for tax", "income tax expense"
     ],
     "net_profit": [
-        "net profit", "net income", "profit after tax", "pat", "net_profit", "profit for the period",
-        "bottom line", "net profit after tax", "profit after taxation"
+        "net profit after tax", "net profit", "profit after tax", "pat", "net income", "profit for the period",
+        "bottom line", "profit after taxation"
     ],
     "current_assets": [
-        "current assets", "current_assets", "ca", "currentassets", "total current assets"
+        "total current assets", "current assets", "current_assets", "ca", "currentassets"
     ],
     "cash_and_equivalents": [
-        "cash", "cash and equivalents", "cash & cash equivalents", "cash & bank", "cash and bank",
-        "cash and bank balances", "cash in hand", "bank balance", "cash equivalents"
+        "cash and bank balances", "cash and bank", "cash & bank", "cash in hand", "bank balance", "cash and equivalents",
+        "cash & cash equivalents", "cash", "cash equivalents"
     ],
     "short_term_investments": [
         "short term investments", "short-term investments", "marketable securities",
         "current investments", "st investments"
     ],
     "accounts_receivable": [
-        "accounts receivable", "receivables", "debtors", "trade receivables", "sundry debtors",
-        "bills receivable"
+        "trade receivables", "accounts receivable", "debtors", "sundry debtors", "bills receivable", "receivables"
     ],
     "inventory": [
-        "inventory", "inventories", "stock", "stock in trade", "finished goods",
-        "raw materials", "work-in-progress", "work in progress", "wip", "closing stock", "closing inventory"
+        "closing inventory", "closing stock", "inventory", "inventories", "stock", "stock in trade", "finished goods",
+        "raw materials", "work-in-progress", "work in progress", "wip"
     ],
     "prepaid_expenses": [
         "prepaid expenses", "prepaid expense", "prepayments", "expenses paid in advance",
@@ -86,12 +84,10 @@ FIELD_ALIASES = {
         "other current assets", "short term advances", "recoverable taxes", "other ca"
     ],
     "current_liabilities": [
-        "current liabilities", "current_liabilities", "cl", "currentliabilities",
-        "total current liabilities"
+        "total current liabilities", "current liabilities", "current_liabilities", "cl", "currentliabilities"
     ],
     "accounts_payable": [
-        "accounts payable", "trade payables", "payables", "creditors", "sundry creditors",
-        "bills payable"
+        "trade payables", "accounts payable", "creditors", "sundry creditors", "bills payable", "payables"
     ],
     "short_term_borrowings": [
         "short term borrowings", "short-term borrowings", "short term debt", "short term loans",
@@ -107,30 +103,31 @@ FIELD_ALIASES = {
         "current portion of long-term debt", "current maturities of long term debt", "current portion of debt"
     ],
     "total_debt": [
-        "total debt", "total_debt", "debt", "borrowings", "short and long term debt",
-        "total borrowings", "secured loans", "loan liabilities"
+        "long term bank loan", "bank loan", "total debt", "total_debt", "borrowings", "short and long term debt",
+        "total borrowings", "secured loans", "loan liabilities", "term loan", "term loans"
     ],
     "long_term_borrowings": [
-        "long term borrowings", "long-term borrowings", "long term debt", "term loans",
-        "non-current liabilities", "debentures", "bonds"
+        "long term bank loan", "long-term bank loan", "bank loan", "total non-current liabilities", "total non current liabilities",
+        "non-current liabilities", "non current liabilities", "long term borrowings", "long-term borrowings", "long term debt",
+        "term loans", "term loan", "debentures", "bonds"
     ],
     "total_equity": [
-        "total equity", "equity", "shareholder equity", "shareholders equity", "shareholders' equity",
-        "net worth", "owners equity", "total net worth", "share capital"
+        "total owner's equity", "total owners equity", "owner's equity", "owners equity", "total equity", "equity",
+        "shareholder equity", "shareholders equity", "shareholders' equity", "shareholders funds", "net worth", "total net worth"
     ],
     "share_capital": [
-        "share capital", "equity share capital", "paid up capital", "capital"
+        "owner's capital", "owners capital", "share capital", "equity share capital", "paid up capital", "capital"
     ],
     "retained_earnings": [
         "retained earnings", "reserves and surplus", "reserves & surplus", "accumulated profits",
         "general reserve", "reserves"
     ],
     "non_current_assets": [
-        "non current assets", "non-current assets", "fixed assets", "net fixed assets",
-        "property plant and equipment", "ppe", "gross block", "net block", "capital work in progress"
+        "total non-current assets", "total non current assets", "non current assets", "non-current assets", "fixed assets",
+        "net fixed assets", "property plant and equipment", "ppe", "gross block", "net block"
     ],
     "total_assets": [
-        "total assets", "total_assets", "assets", "balance sheet total"
+        "total assets", "total_assets", "assets", "balance sheet total", "total equity and liabilities", "total liabilities and equity"
     ],
     "total_liabilities": [
         "total liabilities", "total_liabilities", "liabilities"
@@ -145,16 +142,16 @@ FIELD_ALIASES = {
         "average inventory", "avg inventory", "avg_inventory"
     ],
     "avg_receivables": [
-        "average receivables", "avg receivables", "avg_receivables", "average trade receivables"
+        "average trade receivables", "average receivables", "avg receivables", "average debtors"
     ],
     "avg_payables": [
         "average payables", "avg payables", "avg_payables", "average trade payables"
     ],
     "operating_cash_flow": [
-        "operating cash flow", "cash flow from operations", "cash flow available for debt service", "cfads"
+        "operating cash flow", "cash flow from operations", "cfads"
     ],
     "total_debt_service": [
-        "total debt service", "debt service", "debt servicing", "principal and interest", "total debt repayments"
+        "total debt service", "debt service", "principal and interest"
     ]
 }
 
@@ -202,22 +199,51 @@ def _match_field(key_str: str) -> str:
     """Match a cleaned raw key against known FIELD_ALIASES using exact & word-boundary matching."""
     if not key_str:
         return None
-    clean = str(key_str).lower().strip()
-    clean = re.sub(r'[\(\[\{].*?[\)\]\}]', '', clean)  # remove parenthesized hints like (₹) or (INR)
-    clean = re.sub(r'[^a-z0-9\s&_]', ' ', clean)
+    raw_str = str(key_str).lower().strip()
+    clean = re.sub(r'[\(\[\{].*?[\)\]\}]', '', raw_str)  # remove parenthesized hints like (₹) or (INR)
+    clean = re.sub(r'[\'’]', '', clean)                   # unify owner's -> owners
+    clean = re.sub(r'[^a-z0-9\s&]', ' ', clean)           # replace non-alphanumerics (including _) with space
     clean = re.sub(r'\s+', ' ', clean).strip()
 
     if not clean:
         return None
 
+    # Exclude returns/refunds from matching revenue
+    if 'sales return' in clean or 'sales refund' in clean or clean.startswith('less sales return'):
+        return None
+
+    # Balance sheet total equity & liabilities = Total Assets
+    if 'equity and liabilit' in clean or 'equity & liabilit' in clean:
+        return 'total_assets'
+
+    # Strict non-current vs current distinction
+    is_non_current = 'non current' in clean or 'noncurrent' in clean
+    if is_non_current:
+        if any(w in clean for w in ['liabilit', 'borrow', 'loan', 'debt']):
+            return 'long_term_borrowings'
+        if any(w in clean for w in ['asset', 'fixed']):
+            return 'non_current_assets'
+
     # 1. Exact match first
     for field, aliases in FIELD_ALIASES.items():
-        if clean == field or clean in aliases:
+        if is_non_current and 'current' in field and not field.startswith('non_'):
+            continue
+        if not is_non_current and field.startswith('non_'):
+            continue
+        clean_field = field.replace('_', ' ')
+        if clean == field or clean == clean_field:
             return field
+        for alias in aliases:
+            if clean == alias:
+                return field
 
-    # 2. Whole-word / phrase match, sorting aliases by descending length so specific terms take priority
+    # 2. Whole-word / phrase match, sorting aliases by descending length
     all_candidates = []
     for field, aliases in FIELD_ALIASES.items():
+        if is_non_current and 'current' in field and not field.startswith('non_'):
+            continue
+        if not is_non_current and field.startswith('non_'):
+            continue
         for alias in aliases:
             all_candidates.append((len(alias), field, alias))
     all_candidates.sort(reverse=True, key=lambda x: x[0])
@@ -228,6 +254,86 @@ def _match_field(key_str: str) -> str:
             return field
 
     return None
+
+
+EXPENSE_FIELDS = {
+    "cogs", "operating_expenses", "interest_expense", "tax_expense",
+    "depreciation_amortization", "inventory", "current_liabilities",
+    "accounts_payable", "current_assets", "cash_and_equivalents",
+    "accounts_receivable", "long_term_borrowings", "total_debt",
+    "avg_inventory", "avg_receivables", "avg_payables", "credit_sales", "credit_purchases"
+}
+
+
+def _get_field_priority(matched_field: str, raw_key: str) -> int:
+    """Return priority score (higher = stronger candidate) for a matched row."""
+    clean = re.sub(r'[\'’]', '', str(raw_key).lower().strip())
+    clean = re.sub(r'[^a-z0-9\s&]', ' ', clean)
+    clean = re.sub(r'\s+', ' ', clean).strip()
+
+    if matched_field == "revenue":
+        if any(term in clean for term in ["net sales", "revenue from operations", "net revenue", "income from operations", "operating revenue"]):
+            return 10
+        return 5
+
+    if matched_field == "cogs":
+        if any(term in clean for term in ["cost of goods sold", "cogs", "cost of sales"]):
+            return 10
+        return 5
+
+    if matched_field == "operating_expenses":
+        if any(term in clean for term in ["total operating expenses", "total operating expense", "total opex"]):
+            return 10
+        if "operating expenses" in clean or "operating expense" in clean:
+            return 8
+        return 3
+
+    if matched_field == "current_liabilities":
+        if any(term in clean for term in ["total current liabilities", "total current liability"]):
+            return 10
+        if "current liabilities" in clean or "current liability" in clean:
+            return 8
+        return 3
+
+    if matched_field == "current_assets":
+        if any(term in clean for term in ["total current assets", "total current asset"]):
+            return 10
+        if "current assets" in clean or "current asset" in clean:
+            return 8
+        return 3
+
+    if matched_field == "total_debt":
+        if "total debt" in clean or "total borrowings" in clean:
+            return 10
+        if "long term bank loan" in clean or "total non current liabilities" in clean or "bank loan" in clean:
+            return 8
+        return 5
+
+    if matched_field == "total_equity":
+        if any(term in clean for term in ["total owners equity", "total owner equity", "total shareholders equity", "total shareholders funds", "total equity", "net worth", "total net worth"]):
+            return 10
+        if "owners equity" in clean or "owner equity" in clean or "shareholders equity" in clean or "equity" in clean:
+            return 7
+        return 3
+
+    if matched_field == "total_assets":
+        if "total assets" in clean or "balance sheet total" in clean:
+            return 10
+        if "equity and liabilities" in clean:
+            return 8
+        return 5
+
+    if matched_field == "depreciation_amortization":
+        if "accumulated" in clean:
+            return 3
+        return 10
+
+    if matched_field in ("avg_inventory", "avg_receivables", "avg_payables", "credit_sales", "credit_purchases"):
+        if "average" in clean or "avg" in clean or "credit" in clean:
+            return 10
+        return 5
+
+    return 5
 
 
 def parse_financial_csv(content_str: str) -> Tuple[Dict[str, float], list]:
@@ -250,7 +356,10 @@ def parse_financial_csv(content_str: str) -> Tuple[Dict[str, float], list]:
                 matched = _match_field(str(k))
                 if matched:
                     try:
-                        data[matched] = _clean_numeric_value(str(v))
+                        num = _clean_numeric_value(str(v))
+                        if matched in EXPENSE_FIELDS:
+                            num = abs(num)
+                        data[matched] = num
                     except ValueError:
                         warnings.append(f"Could not parse numeric value for '{k}': {v}")
             if data:
@@ -284,6 +393,7 @@ def parse_financial_csv(content_str: str) -> Tuple[Dict[str, float], list]:
     )
 
     if is_key_value:
+        prios = {}
         for row in rows:
             if len(row) < 2:
                 continue
@@ -293,10 +403,11 @@ def parse_financial_csv(content_str: str) -> Tuple[Dict[str, float], list]:
                 continue
                 
             val_found = False
+            raw_val = None
             # 1. Try joined remainder first (handles unquoted comma numbers like ₹10,00,00,000)
             joined_remainder = "".join(row[1:]).strip()
             try:
-                data[matched_field] = _clean_numeric_value(joined_remainder)
+                raw_val = _clean_numeric_value(joined_remainder)
                 val_found = True
             except ValueError:
                 # 2. Try individual cells
@@ -304,12 +415,20 @@ def parse_financial_csv(content_str: str) -> Tuple[Dict[str, float], list]:
                     if not cell:
                         continue
                     try:
-                        data[matched_field] = _clean_numeric_value(cell)
+                        raw_val = _clean_numeric_value(cell)
                         val_found = True
                         break
                     except ValueError:
                         continue
-            if not val_found and row[1]:
+
+            if val_found and raw_val is not None:
+                if matched_field in EXPENSE_FIELDS:
+                    raw_val = abs(raw_val)
+                p = _get_field_priority(matched_field, raw_key)
+                if matched_field not in data or p > prios.get(matched_field, 0):
+                    data[matched_field] = raw_val
+                    prios[matched_field] = p
+            elif row[1]:
                 warnings.append(f"Could not parse numeric value for '{raw_key}': {row[1]}")
     else:
         # Tabular format: Headers in row 0
@@ -319,7 +438,10 @@ def parse_financial_csv(content_str: str) -> Tuple[Dict[str, float], list]:
             if not matched_field or i >= len(val_row):
                 continue
             try:
-                data[matched_field] = _clean_numeric_value(val_row[i])
+                num = _clean_numeric_value(val_row[i])
+                if matched_field in EXPENSE_FIELDS:
+                    num = abs(num)
+                data[matched_field] = num
             except ValueError:
                 warnings.append(f"Could not parse numeric value for '{rows[0][i]}': {val_row[i]}")
 
@@ -349,12 +471,12 @@ def _derive_accounting_identities(data: Dict[str, float]):
 
     # 3. EBITDA = EBIT + Depreciation & Amortisation
     if "ebitda" not in data and "ebit" in data:
-        dna = data.get("depreciation_amortization", 0.0)
+        dna = abs(data.get("depreciation_amortization", 0.0))
         data["ebitda"] = round(data["ebit"] + dna, 2)
 
     # 4. Net Profit = Profit Before Tax - Tax Expense
     if "net_profit" not in data and "profit_before_tax" in data:
-        tax = data.get("tax_expense", 0.0)
+        tax = abs(data.get("tax_expense", 0.0))
         data["net_profit"] = round(data["profit_before_tax"] - tax, 2)
 
     # 5. Current Assets aggregation
@@ -368,7 +490,7 @@ def _derive_accounting_identities(data: Dict[str, float]):
         data["current_liabilities"] = sum(data.get(k, 0.0) for k in cl_components)
 
     # 7. Total Debt = Short-Term Borrowings + Long-Term Borrowings
-    if "total_debt" not in data:
+    if "total_debt" not in data or data.get("total_debt", 0.0) == 0.0:
         if "short_term_borrowings" in data or "long_term_borrowings" in data:
             data["total_debt"] = round(data.get("short_term_borrowings", 0.0) + data.get("long_term_borrowings", 0.0), 2)
 
@@ -481,6 +603,7 @@ def parse_financial_pdf(file_bytes: bytes) -> Tuple[Dict[str, float], list]:
         re.IGNORECASE
     )
 
+    prios = {}
     for idx in target_pages:
         ptxt = all_page_texts[idx]
         lines = ptxt.splitlines()
@@ -517,9 +640,12 @@ def parse_financial_pdf(file_bytes: bytes) -> Tuple[Dict[str, float], list]:
                 if global_multiplier > 1.0 and abs(val) < 1_000_000 and not any(u in fig_str.lower() for u in ['cr', 'crore', 'lakh', 'lac', 'million', 'm', 'k']):
                     val = val * global_multiplier
 
-                # Set field if not yet populated
-                if matched_field not in data:
+                if matched_field in EXPENSE_FIELDS:
+                    val = abs(val)
+                p = _get_field_priority(matched_field, candidate_label)
+                if matched_field not in data or p > prios.get(matched_field, 0):
                     data[matched_field] = val
+                    prios[matched_field] = p
             except ValueError:
                 continue
 
@@ -551,6 +677,7 @@ def parse_financial_excel(file_bytes: bytes) -> Tuple[Dict[str, float], list]:
     except Exception as e:
         return data, [f"Could not open Excel file: {str(e)}"]
 
+    prios = {}
     for sheet in wb.worksheets:
         rows = list(sheet.iter_rows(values_only=True))
         if not rows:
@@ -567,20 +694,26 @@ def parse_financial_excel(file_bytes: bytes) -> Tuple[Dict[str, float], list]:
                 row_remainder = row[2:]
 
             matched_field = _match_field(first_cell)
-            if matched_field and matched_field not in data:
+            if matched_field:
                 for cell in row_remainder:
                     if cell is None or cell == "":
                         continue
+                    val = None
                     if isinstance(cell, (int, float)):
-                        data[matched_field] = float(cell)
-                        break
+                        val = float(cell)
                     else:
                         try:
                             val = _clean_numeric_value(str(cell))
-                            data[matched_field] = val
-                            break
                         except ValueError:
                             continue
+                    if val is not None:
+                        if matched_field in EXPENSE_FIELDS:
+                            val = abs(val)
+                        p = _get_field_priority(matched_field, first_cell)
+                        if matched_field not in data or p > prios.get(matched_field, 0):
+                            data[matched_field] = val
+                            prios[matched_field] = p
+                        break
 
         # 2. Tabular format: check header row if fewer than 3 fields detected
         if len(data) < 3 and len(rows) >= 2:
@@ -590,19 +723,24 @@ def parse_financial_excel(file_bytes: bytes) -> Tuple[Dict[str, float], list]:
                 for i, h in enumerate(headers):
                     if h and h not in data and i < len(val_row) and val_row[i] is not None:
                         val = val_row[i]
+                        num = None
                         if isinstance(val, (int, float)):
-                            data[h] = float(val)
+                            num = float(val)
                         else:
                             try:
-                                data[h] = _clean_numeric_value(str(val))
+                                num = _clean_numeric_value(str(val))
                             except ValueError:
                                 pass
+                        if num is not None:
+                            if h in EXPENSE_FIELDS:
+                                num = abs(num)
+                            data[h] = num
 
     _derive_accounting_identities(data)
 
     if not data:
         warnings.append(
-            "No recognizable financial statement lines (such as Revenue, Operating Profit, Current Assets, Liabilities, or Equity) were detected in this Excel sheet."
+            "No recognizable financial statement lines (such as Revenue, Operating Profit, Current Assets, Liabilities, or Equity) were detected in this Excel spreadsheet."
         )
 
     return data, warnings

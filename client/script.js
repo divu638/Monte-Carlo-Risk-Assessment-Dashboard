@@ -11342,17 +11342,17 @@ function updateFinancialStatementUI(data, docTitle, docDesc) {
     if (descEl && docDesc) descEl.textContent = docDesc;
 
     // Derived figures
-    const rev = Number(data.revenue) || 0;
-    const cogs = Number(data.cogs) || 0;
+    const rev = Math.abs(Number(data.revenue) || 0);
+    const cogs = Math.abs(Number(data.cogs) || 0);
     const gp = rev - cogs;
     const ebit = Number(data.operatingProfit) || 0;
-    const interest = Number(data.interest) || 0;
+    const interest = Math.abs(Number(data.interest) || 0);
     const pat = Number(data.netProfit) || 0;
-    const ca = Number(data.currentAssets) || 0;
-    const inv = Number(data.inventory) || 0;
-    const cl = Number(data.currentLiabilities) || 0;
-    const debt = Number(data.totalDebt) || 0;
-    const equity = Number(data.equity) || 0;
+    const ca = Math.abs(Number(data.currentAssets) || 0);
+    const inv = Math.abs(Number(data.inventory) || 0);
+    const cl = Math.abs(Number(data.currentLiabilities) || 0);
+    const debt = Math.abs(Number(data.totalDebt) || 0);
+    const equity = Math.abs(Number(data.equity) || 0);
     const prepaid = Number(data.prepaidExpenses) || 0;
     const creditSales = Number(data.creditSales) || (rev * 0.8 || rev);
     const avgInv = Number(data.avgInventory) || inv || 1;
@@ -11544,20 +11544,21 @@ function clientParseStatementText(text) {
         try {
             const j = JSON.parse(text);
             return {
-                revenue: j.revenue || j.sales || j.turnover || 0,
-                cogs: j.cogs || j.cost_of_goods_sold || 0,
-                operatingProfit: j.ebit || j.operating_profit || j.operatingProfit || 0,
-                netProfit: j.net_profit || j.pat || j.netProfit || 0,
-                interest: j.interest_expense || j.interest || 0,
-                currentAssets: j.current_assets || j.currentAssets || 0,
-                inventory: j.inventory || j.stock || 0,
-                currentLiabilities: j.current_liabilities || j.currentLiabilities || 0,
-                totalDebt: j.total_debt || j.totalDebt || 0,
-                equity: j.total_equity || j.equity || j.net_worth || 0,
-                prepaidExpenses: j.prepaid_expenses || j.prepaidExpenses || 0,
-                avgInventory: j.avg_inventory || j.avgInventory || j.inventory || 0,
-                avgReceivables: j.avg_receivables || j.avgReceivables || j.accounts_receivable || 0,
-                creditSales: j.credit_sales || j.creditSales || j.revenue || 0
+                revenue: Math.abs(j.revenue || j.sales || j.turnover || 0),
+                cogs: Math.abs(j.cogs || j.cost_of_goods_sold || 0),
+                operatingProfit: Number(j.ebit || j.operating_profit || j.operatingProfit || 0),
+                netProfit: Number(j.net_profit || j.pat || j.netProfit || 0),
+                interest: Math.abs(j.interest_expense || j.interest || 0),
+                currentAssets: Math.abs(j.current_assets || j.currentAssets || 0),
+                inventory: Math.abs(j.inventory || j.stock || 0),
+                currentLiabilities: Math.abs(j.current_liabilities || j.currentLiabilities || 0),
+                totalDebt: Math.abs(j.total_debt || j.totalDebt || 0),
+                equity: Math.abs(j.total_equity || j.equity || j.net_worth || 0),
+                prepaidExpenses: Math.abs(j.prepaid_expenses || j.prepaidExpenses || 0),
+                avgInventory: Math.abs(j.avg_inventory || j.avgInventory || j.inventory || 0),
+                avgReceivables: Math.abs(j.avg_receivables || j.avgReceivables || j.accounts_receivable || 0),
+                creditSales: Math.abs(j.credit_sales || j.creditSales || j.revenue || 0),
+                totalAssets: Math.abs(j.total_assets || j.totalAssets || 0)
             };
         } catch(e) {}
     }
@@ -11580,26 +11581,67 @@ function clientParseStatementText(text) {
     };
 
     const data = {};
+    const prios = {};
+
     for (const line of lines) {
         let parts = line.split(/[,\t;:]/).map(p => p.trim()).filter(Boolean);
         if (parts.length < 2) continue;
-        const key = parts[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+        const rawKey = parts[0];
+        const key = rawKey.toLowerCase().replace(/[^a-z0-9]/g, '');
         const joinedVal = parts.slice(1).join('');
         const numVal = cleanNum(joinedVal);
 
-        if (/revenue|sales|turnover|topline/i.test(key) && !/credit|cogs/i.test(key)) data.revenue = numVal;
-        else if (/cogs|costofgoodssold|costofsales/i.test(key)) data.cogs = numVal;
-        else if (/ebit|operatingprofit|operatingincome/i.test(key)) data.operatingProfit = numVal;
-        else if (/netprofit|pat|netincome/i.test(key)) data.netProfit = numVal;
-        else if (/interest|financecost/i.test(key)) data.interest = numVal;
-        else if (/currentassets|ca\b/i.test(key)) data.currentAssets = numVal;
-        else if (/inventory|stock|finishedgoods/i.test(key)) data.inventory = numVal;
-        else if (/prepaid/i.test(key)) data.prepaidExpenses = numVal;
-        else if (/currentliabilit/i.test(key)) data.currentLiabilities = numVal;
-        else if (/totaldebt|borrowings|loans/i.test(key)) data.totalDebt = numVal;
-        else if (/equity|networth|sharecapital/i.test(key)) data.equity = numVal;
-        else if (/creditsales/i.test(key)) data.creditSales = numVal;
-        else if (/receivable|debtor/i.test(key)) data.avgReceivables = numVal;
+        // Skip returns
+        if (/salesreturn|returnsinward/i.test(key)) continue;
+
+        const isNonCurrent = /noncurrent/i.test(key);
+
+        if (/netsales|revenuefromoperations|netrevenue/i.test(key)) {
+            data.revenue = Math.abs(numVal);
+            prios.revenue = 10;
+        } else if (/revenue|sales|turnover|topline/i.test(key) && !/credit|cogs/i.test(key)) {
+            if (!prios.revenue || prios.revenue <= 5) {
+                data.revenue = Math.abs(numVal);
+                prios.revenue = 5;
+            }
+        } else if (/costofgoodssold|cogs|costofsales/i.test(key)) {
+            data.cogs = Math.abs(numVal);
+            prios.cogs = 10;
+        } else if (/ebit|operatingprofit|operatingincome/i.test(key)) {
+            data.operatingProfit = numVal;
+        } else if (/netprofit|pat|netincome/i.test(key)) {
+            data.netProfit = numVal;
+        } else if (/interest|financecost/i.test(key)) {
+            data.interest = Math.abs(numVal);
+        } else if (/currentassets|ca\b/i.test(key) && !isNonCurrent) {
+            data.currentAssets = Math.abs(numVal);
+        } else if (/inventory|stock|finishedgoods/i.test(key) && !/opening/i.test(key)) {
+            data.inventory = Math.abs(numVal);
+        } else if (/prepaid/i.test(key)) {
+            data.prepaidExpenses = Math.abs(numVal);
+        } else if (/currentliabilit/i.test(key) && !isNonCurrent) {
+            data.currentLiabilities = Math.abs(numVal);
+        } else if (/longtermbankloan|bankloan|termloan|totaldebt|borrowing/i.test(key) || (isNonCurrent && /liabilit|loan/i.test(key))) {
+            if (!data.totalDebt || /totalnoncurrent|totaldebt/i.test(key)) {
+                data.totalDebt = Math.abs(numVal);
+            }
+        } else if (/totalequityandliabilit/i.test(key)) {
+            data.totalAssets = Math.abs(numVal);
+        } else if (/ownersequity|totalowner|totalshareholder|shareholdersfund|networth|equity/i.test(key) && !/liabilit/i.test(key)) {
+            const p = /totalowner|totalshareholder|networth/i.test(key) ? 10 : 5;
+            if (!prios.equity || p >= prios.equity) {
+                data.equity = Math.abs(numVal);
+                prios.equity = p;
+            }
+        } else if (/creditsales/i.test(key)) {
+            data.creditSales = Math.abs(numVal);
+        } else if (/averagetradereceivable|avgreceivable/i.test(key)) {
+            data.avgReceivables = Math.abs(numVal);
+        } else if (/receivable|debtor/i.test(key) && !data.avgReceivables) {
+            data.avgReceivables = Math.abs(numVal);
+        } else if (/averageinventory|avginventory/i.test(key)) {
+            data.avgInventory = Math.abs(numVal);
+        }
     }
 
     if (data.revenue && data.cogs && !data.operatingProfit) {
@@ -11621,9 +11663,10 @@ function clientParseStatementText(text) {
         totalDebt: data.totalDebt || 0,
         equity: data.equity || 0,
         prepaidExpenses: data.prepaidExpenses || 0,
-        avgInventory: data.inventory || 0,
+        avgInventory: data.avgInventory || data.inventory || 0,
         avgReceivables: data.avgReceivables || Math.round((data.revenue || 0) * 0.1),
-        creditSales: data.creditSales || Math.round((data.revenue || 0) * 0.8)
+        creditSales: data.creditSales || Math.round((data.revenue || 0) * 0.8),
+        totalAssets: data.totalAssets || 0
     };
 }
 

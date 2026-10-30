@@ -147,39 +147,39 @@ def calculate_financial_ratios(data: dict, industry: str = "General") -> dict:
             return default
 
     # Extract base figures
-    revenue              = g("revenue")
-    cogs                 = g("cogs")
+    revenue              = abs(g("revenue"))
+    cogs                 = abs(g("cogs"))
     gross_profit         = g("gross_profit") or (revenue - cogs if revenue and cogs else 0.0)
-    operating_expenses   = g("operating_expenses")
+    operating_expenses   = abs(g("operating_expenses"))
     ebit                 = g("ebit") or (gross_profit - operating_expenses if gross_profit and operating_expenses else 0.0)
-    dna                  = g("depreciation_amortization")
+    dna                  = abs(g("depreciation_amortization"))
     ebitda               = g("ebitda") or (ebit + dna if ebit and dna else ebit)
-    interest_expense     = g("interest_expense")
+    interest_expense     = abs(g("interest_expense"))
     net_profit           = g("net_profit")
     
-    current_assets       = g("current_assets")
-    cash                 = g("cash_and_equivalents")
-    st_investments       = g("short_term_investments")
-    accounts_receivable  = g("accounts_receivable")
-    inventory            = g("inventory")
-    prepaid_expenses     = g("prepaid_expenses")
+    current_assets       = abs(g("current_assets"))
+    cash                 = abs(g("cash_and_equivalents"))
+    st_investments       = abs(g("short_term_investments"))
+    accounts_receivable  = abs(g("accounts_receivable"))
+    inventory            = abs(g("inventory"))
+    prepaid_expenses     = abs(g("prepaid_expenses"))
     
-    current_liabilities  = g("current_liabilities")
-    accounts_payable     = g("accounts_payable")
+    current_liabilities  = abs(g("current_liabilities"))
+    accounts_payable     = abs(g("accounts_payable"))
     
-    total_debt           = g("total_debt")
-    total_equity         = g("total_equity")
-    total_liabilities    = g("total_liabilities") or total_debt
-    total_assets         = g("total_assets")
-    net_fixed_assets     = g("non_current_assets")
+    total_debt           = abs(g("total_debt"))
+    total_equity         = abs(g("total_equity"))
+    total_liabilities    = abs(g("total_liabilities")) or total_debt
+    total_assets         = abs(g("total_assets"))
+    net_fixed_assets     = abs(g("non_current_assets"))
     
-    credit_sales         = g("credit_sales") or revenue
-    credit_purchases     = g("credit_purchases") or cogs
-    avg_inventory        = g("avg_inventory") or inventory
-    avg_receivables      = g("avg_receivables") or accounts_receivable
-    avg_payables         = g("avg_payables") or accounts_payable
-    avg_total_assets     = g("avg_total_assets") or total_assets
-    avg_equity           = g("avg_equity") or total_equity
+    credit_sales         = abs(g("credit_sales")) or revenue
+    credit_purchases     = abs(g("credit_purchases")) or cogs
+    avg_inventory        = abs(g("avg_inventory")) or inventory
+    avg_receivables      = abs(g("avg_receivables")) or accounts_receivable
+    avg_payables         = abs(g("avg_payables")) or accounts_payable
+    avg_total_assets     = abs(g("avg_total_assets")) or total_assets
+    avg_equity           = abs(g("avg_equity")) or total_equity
     
     retained_earnings    = g("retained_earnings")
     market_cap           = g("market_cap") or total_equity
