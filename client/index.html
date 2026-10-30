@@ -112,137 +112,148 @@
                 </button>
             </div>
 
-            <!-- Database Connection Badge -->
-            <div class="db-status-pill" id="sidebar-db-pill" role="button" tabindex="0" title="Click to configure Supabase Cloud Sync">
-                <span class="status-dot pulse" id="db-status-dot"></span>
-                <span class="status-text" id="db-status-text">Supabase Cloud</span>
-                <span class="db-badge" id="db-status-badge">PostgreSQL</span>
-            </div>
+            <!-- Scrollable Middle Section (Never pushes footer offscreen) -->
+            <div class="sidebar-scrollable" id="sidebar-scrollable">
+                <!-- Database Connection Badge -->
+                <div class="db-status-pill" id="sidebar-db-pill" role="button" tabindex="0" title="Click to configure Supabase Cloud Sync">
+                    <span class="status-dot pulse" id="db-status-dot"></span>
+                    <span class="status-text" id="db-status-text">Supabase Cloud</span>
+                    <span class="db-badge" id="db-status-badge">PostgreSQL</span>
+                </div>
 
-            <!-- Prominent Linear-Style Primary Action CTA -->
-            <div class="sidebar-hero-cta">
-                <button type="button" class="btn-sidebar-wizard" onclick="switchTab('assessment'); if(window.assessmentWizard) window.assessmentWizard.startNew();" id="btn-sidebar-start-wizard" title="Start New 8-Step Business Risk Assessment">
-                    <div class="cta-sparkle">✦</div>
-                    <div class="cta-label-group">
-                        <span class="cta-main-text">Start Assessment</span>
-                        <span class="cta-sub-text">8-Step Guided Flow</span>
-                    </div>
-                    <span class="cta-step-pill">Wizard</span>
-                </button>
-            </div>
-
-            <!-- Navigation Links -->
-            <div class="nav-section-label">CORE PLATFORM</div>
-            <nav class="nav-menu">
-                <button class="nav-item active" data-tab="overview" id="nav-overview" data-tooltip="Executive Overview">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"/>
-                        <rect x="14" y="3" width="7" height="7"/>
-                        <rect x="14" y="14" width="7" height="7"/>
-                        <rect x="3" y="14" width="7" height="7"/>
-                    </svg>
-                    <span>Executive Overview</span>
-                </button>
-
-                <button class="nav-item" data-tab="assessment" id="nav-assessment" data-tooltip="Assessment Wizard (8 Steps)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                    </svg>
-                    <span>Assessment Wizard</span>
-                    <span class="nav-badge nav-badge-accent">8 Steps</span>
-                </button>
-
-                <div class="nav-section-label" style="margin-top: 10px;">RISK &amp; QUANT ANALYTICS</div>
-
-                <button class="nav-item" data-tab="registry" id="nav-registry" data-tooltip="Enterprise Risk Registry">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="8" y1="6" x2="21" y2="6"/>
-                        <line x1="8" y1="12" x2="21" y2="12"/>
-                        <line x1="8" y1="18" x2="21" y2="18"/>
-                        <line x1="3" y1="6" x2="3.01" y2="6"/>
-                        <line x1="3" y1="12" x2="3.01" y2="12"/>
-                        <line x1="3" y1="18" x2="3.01" y2="18"/>
-                    </svg>
-                    <span>Risk Registry</span>
-                    <span class="nav-badge" id="nav-risk-count">0</span>
-                </button>
-
-                <button class="nav-item" data-tab="matrix" id="nav-matrix" data-tooltip="3D Risk Heatmap">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <line x1="3" y1="9" x2="21" y2="9"/>
-                        <line x1="3" y1="15" x2="21" y2="15"/>
-                        <line x1="9" y1="3" x2="9" y2="21"/>
-                        <line x1="15" y1="3" x2="15" y2="21"/>
-                    </svg>
-                    <span>3D Risk Heatmap</span>
-                </button>
-
-                <button class="nav-item" data-tab="analytics" id="nav-analytics" data-tooltip="Quantitative VaR Simulation">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 3v18h18"/>
-                        <path d="M18 17V9"/>
-                        <path d="M13 17V5"/>
-                        <path d="M8 17v-3"/>
-                    </svg>
-                    <span>Quantitative VaR</span>
-                </button>
-
-                <button class="nav-item" data-tab="financial" id="nav-financial" data-tooltip="Stress Testing & Sensitivity">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                    </svg>
-                    <span>Stress Testing</span>
-                </button>
-
-                <div class="nav-section-label" style="margin-top: 10px;">GOVERNANCE &amp; REPORTS</div>
-
-                <button class="nav-item" data-tab="audit" id="nav-audit" data-tooltip="Audit Trail & Compliance Log">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                    <span>Audit Trail</span>
-                </button>
-
-                <button class="nav-item" data-tab="admin" id="nav-admin" data-tooltip="Admin Governance Console">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        <circle cx="12" cy="11" r="3"/>
-                        <path d="M12 8v2"/>
-                    </svg>
-                    <span>Admin &amp; Settings</span>
-                    <span class="nav-badge" id="nav-admin-badge" style="background: rgba(245, 158, 11, 0.2); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.35);">Admin</span>
-                </button>
-            </nav>
-
-            <!-- Sidebar Footer -->
-            <div class="sidebar-footer">
-                <div class="user-profile" id="sidebar-user-profile" style="position: relative; display: flex; align-items: center; gap: 10px;">
-                    <div class="avatar" id="sidebar-user-avatar" title="Authenticated User Profile">CRO</div>
-                    <div class="user-info" style="flex: 1; min-width: 0;">
-                        <span class="user-name" id="sidebar-user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; font-weight: 600;">Chief Risk Officer</span>
-                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 3px;">
-                            <span class="role-badge-pill role-admin" id="sidebar-role-badge">👑 Admin</span>
-                            <button type="button" class="btn-role-quick-toggle" id="btn-quick-toggle-role" onclick="toggleUserRoleQuick()" title="Switch between Admin and Normal User roles">⇄ Switch</button>
+                <!-- Primary Action CTA -->
+                <div class="sidebar-hero-cta">
+                    <button type="button" class="btn-sidebar-wizard" onclick="switchTab('assessment'); if(window.assessmentWizard) window.assessmentWizard.startNew();" id="btn-sidebar-start-wizard" title="Start New 8-Step Business Risk Assessment">
+                        <div class="cta-sparkle">✦</div>
+                        <div class="cta-label-group">
+                            <span class="cta-main-text">Start Assessment</span>
+                            <span class="cta-sub-text">8-Step Guided Flow</span>
                         </div>
-                    </div>
-                    <button type="button" class="btn-logout-icon" id="btn-sidebar-logout" onclick="logoutUser()" title="Logout Session" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #F87171; padding: 6px 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; font-size: 0.72rem; font-weight: 600; flex-shrink: 0;" onmouseover="this.style.background='rgba(239,68,68,0.28)';this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.12)';this.style.color='#F87171';">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        <span>Logout</span>
+                        <span class="cta-step-pill">Wizard</span>
                     </button>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
-                    <a href="home.html" style="font-size: 0.72rem; color: #34D399; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.color='#10B981';" onmouseout="this.style.color='#34D399';">
+
+                <!-- Navigation Links -->
+                <nav class="nav-menu">
+                    <div class="nav-section-label">CORE PLATFORM</div>
+
+                    <button class="nav-item active" data-tab="overview" id="nav-overview" data-tooltip="Executive Overview">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                        <span>Executive Overview</span>
+                    </button>
+
+                    <button class="nav-item" data-tab="assessment" id="nav-assessment" data-tooltip="Assessment Wizard (8 Steps)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        <span>Assessment Wizard</span>
+                        <span class="nav-badge nav-badge-accent">8 Steps</span>
+                    </button>
+
+                    <div class="nav-section-label">RISK &amp; QUANT ANALYTICS</div>
+
+                    <button class="nav-item" data-tab="registry" id="nav-registry" data-tooltip="Enterprise Risk Registry">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="8" y1="6" x2="21" y2="6"/>
+                            <line x1="8" y1="12" x2="21" y2="12"/>
+                            <line x1="8" y1="18" x2="21" y2="18"/>
+                            <line x1="3" y1="6" x2="3.01" y2="6"/>
+                            <line x1="3" y1="12" x2="3.01" y2="12"/>
+                            <line x1="3" y1="18" x2="3.01" y2="18"/>
+                        </svg>
+                        <span>Risk Registry</span>
+                        <span class="nav-badge" id="nav-risk-count">0</span>
+                    </button>
+
+                    <button class="nav-item" data-tab="matrix" id="nav-matrix" data-tooltip="3D Risk Heatmap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <line x1="3" y1="9" x2="21" y2="9"/>
+                            <line x1="3" y1="15" x2="21" y2="15"/>
+                            <line x1="9" y1="3" x2="9" y2="21"/>
+                            <line x1="15" y1="3" x2="15" y2="21"/>
+                        </svg>
+                        <span>3D Risk Heatmap</span>
+                    </button>
+
+                    <button class="nav-item" data-tab="analytics" id="nav-analytics" data-tooltip="Quantitative VaR Simulation">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/>
+                            <path d="M18 17V9"/>
+                            <path d="M13 17V5"/>
+                            <path d="M8 17v-3"/>
+                        </svg>
+                        <span>Quantitative VaR</span>
+                    </button>
+
+                    <button class="nav-item" data-tab="financial" id="nav-financial" data-tooltip="Stress Testing & Sensitivity">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        <span>Stress Testing</span>
+                    </button>
+
+                    <div class="nav-section-label">GOVERNANCE &amp; REPORTS</div>
+
+                    <button class="nav-item" data-tab="audit" id="nav-audit" data-tooltip="Audit Trail & Compliance Log">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span>Audit Trail</span>
+                    </button>
+
+                    <button class="nav-item" data-tab="admin" id="nav-admin" data-tooltip="Admin Governance Console">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <circle cx="12" cy="11" r="3"/>
+                            <path d="M12 8v2"/>
+                        </svg>
+                        <span>Admin &amp; Settings</span>
+                        <span class="nav-badge" id="nav-admin-badge" style="background: rgba(245, 158, 11, 0.2); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.35);">Admin</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Sleek Anchored Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="user-profile-card">
+                    <div class="user-profile-main" id="sidebar-user-profile">
+                        <div class="avatar" id="sidebar-user-avatar" title="Active Persona Profile">CRO</div>
+                        <div class="user-profile-meta">
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                                <span class="user-profile-name" id="sidebar-user-name">Chief Risk Officer</span>
+                                <span class="role-badge-pill role-admin" id="sidebar-role-badge">👑 Admin</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-profile-actions">
+                        <button type="button" class="btn-profile-toggle" id="btn-quick-toggle-role" onclick="toggleUserRoleQuick()" title="Switch between Admin and Normal User roles">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/></svg>
+                            <span>⇄ Switch Role</span>
+                        </button>
+                        <button type="button" class="btn-profile-logout" id="btn-sidebar-logout" onclick="logoutUser()" title="Logout Session">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="sidebar-footer-bottom">
+                    <a href="home.html" class="sidebar-landing-link">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                        Landing Page
+                        <span>Landing Page</span>
                     </a>
-                    <span style="font-size: 0.65rem; color: var(--text-muted); opacity: 0.6;">ISO 31000 · v2.4</span>
+                    <span class="sidebar-iso-tag">ISO 31000 · v3.2</span>
                 </div>
             </div>
         </aside>
