@@ -324,6 +324,18 @@ def serve_static(filename):
 
 # ─── REST API Endpoints ───────────────────────────────────────────────────────
 
+@app.route("/health", methods=["GET"])
+@app.route("/api/health", methods=["GET"])
+def health_check():
+    """Health check endpoint for Render/cloud uptime monitoring."""
+    return jsonify({
+        "status": "healthy",
+        "service": "RiskGuard Pro Analytics Engine",
+        "version": "3.2.0",
+        "timestamp": time.time()
+    }), 200
+
+
 @app.route("/api/db-status", methods=["GET"])
 def get_db_status():
     """Retrieve database engine status, provider, and masked Supabase connectivity."""
