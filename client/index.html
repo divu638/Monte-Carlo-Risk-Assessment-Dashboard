@@ -1284,6 +1284,32 @@
                     </div>
                 </div>
 
+                <!-- Comprehensive Financial Risk Diagnostic & Advisory Matrix (5 Pillars) -->
+                <div class="fin-diagnostic-section" id="tab-fin-diagnostic-section" style="margin-bottom: 24px;">
+                    <div class="diag-header-row">
+                        <div>
+                            <h4 style="font-size: 0.95rem; font-weight: 700; color: #34D399; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                <span>🛡️</span> Enterprise Financial Risk Diagnostics &amp; Strategic Advisory Matrix
+                            </h4>
+                            <p style="font-size: 0.74rem; color: #94A3B8; margin: 3px 0 0;">
+                                Detailed 4-part diagnosis (Classification, Interpretation, Business Impact, Action Plan) across all 5 financial pillars
+                            </p>
+                        </div>
+                        <div class="diag-filter-pills" id="tab-diag-filter-pills">
+                            <button type="button" class="diag-filter-btn active" onclick="filterDiagnosticPillar('all')">All Pillars</button>
+                            <button type="button" class="diag-filter-btn" onclick="filterDiagnosticPillar('liquidity')">💧 Liquidity</button>
+                            <button type="button" class="diag-filter-btn" onclick="filterDiagnosticPillar('profitability')">📈 Profitability</button>
+                            <button type="button" class="diag-filter-btn" onclick="filterDiagnosticPillar('solvency')">🏛️ Solvency</button>
+                            <button type="button" class="diag-filter-btn" onclick="filterDiagnosticPillar('efficiency')">⚡ Efficiency</button>
+                            <button type="button" class="diag-filter-btn" onclick="filterDiagnosticPillar('cashflow')">💸 Cash Flow</button>
+                        </div>
+                    </div>
+
+                    <div id="tab-diagnostic-cards-grid" class="diagnostic-cards-grid">
+                        <!-- Populated dynamically by script.js -->
+                    </div>
+                </div>
+
                 <!-- Financial Stress Presets -->
                     <div class="card">
                         <div class="card-header">
@@ -2625,6 +2651,32 @@
                                                 </div>
                                             </div>
                                         </details>
+                                    </div>
+
+                                    <!-- Comprehensive Financial Risk Diagnostic & Advisory Matrix (5 Pillars) -->
+                                    <div class="fin-diagnostic-section" id="wiz-fin-diagnostic-section" style="margin-bottom: 18px;">
+                                        <div class="diag-header-row">
+                                            <div>
+                                                <h4 style="font-size: 0.95rem; font-weight: 700; color: #34D399; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                                    <span>🛡️</span> Financial Risk Diagnostic &amp; Strategic Advisory Matrix
+                                                </h4>
+                                                <p style="font-size: 0.74rem; color: #94A3B8; margin: 3px 0 0;">
+                                                    ISO 31000 quantitative risk classification, business impact assessment &amp; practical action plans across 5 key pillars
+                                                </p>
+                                            </div>
+                                            <div class="diag-filter-pills" id="wiz-diag-filter-pills">
+                                                <button type="button" class="diag-filter-btn active" onclick="filterDiagnosticPillar('all')">All Pillars</button>
+                                                <button type="button" class="diag-filter-btn" onclick="filterDiagnosticPillar('liquidity')">💧 Liquidity</button>
+                                                <button type="button" class="diag-filter-btn" onclick="filterDiagnosticPillar('profitability')">📈 Profitability</button>
+                                                <button type="button" class="diag-filter-btn" onclick="filterDiagnosticPillar('solvency')">🏛️ Solvency</button>
+                                                <button type="button" class="diag-filter-btn" onclick="filterDiagnosticPillar('efficiency')">⚡ Efficiency</button>
+                                                <button type="button" class="diag-filter-btn" onclick="filterDiagnosticPillar('cashflow')">💸 Cash Flow</button>
+                                            </div>
+                                        </div>
+
+                                        <div id="wiz-diagnostic-cards-grid" class="diagnostic-cards-grid">
+                                            <!-- Populated dynamically by script.js -->
+                                        </div>
                                     </div>
 
                                     <!-- 5. Collapsible Optional Adjustment Form (Hidden by default, keeps existing models 100% compatible) -->

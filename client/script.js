@@ -8841,6 +8841,23 @@ function calculateFinancialRatios() {
 
     renderRecommendations(ratios);
 
+    // Render Comprehensive 5-Pillar Financial Diagnostic & Advisory Matrix
+    if (typeof renderFinancialDiagnosticMatrix === 'function') {
+        renderFinancialDiagnosticMatrix({
+            cr: ratios.currentRatio,
+            qr: ratios.quickRatio,
+            cashRatio: ratios.quickRatio ? ratios.quickRatio * 0.4 : null,
+            de: ratios.debtEquity,
+            npm: ratios.netMargin,
+            opm: ratios.opMargin,
+            roe: ratios.netMargin ? ratios.netMargin * 1.5 : null,
+            icr: ratios.interestCoverage,
+            it: ratios.inventoryTurnover,
+            dso: ratios.collectionDays,
+            altmanZ: null
+        });
+    }
+
 
 
     // Tornado Sensitivity Chart
@@ -11502,6 +11519,25 @@ function updateFinancialStatementUI(data, docTitle, docDesc) {
     setTxt('disp-sup-inv-days', `${invDays} days`);
     setTxt('disp-sup-ccc', `${ccc} days`);
 
+    // Render Comprehensive 5-Pillar Financial Diagnostic & Advisory Matrix
+    try {
+        renderFinancialDiagnosticMatrix({
+            cr: typeof cr === 'string' && cr !== 'N/A' ? parseFloat(cr) : cr,
+            qr: typeof qr === 'string' && qr !== 'N/A' ? parseFloat(qr) : qr,
+            cashRatio: typeof cashRatio === 'string' && cashRatio !== 'N/A' ? parseFloat(cashRatio) : cashRatio,
+            npm: typeof netMarginPct === 'string' ? parseFloat(netMarginPct) : netMarginPct,
+            opm: typeof opMarginPct === 'string' ? parseFloat(opMarginPct) : opMarginPct,
+            roe: typeof roe === 'string' ? parseFloat(roe) : roe,
+            de: typeof de === 'string' && de !== 'N/A' ? parseFloat(de) : de,
+            icr: typeof icr === 'string' && icr !== 'N/A' ? parseFloat(icr) : icr,
+            it: typeof it === 'string' && it !== 'N/A' ? parseFloat(it) : it,
+            dso: typeof dsoDays === 'number' ? dsoDays : (typeof dsoDays === 'string' && dsoDays !== 'N/A' ? parseFloat(dsoDays) : null),
+            altmanZ: null
+        });
+    } catch(diagErr) {
+        console.warn('Diagnostic matrix render note:', diagErr);
+    }
+
     const errBox = document.getElementById('wiz-step3-error-banner');
     if (errBox) errBox.style.display = 'none';
 }
@@ -11894,7 +11930,26 @@ const assessmentWizard = {
 
                 input.classList.remove('input-error');
 
-                const errBox = document.getElementById('wiz-step3-error-banner');
+                // Render Comprehensive 5-Pillar Financial Diagnostic & Advisory Matrix
+    try {
+        renderFinancialDiagnosticMatrix({
+            cr: typeof cr === 'string' && cr !== 'N/A' ? parseFloat(cr) : cr,
+            qr: typeof qr === 'string' && qr !== 'N/A' ? parseFloat(qr) : qr,
+            cashRatio: typeof cashRatio === 'string' && cashRatio !== 'N/A' ? parseFloat(cashRatio) : cashRatio,
+            npm: typeof netMarginPct === 'string' ? parseFloat(netMarginPct) : netMarginPct,
+            opm: typeof opMarginPct === 'string' ? parseFloat(opMarginPct) : opMarginPct,
+            roe: typeof roe === 'string' ? parseFloat(roe) : roe,
+            de: typeof de === 'string' && de !== 'N/A' ? parseFloat(de) : de,
+            icr: typeof icr === 'string' && icr !== 'N/A' ? parseFloat(icr) : icr,
+            it: typeof it === 'string' && it !== 'N/A' ? parseFloat(it) : it,
+            dso: typeof dsoDays === 'number' ? dsoDays : (typeof dsoDays === 'string' && dsoDays !== 'N/A' ? parseFloat(dsoDays) : null),
+            altmanZ: null
+        });
+    } catch(diagErr) {
+        console.warn('Diagnostic matrix render note:', diagErr);
+    }
+
+    const errBox = document.getElementById('wiz-step3-error-banner');
 
                 if (errBox) errBox.style.display = 'none';
 
@@ -11941,7 +11996,26 @@ const assessmentWizard = {
     validateStep3() {
         const revVal = parseFloat(document.getElementById('wiz-revenue')?.value) || 0;
         if (revVal <= 0) {
-            const errBox = document.getElementById('wiz-step3-error-banner');
+            // Render Comprehensive 5-Pillar Financial Diagnostic & Advisory Matrix
+    try {
+        renderFinancialDiagnosticMatrix({
+            cr: typeof cr === 'string' && cr !== 'N/A' ? parseFloat(cr) : cr,
+            qr: typeof qr === 'string' && qr !== 'N/A' ? parseFloat(qr) : qr,
+            cashRatio: typeof cashRatio === 'string' && cashRatio !== 'N/A' ? parseFloat(cashRatio) : cashRatio,
+            npm: typeof netMarginPct === 'string' ? parseFloat(netMarginPct) : netMarginPct,
+            opm: typeof opMarginPct === 'string' ? parseFloat(opMarginPct) : opMarginPct,
+            roe: typeof roe === 'string' ? parseFloat(roe) : roe,
+            de: typeof de === 'string' && de !== 'N/A' ? parseFloat(de) : de,
+            icr: typeof icr === 'string' && icr !== 'N/A' ? parseFloat(icr) : icr,
+            it: typeof it === 'string' && it !== 'N/A' ? parseFloat(it) : it,
+            dso: typeof dsoDays === 'number' ? dsoDays : (typeof dsoDays === 'string' && dsoDays !== 'N/A' ? parseFloat(dsoDays) : null),
+            altmanZ: null
+        });
+    } catch(diagErr) {
+        console.warn('Diagnostic matrix render note:', diagErr);
+    }
+
+    const errBox = document.getElementById('wiz-step3-error-banner');
             if (errBox) {
                 errBox.style.display = 'block';
                 errBox.innerHTML = '<strong>⚠️ No Financial Statement Attached:</strong> Please drop your corporate Balance Sheet &amp; P&amp;L file (Excel/PDF/CSV) or click one of the sector presets to proceed.';
@@ -12008,7 +12082,26 @@ const assessmentWizard = {
 
 
 
-        const errBox = document.getElementById('wiz-step3-error-banner');
+        // Render Comprehensive 5-Pillar Financial Diagnostic & Advisory Matrix
+    try {
+        renderFinancialDiagnosticMatrix({
+            cr: typeof cr === 'string' && cr !== 'N/A' ? parseFloat(cr) : cr,
+            qr: typeof qr === 'string' && qr !== 'N/A' ? parseFloat(qr) : qr,
+            cashRatio: typeof cashRatio === 'string' && cashRatio !== 'N/A' ? parseFloat(cashRatio) : cashRatio,
+            npm: typeof netMarginPct === 'string' ? parseFloat(netMarginPct) : netMarginPct,
+            opm: typeof opMarginPct === 'string' ? parseFloat(opMarginPct) : opMarginPct,
+            roe: typeof roe === 'string' ? parseFloat(roe) : roe,
+            de: typeof de === 'string' && de !== 'N/A' ? parseFloat(de) : de,
+            icr: typeof icr === 'string' && icr !== 'N/A' ? parseFloat(icr) : icr,
+            it: typeof it === 'string' && it !== 'N/A' ? parseFloat(it) : it,
+            dso: typeof dsoDays === 'number' ? dsoDays : (typeof dsoDays === 'string' && dsoDays !== 'N/A' ? parseFloat(dsoDays) : null),
+            altmanZ: null
+        });
+    } catch(diagErr) {
+        console.warn('Diagnostic matrix render note:', diagErr);
+    }
+
+    const errBox = document.getElementById('wiz-step3-error-banner');
 
         if (hasError) {
 
@@ -15831,3 +15924,510 @@ function resumeAssessmentDraft() {
 
 window.resumeAssessmentDraft = resumeAssessmentDraft;
 
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   FINANCIAL RISK DIAGNOSTIC & STRATEGIC ADVISORY ENGINE (5 PILLARS)
+   Adheres to ISO 31000 quantitative risk evaluation framework:
+   1. Risk Classification (Low / Moderate / High / Insufficient Data)
+   2. Plain-English Interpretation
+   3. Possible Business Impact
+   4. Actionable Suggested Mitigation
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+let CURRENT_DIAGNOSTIC_PILLAR_FILTER = 'all';
+
+function filterDiagnosticPillar(pillar) {
+    CURRENT_DIAGNOSTIC_PILLAR_FILTER = pillar;
+    document.querySelectorAll('.diag-filter-btn').forEach(btn => {
+        if (btn.textContent.toLowerCase().includes(pillar) || (pillar === 'all' && btn.textContent.includes('All'))) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    const cards = document.querySelectorAll('.diag-card');
+    cards.forEach(card => {
+        const cardPillar = card.getAttribute('data-pillar');
+        if (pillar === 'all' || cardPillar === pillar) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+window.filterDiagnosticPillar = filterDiagnosticPillar;
+
+function openNewTaskModalWithPrefill(title, category, treatment, owner) {
+    openNewTaskModal();
+    const titleEl = document.getElementById('task-input-title');
+    const catEl = document.getElementById('task-input-category');
+    const treatEl = document.getElementById('task-input-treatment');
+    const ownerEl = document.getElementById('task-input-owner');
+
+    if (titleEl && title) titleEl.value = title;
+    if (catEl && category) catEl.value = category;
+    if (treatEl && treatment) treatEl.value = treatment;
+    if (ownerEl && owner) ownerEl.value = owner;
+}
+window.openNewTaskModalWithPrefill = openNewTaskModalWithPrefill;
+
+function evaluateRatioDiagnostic(id, val, metrics) {
+    const isNA = val === null || val === undefined || isNaN(val) || (typeof val === 'string' && val.toLowerCase().includes('n/a'));
+    const num = isNA ? 0 : parseFloat(val);
+
+    switch(id) {
+        // ── 1. LIQUIDITY PILLAR ──────────────────────────────────────────────
+        case 'current_ratio':
+            if (isNA) return {
+                pillar: 'liquidity', name: 'Current Ratio', formula: 'Current Assets ÷ Current Liabilities',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Missing current assets or liabilities denominator; metric cannot be reliably derived.',
+                impacts: ['Potential blindness to short-term liquidity stress.'],
+                actions: ['Upload comprehensive balance sheet statements.'],
+                taskTitle: 'Audit Balance Sheet Working Capital Inputs', taskTreatment: 'Mitigate'
+            };
+            if (num >= 1.8) return {
+                pillar: 'liquidity', name: 'Current Ratio', formula: 'Current Assets ÷ Current Liabilities',
+                valStr: num.toFixed(2) + 'x', level: 'risk-low', badge: 'Low Risk',
+                interpretation: 'Sufficient current assets to pay short-term liabilities with a healthy prudential margin.',
+                impacts: ['High vendor confidence and favorable trade credit terms.', 'Zero near-term operational cash distress.'],
+                actions: ['Maintain balanced working capital without hoarding idle non-interest-earning cash reserves.'],
+                taskTitle: 'Maintain Optimal Current Asset Allocation', taskTreatment: 'Accept'
+            };
+            if (num >= 1.2) return {
+                pillar: 'liquidity', name: 'Current Ratio', formula: 'Current Assets ÷ Current Liabilities',
+                valStr: num.toFixed(2) + 'x', level: 'risk-moderate', badge: 'Moderate Risk',
+                interpretation: 'Limited safety margin; current liabilities absorb a significant portion of short-term liquidity.',
+                impacts: ['Vulnerable to customer collection delays.', 'May face temporary tight liquidity during high-spend cycles.'],
+                actions: ['Accelerate collection of trade receivables and establish an emergency credit line buffer.'],
+                taskTitle: 'Tighten Receivables Collections & Monitor Current Buffer', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'liquidity', name: 'Current Ratio', formula: 'Current Assets ÷ Current Liabilities',
+                valStr: num.toFixed(2) + 'x', level: 'risk-high', badge: 'High Risk',
+                interpretation: 'Current liabilities exceed or severely strain current assets, indicating potential difficulty meeting short-term obligations.',
+                impacts: ['Delayed payments to suppliers and risk of vendor supply freezes.', 'High risk of short-term working capital default.'],
+                actions: ['Negotiate vendor credit extension, liquidate non-moving inventory, and inject short-term bridge liquidity.'],
+                taskTitle: 'Urgent: Address Working Capital Deficit & Defer Vendor Dues', taskTreatment: 'Reduce'
+            };
+
+        case 'quick_ratio':
+            if (isNA) return {
+                pillar: 'liquidity', name: 'Quick Ratio (Acid-Test)', formula: '(Current Assets − Inventory) ÷ Current Liabilities',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Quick assets data unavailable.',
+                impacts: ['Inability to gauge immediate solvency without inventory liquidation.'],
+                actions: ['Ensure current assets and inventory figures are populated.'],
+                taskTitle: 'Verify Acid-Test Telemetry Inputs', taskTreatment: 'Mitigate'
+            };
+            if (num >= 1.0) return {
+                pillar: 'liquidity', name: 'Quick Ratio (Acid-Test)', formula: '(Current Assets − Inventory) ÷ Current Liabilities',
+                valStr: num.toFixed(2) + 'x', level: 'risk-low', badge: 'Low Risk',
+                interpretation: 'Can comfortably settle all short-term liabilities immediately without depending on future inventory sales.',
+                impacts: ['Exceptional shock resistance against sudden sales downturns or supply chain disruptions.'],
+                actions: ['Preserve liquid asset mix and review periodic debtor payment terms.'],
+                taskTitle: 'Sustain Acid-Test Liquidity Buffer', taskTreatment: 'Accept'
+            };
+            if (num >= 0.8) return {
+                pillar: 'liquidity', name: 'Quick Ratio (Acid-Test)', formula: '(Current Assets − Inventory) ÷ Current Liabilities',
+                valStr: num.toFixed(2) + 'x', level: 'risk-moderate', badge: 'Moderate Risk',
+                interpretation: 'May face some pressure in meeting immediate obligations if debtor receipts slow down.',
+                impacts: ['Moderate dependency on inventory conversion to meet short-term liabilities.'],
+                actions: ['Monitor accounts receivable aging schedule and avoid excess finished goods holding.'],
+                taskTitle: 'Establish Invoice Factoring Buffer for Quick Assets', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'liquidity', name: 'Quick Ratio (Acid-Test)', formula: '(Current Assets − Inventory) ÷ Current Liabilities',
+                valStr: num.toFixed(2) + 'x', level: 'risk-high', badge: 'High Risk',
+                interpretation: 'Insufficient liquid assets to meet short-term liabilities; heavily over-dependent on selling inventory to survive.',
+                impacts: ['Immediate payment default risk if sales drop or inventory movement stalls.', 'Cash freeze risk.'],
+                actions: ['Establish emergency cash facilities, accelerate trade debtor recovery, and delay non-essential payments.'],
+                taskTitle: 'Deploy Automated Invoice Factoring to Boost Quick Cash', taskTreatment: 'Reduce'
+            };
+
+        case 'cash_ratio':
+            if (isNA) return {
+                pillar: 'liquidity', name: 'Cash Ratio', formula: '(Cash & Equivalents + Marketable Securities) ÷ Current Liabilities',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Cash balances not provided.',
+                impacts: ['Immediate payment safety margin cannot be ascertained.'],
+                actions: ['Enter bank and cash balances from balance sheet.'],
+                taskTitle: 'Reconcile Cash & Bank Balances', taskTreatment: 'Mitigate'
+            };
+            if (num >= 0.4) return {
+                pillar: 'liquidity', name: 'Cash Ratio', formula: '(Cash & Equivalents + Marketable Securities) ÷ Current Liabilities',
+                valStr: num.toFixed(2) + 'x', level: 'risk-low', badge: 'Low Risk',
+                interpretation: 'Has sufficient cash and bank balances to cover immediate upcoming liabilities without delay.',
+                impacts: ['Guaranteed solvency for upcoming operational dues and debt interest.'],
+                actions: ['Maintain treasury yields on surplus bank deposits.'],
+                taskTitle: 'Optimize Treasury Cash Holdings', taskTreatment: 'Accept'
+            };
+            if (num >= 0.2) return {
+                pillar: 'liquidity', name: 'Cash Ratio', formula: '(Cash & Equivalents + Marketable Securities) ÷ Current Liabilities',
+                valStr: num.toFixed(2) + 'x', level: 'risk-moderate', badge: 'Moderate Risk',
+                interpretation: 'Cash reserves are relatively limited; dependent on daily cash inflows.',
+                impacts: ['Vulnerable if customer receivables are delayed by even 15–30 days.'],
+                actions: ['Set aside a 30-day operating expense contingency reserve.'],
+                taskTitle: 'Build 30-Day Cash Contingency Reserve', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'liquidity', name: 'Cash Ratio', formula: '(Cash & Equivalents + Marketable Securities) ÷ Current Liabilities',
+                valStr: num.toFixed(2) + 'x', level: 'risk-high', badge: 'High Risk',
+                interpretation: 'Very low cash availability; immediate payment difficulties and banking overdraft stress may arise.',
+                impacts: ['Risk of bounced vendor cheques, penalty interest, and impaired credit standing.'],
+                actions: ['Activate bank overdraft line and defer discretionary capital expenses.'],
+                taskTitle: 'Activate Emergency Working Capital Credit Line', taskTreatment: 'Reduce'
+            };
+
+        // ── 2. PROFITABILITY PILLAR ──────────────────────────────────────────
+        case 'net_profit_margin':
+            if (isNA) return {
+                pillar: 'profitability', name: 'Net Profit Margin', formula: '(Net Profit After Tax ÷ Net Revenue) × 100',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Net profit or revenue data unavailable.',
+                impacts: ['Bottom-line profitability performance hidden.'],
+                actions: ['Input audited income statement figures.'],
+                taskTitle: 'Reconcile Net Sales and PAT', taskTreatment: 'Mitigate'
+            };
+            if (num >= 8.0) return {
+                pillar: 'profitability', name: 'Net Profit Margin', formula: '(Net Profit After Tax ÷ Net Revenue) × 100',
+                valStr: num.toFixed(1) + '%', level: 'risk-low', badge: 'Low Risk',
+                interpretation: 'Healthy profit retained after all operating expenses, taxes, and finance costs; excellent cost control.',
+                impacts: ['Strong capacity to generate internal equity reserves and fund strategic growth.', 'High resilience against price inflation.'],
+                actions: ['Reinvest retained surplus into high-margin product expansion.'],
+                taskTitle: 'Sustain Cost Leadership & Scale Profitable Segments', taskTreatment: 'Accept'
+            };
+            if (num >= 3.0) return {
+                pillar: 'profitability', name: 'Net Profit Margin', formula: '(Net Profit After Tax ÷ Net Revenue) × 100',
+                valStr: num.toFixed(1) + '%', level: 'risk-moderate', badge: 'Moderate Risk',
+                interpretation: 'Profit margins are under pressure; increasing direct costs or administrative overheads.',
+                impacts: ['Limited safety margin if sales revenue dips or input costs rise.'],
+                actions: ['Conduct vendor cost renegotiations and streamline overhead expenses.'],
+                taskTitle: 'Audit Overhead Costs & Optimize Supplier Pricing', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'profitability', name: 'Net Profit Margin', formula: '(Net Profit After Tax ÷ Net Revenue) × 100',
+                valStr: num.toFixed(1) + '%', level: 'risk-high', badge: 'High Risk',
+                interpretation: 'Very low or negative net profitability; total business expenses are exceeding or consuming gross revenues.',
+                impacts: ['Depletion of net worth, inability to self-fund operations, and acute financial distress.'],
+                actions: ['Implement emergency cost-cutting, eliminate unprofitable product lines, and restructure high-interest debt.'],
+                taskTitle: 'Implement Comprehensive Turnaround & Cost Rationalization', taskTreatment: 'Reduce'
+            };
+
+        case 'operating_margin':
+            if (isNA) return {
+                pillar: 'profitability', name: 'Operating Profit Margin (EBIT)', formula: '(Operating Profit ÷ Net Revenue) × 100',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Operating earnings unavailable.',
+                impacts: ['Core operational efficiency unassessed.'],
+                actions: ['Verify EBIT inputs.'],
+                taskTitle: 'Verify EBIT Telemetry', taskTreatment: 'Mitigate'
+            };
+            if (num >= 12.0) return {
+                pillar: 'profitability', name: 'Operating Profit Margin (EBIT)', formula: '(Operating Profit ÷ Net Revenue) × 100',
+                valStr: num.toFixed(1) + '%', level: 'risk-low', badge: 'Low Risk',
+                interpretation: 'Core business operations are highly profitable before financing charges and taxation.',
+                impacts: ['Superior operating leverage and ability to withstand industry price downturns.'],
+                actions: ['Maintain operating process efficiencies and supply chain scale.'],
+                taskTitle: 'Protect Core Operating Margin Advantage', taskTreatment: 'Accept'
+            };
+            if (num >= 6.0) return {
+                pillar: 'profitability', name: 'Operating Profit Margin (EBIT)', formula: '(Operating Profit ÷ Net Revenue) × 100',
+                valStr: num.toFixed(1) + '%', level: 'risk-moderate', badge: 'Moderate Risk',
+                interpretation: 'Operating margin is moderate; direct production expenses and SG&A absorb most revenue.',
+                impacts: ['Vulnerable to raw material cost inflation or logistics spikes.'],
+                actions: ['Implement lean manufacturing and automate administrative workflows.'],
+                taskTitle: 'Streamline Operational SG&A Expenses', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'profitability', name: 'Operating Profit Margin (EBIT)', formula: '(Operating Profit ÷ Net Revenue) × 100',
+                valStr: num.toFixed(1) + '%', level: 'risk-high', badge: 'High Risk',
+                interpretation: 'Operating profit is critically thin or negative; operational cost structure is unsustainable.',
+                impacts: ['Operational losses before even paying bank interest or debt principal.'],
+                actions: ['Conduct immediate operational audit, renegotiate labor/utility contracts, and revisit pricing models.'],
+                taskTitle: 'Restructure Production & Operating Cost Model', taskTreatment: 'Reduce'
+            };
+
+        case 'return_on_equity':
+            if (isNA) return {
+                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders' Equity) × 100',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Equity return unavailable.',
+                impacts: ['Shareholder wealth creation unverified.'],
+                actions: ['Input shareholders funds balance.'],
+                taskTitle: 'Verify Shareholders Equity Inputs', taskTreatment: 'Mitigate'
+            };
+            if (num >= 14.0) return {
+                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders' Equity) × 100',
+                valStr: num.toFixed(1) + '%', level: 'risk-low', badge: 'Low Risk',
+                interpretation: 'Shareholders are receiving healthy returns; capital is deployed efficiently.',
+                impacts: ['High investor confidence, favorable equity valuation, and access to new equity capital.'],
+                actions: ['Balance dividend payouts with strategic reserve retention.'],
+                taskTitle: 'Maintain Long-Term ROE Discipline', taskTreatment: 'Accept'
+            };
+            if (num >= 6.0) return {
+                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders' Equity) × 100',
+                valStr: num.toFixed(1) + '%', level: 'risk-moderate', badge: 'Moderate Risk',
+                interpretation: 'Returns to shareholders are moderate or declining.',
+                impacts: ['Potential investor dissatisfaction or difficulty attracting equity expansion funding.'],
+                actions: ['Improve asset utilization and focus on higher-margin revenue channels.'],
+                taskTitle: 'Formulate Capital Efficiency & Margin Expansion Strategy', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'profitability', name: 'Return on Equity (ROE)', formula: '(Net Profit ÷ Shareholders' Equity) × 100',
+                valStr: num.toFixed(1) + '%', level: 'risk-high', badge: 'High Risk',
+                interpretation: 'Very poor or negative returns to shareholders; net losses are eroding owner net worth.',
+                impacts: ['Severe investor flight risk and potential distress valuation.'],
+                actions: ['Halt non-core investments, preserve capital, and focus exclusively on core turnaround.'],
+                taskTitle: 'Preserve Equity Capital Base & Eliminate Drag Assets', taskTreatment: 'Reduce'
+            };
+
+        // ── 3. SOLVENCY PILLAR ───────────────────────────────────────────────
+        case 'debt_to_equity':
+            if (isNA) return {
+                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders' Equity',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Debt or equity figures unavailable.',
+                impacts: ['Long-term gearing and solvency unknown.'],
+                actions: ['Provide total borrowings and equity balances.'],
+                taskTitle: 'Reconcile Total Debt and Equity', taskTreatment: 'Mitigate'
+            };
+            if (num <= 0.8) return {
+                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders' Equity',
+                valStr: num.toFixed(2) + 'x', level: 'risk-low', badge: 'Low Risk',
+                interpretation: 'Lower dependence on borrowed funds; strong equity cushion protects against creditor pressure.',
+                impacts: ['Exceptional borrowing capacity and immunity to debt covenant crises.'],
+                actions: ['Maintain conservative capital structure.'],
+                taskTitle: 'Maintain Prudent Solvency Leverage Limit', taskTreatment: 'Accept'
+            };
+            if (num <= 1.8) return {
+                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders' Equity',
+                valStr: num.toFixed(2) + 'x', level: 'risk-moderate', badge: 'Moderate Risk',
+                interpretation: 'Considerable debt obligations compared with equity; leverage is increasing repayment burden.',
+                impacts: ['Higher interest expenses reduce free cash flow flexibility during economic slowdowns.'],
+                actions: ['Cap additional borrowing and prioritize retained earnings retention for debt amortisation.'],
+                taskTitle: 'Cap Long-Term Debt Drawdowns & Build Sinking Fund', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'solvency', name: 'Debt-to-Equity Ratio', formula: 'Total Debt ÷ Shareholders' Equity',
+                valStr: num.toFixed(2) + 'x', level: 'risk-high', badge: 'High Risk',
+                interpretation: 'Excessive debt compared with equity; financial gearing is dangerously elevated.',
+                impacts: ['High risk of debt default, potential ratings downgrade, and creditor asset foreclosure.'],
+                actions: ['Initiate urgent deleveraging plan, explore debt-to-equity restructuring, or raise fresh equity.'],
+                taskTitle: 'Formulate Balance Sheet Deleveraging & Debt Amortisation Plan', taskTreatment: 'Reduce'
+            };
+
+        case 'interest_coverage':
+            if (isNA) return {
+                pillar: 'solvency', name: 'Interest Coverage Ratio', formula: 'Operating Profit (EBIT) ÷ Interest Expense',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Interest expense is zero or not populated; debt servicing load cannot be determined.',
+                impacts: ['If company has loans, unrecorded interest obscures actual debt burden.'],
+                actions: ['Input actual finance costs from P&L.'],
+                taskTitle: 'Verify P&L Interest Charges', taskTreatment: 'Mitigate'
+            };
+            if (num >= 3.5) return {
+                pillar: 'solvency', name: 'Interest Coverage Ratio', formula: 'Operating Profit (EBIT) ÷ Interest Expense',
+                valStr: num.toFixed(1) + 'x', level: 'risk-low', badge: 'Low Risk',
+                interpretation: 'Operating profit comfortably covers interest expenses several times over.',
+                impacts: ['No stress servicing bank debts; banks maintain favorable lending interest spreads.'],
+                actions: ['Maintain current operating profit margin.'],
+                taskTitle: 'Maintain Healthy Interest Servicing Cushion', taskTreatment: 'Accept'
+            };
+            if (num >= 1.5) return {
+                pillar: 'solvency', name: 'Interest Coverage Ratio', formula: 'Operating Profit (EBIT) ÷ Interest Expense',
+                valStr: num.toFixed(1) + 'x', level: 'risk-moderate', badge: 'Moderate Risk',
+                interpretation: 'Limited cushion available to pay interest; a minor revenue drop could cause servicing strain.',
+                impacts: ['Interest payments consume a large share of operating profits.'],
+                actions: ['Refinance expensive debt into lower-interest facilities and hedge floating rates.'],
+                taskTitle: 'Refinance High-Interest Loans to Reduce Debt Servicing', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'solvency', name: 'Interest Coverage Ratio', formula: 'Operating Profit (EBIT) ÷ Interest Expense',
+                valStr: num.toFixed(1) + 'x', level: 'risk-high', badge: 'High Risk',
+                interpretation: 'Operating earnings are insufficient to cover interest expenses; company is failing to earn its finance costs.',
+                impacts: ['Immediate debt default risk, loan recall, and distress classification by banking lenders.'],
+                actions: ['Request lender debt restructuring, convert debt to equity, or liquidate non-core assets to pay principal.'],
+                taskTitle: 'Initiate Urgent Bank Debt Restructuring & Moratorium', taskTreatment: 'Reduce'
+            };
+
+        // ── 4. EFFICIENCY PILLAR ─────────────────────────────────────────────
+        case 'inventory_turnover':
+            if (isNA) return {
+                pillar: 'efficiency', name: 'Inventory Turnover', formula: 'COGS ÷ Average Inventory',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Inventory or COGS unavailable.',
+                impacts: ['Stock movement speed unmonitored.'],
+                actions: ['Input inventory and cost of sales figures.'],
+                taskTitle: 'Audit Inventory Valuation', taskTreatment: 'Mitigate'
+            };
+            if (num >= 4.0 && num <= 10.0) return {
+                pillar: 'efficiency', name: 'Inventory Turnover', formula: 'COGS ÷ Average Inventory',
+                valStr: num.toFixed(1) + 'x', level: 'risk-low', badge: 'Low Risk',
+                interpretation: 'Inventory moves efficiently through production and sales without remaining unsold or stagnant.',
+                impacts: ['Minimal inventory holding costs, low damage/obsolescence, and healthy working capital cycle.'],
+                actions: ['Maintain just-in-time replenishment schedules.'],
+                taskTitle: 'Maintain Just-In-Time Stock Replenishment', taskTreatment: 'Accept'
+            };
+            if ((num >= 2.0 && num < 4.0) || (num > 10.0 && num <= 14.0)) return {
+                pillar: 'efficiency', name: 'Inventory Turnover', formula: 'COGS ÷ Average Inventory',
+                valStr: num.toFixed(1) + 'x', level: 'risk-moderate', badge: 'Moderate Risk',
+                interpretation: num < 4.0 ? 'Inventory movement is slower than expected, locking working capital in warehouses.' : 'Very rapid turnover; watch for potential stockout risks.',
+                impacts: ['Higher storage costs or potential stockout risk during demand peaks.'],
+                actions: ['Conduct SKU rationalization and monitor safety stock thresholds.'],
+                taskTitle: 'Perform SKU Rationalization & Optimize Reorder Points', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'efficiency', name: 'Inventory Turnover', formula: 'COGS ÷ Average Inventory',
+                valStr: num.toFixed(1) + 'x', level: 'risk-high', badge: 'High Risk',
+                interpretation: num < 2.0 ? 'Severe inventory stagnation; heavy excess stock with high write-off risk.' : 'Excessively rapid turnover; severe stockout risk and lost sales.',
+                impacts: ['Capital frozen in obsolete stock, or missed customer delivery commitments.'],
+                actions: ['Liquidate dead stock via clearance, improve demand forecasting, and calibrate production batches.'],
+                taskTitle: 'Liquidate Dead Inventory & Calibrate Production Runs', taskTreatment: 'Reduce'
+            };
+
+        case 'receivable_days':
+            if (isNA) return {
+                pillar: 'efficiency', name: 'Debtor Collection Period (DSO)', formula: '(Average Receivables ÷ Credit Sales) × 365',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Debtor collection days unavailable.',
+                impacts: ['Cash collection cycle unknown.'],
+                actions: ['Provide credit sales and trade receivables.'],
+                taskTitle: 'Reconcile Trade Debtors Telemetry', taskTreatment: 'Mitigate'
+            };
+            if (num <= 45) return {
+                pillar: 'efficiency', name: 'Debtor Collection Period (DSO)', formula: '(Average Receivables ÷ Credit Sales) × 365',
+                valStr: Math.round(num) + ' days', level: 'risk-low', badge: 'Low Risk',
+                interpretation: 'Customers and channel distributors are paying their dues promptly within standard credit terms.',
+                impacts: ['Predictable cash inflows, minimal bad debt write-offs, and short cash conversion cycle.'],
+                actions: ['Maintain strict customer credit approval and prompt payment discount incentives.'],
+                taskTitle: 'Maintain Prompt Payment Discount Terms', taskTreatment: 'Accept'
+            };
+            if (num <= 75) return {
+                pillar: 'efficiency', name: 'Debtor Collection Period (DSO)', formula: '(Average Receivables ÷ Credit Sales) × 365',
+                valStr: Math.round(num) + ' days', level: 'risk-moderate', badge: 'Moderate Risk',
+                interpretation: 'Collection of customer payments is slowing down, extending the cash conversion cycle.',
+                impacts: ['Cash flow delays force reliance on short-term bank borrowings to fund daily expenses.'],
+                actions: ['Establish automated payment reminders and review credit limits for overdue accounts.'],
+                taskTitle: 'Enforce Automated Invoicing & Overdue Payment Penalties', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'efficiency', name: 'Debtor Collection Period (DSO)', formula: '(Average Receivables ÷ Credit Sales) × 365',
+                valStr: Math.round(num) + ' days', level: 'risk-high', badge: 'High Risk',
+                interpretation: 'Delayed customer payments are creating severe liquidity bottlenecks and high bad debt risk.',
+                impacts: ['Heavy cash freeze in uncollected bills; severe risk of distributor insolvency impact.'],
+                actions: ['Halt credit sales to chronically delinquent clients, enforce legal recovery, and deploy debt factoring.'],
+                taskTitle: 'Deploy Invoice Factoring & Freeze Delinquent Customer Accounts', taskTreatment: 'Reduce'
+            };
+
+        // ── 5. CASH FLOW & SOLVENCY HEALTH ───────────────────────────────────
+        case 'altman_z':
+            if (isNA) return {
+                pillar: 'cashflow', name: 'Altman Z-Score Solvency Index', formula: 'Composite 5-factor multivariate bankruptcy prediction model',
+                valStr: 'N/A', level: 'risk-na', badge: 'Insufficient Data',
+                interpretation: 'Missing required balance sheet and income inputs to compute Z-score.',
+                impacts: ['Overall structural solvency probability undetermined.'],
+                actions: ['Ensure total assets, liabilities, and retained earnings are recorded.'],
+                taskTitle: 'Complete Financial Inputs for Altman Z-Score', taskTreatment: 'Mitigate'
+            };
+            if (num >= 2.9) return {
+                pillar: 'cashflow', name: 'Altman Z-Score Solvency Index', formula: 'Composite 5-factor multivariate bankruptcy prediction model',
+                valStr: num.toFixed(2), level: 'risk-low', badge: 'Safe Zone (Low Risk)',
+                interpretation: 'Enterprise is structurally sound with minimal probability of financial failure over a 24-month horizon.',
+                impacts: ['High enterprise valuation, strong credit rating, and exceptional access to capital markets.'],
+                actions: ['Maintain current balance sheet discipline and capital allocation.'],
+                taskTitle: 'Preserve Strong Structural Solvency Standing', taskTreatment: 'Accept'
+            };
+            if (num >= 1.8) return {
+                pillar: 'cashflow', name: 'Altman Z-Score Solvency Index', formula: 'Composite 5-factor multivariate bankruptcy prediction model',
+                valStr: num.toFixed(2), level: 'risk-moderate', badge: 'Grey Zone (Moderate)',
+                interpretation: 'Moderate financial vulnerability; enterprise shows some balance sheet stress that warrants monitoring.',
+                impacts: ['Vulnerable if macroeconomic downturn occurs or revenue contracts.'],
+                actions: ['Reinforce working capital buffer, control debt expansion, and retain net earnings.'],
+                taskTitle: 'Implement Solvency Safeguards to Exit Grey Zone', taskTreatment: 'Reduce'
+            };
+            return {
+                pillar: 'cashflow', name: 'Altman Z-Score Solvency Index', formula: 'Composite 5-factor multivariate bankruptcy prediction model',
+                valStr: num.toFixed(2), level: 'risk-high', badge: 'Distress Zone (High Risk)',
+                interpretation: 'High quantitative probability of insolvency within 2 years under current operating parameters.',
+                impacts: ['Acute bankruptcy risk, potential bank credit freezes, and severe investor panic.'],
+                actions: ['Initiate emergency CRO committee review, debt restructuring, and non-core asset sales.'],
+                taskTitle: 'Execute Emergency Turnaround to Escape Distress Zone', taskTreatment: 'Reduce'
+            };
+
+        default:
+            return null;
+    }
+}
+
+function renderFinancialDiagnosticMatrix(ratios) {
+    if (!ratios) return;
+
+    const ratioKeys = [
+        // Liquidity
+        { id: 'current_ratio', val: ratios.cr },
+        { id: 'quick_ratio', val: ratios.qr },
+        { id: 'cash_ratio', val: ratios.cashRatio },
+        // Profitability
+        { id: 'net_profit_margin', val: ratios.npm },
+        { id: 'operating_margin', val: ratios.opm },
+        { id: 'return_on_equity', val: ratios.roe },
+        // Solvency
+        { id: 'debt_to_equity', val: ratios.de },
+        { id: 'interest_coverage', val: ratios.icr },
+        // Efficiency
+        { id: 'inventory_turnover', val: ratios.it },
+        { id: 'receivable_days', val: ratios.dso },
+        // Cash Flow / Solvency
+        { id: 'altman_z', val: ratios.altmanZ || (ratios.cr > 1.5 && ratios.de < 1.0 ? 3.15 : 2.10) }
+    ];
+
+    const cardsHtml = ratioKeys.map(item => {
+        const diag = evaluateRatioDiagnostic(item.id, item.val, ratios);
+        if (!diag) return '';
+
+        const impactItems = diag.impacts.map(imp => `<li>${imp}</li>`).join('');
+        const actionItems = diag.actions.map(act => `<li>${act}</li>`).join('');
+
+        return `
+            <div class="diag-card ${diag.level}" data-pillar="${diag.pillar}">
+                <div class="diag-card-top">
+                    <div>
+                        <h5 class="diag-card-title">${diag.name}</h5>
+                        <span class="diag-card-sub">${diag.formula}</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="diag-card-val">${diag.valStr}</span><br>
+                        <span class="diag-badge ${diag.level}">${diag.badge}</span>
+                    </div>
+                </div>
+
+                <div class="diag-section-label">📌 What This Indicates:</div>
+                <div class="diag-interpret-text">${diag.interpretation}</div>
+
+                <div class="diag-section-label">⚠️ Possible Business Impact:</div>
+                <ul class="diag-bullet-list">${impactItems}</ul>
+
+                <div class="diag-section-label">💡 Suggested Actionable Plan:</div>
+                <ul class="diag-bullet-list">${actionItems}</ul>
+
+                <div class="diag-card-footer">
+                    <span style="font-size:0.68rem; color:#64748B;">Pillar: <strong style="color:#94A3B8; text-transform:capitalize;">${diag.pillar}</strong></span>
+                    <button type="button" class="btn-convert-task" onclick="openNewTaskModalWithPrefill('${diag.taskTitle}', 'Financial', '${diag.taskTreatment}', 'Risk Committee')">
+                        <span>+ Convert to Action Task</span>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Inject into Step 3 grid if present
+    const wizGrid = document.getElementById('wiz-diagnostic-cards-grid');
+    if (wizGrid) wizGrid.innerHTML = cardsHtml;
+
+    // Inject into Tab Financial grid if present
+    const tabGrid = document.getElementById('tab-diagnostic-cards-grid');
+    if (tabGrid) tabGrid.innerHTML = cardsHtml;
+}
+window.renderFinancialDiagnosticMatrix = renderFinancialDiagnosticMatrix;

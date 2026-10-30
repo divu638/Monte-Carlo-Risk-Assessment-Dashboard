@@ -6454,3 +6454,193 @@ body.sidebar-collapsed .btn-profile-logout span {
 
 
 
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   FINANCIAL RISK DIAGNOSTIC & ADVISORY MATRIX (5 PILLARS)
+   ══════════════════════════════════════════════════════════════════════════════ */
+.fin-diagnostic-section {
+    margin-top: 20px;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(52, 211, 153, 0.22);
+    border-radius: 14px;
+    padding: 18px 22px;
+}
+.diag-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.diag-filter-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.diag-filter-btn {
+    background: rgba(148, 163, 184, 0.08);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    color: #94A3B8;
+    padding: 5px 13px;
+    border-radius: 20px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.diag-filter-btn:hover {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34D399;
+    border-color: rgba(52, 211, 153, 0.4);
+}
+.diag-filter-btn.active {
+    background: rgba(52, 211, 153, 0.22);
+    color: #34D399;
+    border-color: #34D399;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.25);
+}
+.diagnostic-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+}
+.diag-card {
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.diag-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(52, 211, 153, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.diag-card.risk-low {
+    border-left: 4px solid #10B981;
+}
+.diag-card.risk-moderate {
+    border-left: 4px solid #F59E0B;
+}
+.diag-card.risk-high {
+    border-left: 4px solid #EF4444;
+}
+.diag-card.risk-na {
+    border-left: 4px solid #64748B;
+}
+.diag-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+.diag-card-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 2px 0;
+}
+.diag-card-sub {
+    font-size: 0.68rem;
+    color: #94A3B8;
+}
+.diag-card-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #34D399;
+}
+.diag-badge {
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    display: inline-block;
+}
+.diag-badge.risk-low {
+    background: rgba(16, 185, 129, 0.18);
+    color: #34D399;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+}
+.diag-badge.risk-moderate {
+    background: rgba(245, 158, 11, 0.18);
+    color: #FBBF24;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+.diag-badge.risk-high {
+    background: rgba(239, 68, 68, 0.18);
+    color: #F87171;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+.diag-badge.risk-na {
+    background: rgba(100, 116, 139, 0.18);
+    color: #94A3B8;
+    border: 1px solid rgba(100, 116, 139, 0.4);
+}
+.diag-section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    color: #E2E8F0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.diag-interpret-text {
+    font-size: 0.78rem;
+    color: #CBD5E1;
+    line-height: 1.45;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+.diag-bullet-list {
+    margin: 4px 0 10px;
+    padding-left: 18px;
+    font-size: 0.74rem;
+    color: #94A3B8;
+}
+.diag-bullet-list li {
+    margin-bottom: 3px;
+    line-height: 1.35;
+}
+.diag-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.btn-convert-task {
+    background: rgba(52, 211, 153, 0.12);
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    color: #34D399;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-convert-task:hover {
+    background: rgba(52, 211, 153, 0.25);
+    color: #fff;
+    border-color: #34D399;
+}
